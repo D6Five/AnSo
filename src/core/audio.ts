@@ -8,7 +8,9 @@
 
 let ctx: AudioContext | null = null;
 let master: GainNode | null = null;
+let musicBus: GainNode | null = null;
 let volume = 0.7;
+let musicVolume = 0.35;
 
 /** Browsers block audio until a user gesture; call this from a click handler. */
 export function unlockAudio(): void {
@@ -19,9 +21,34 @@ export function unlockAudio(): void {
   const Ctor = window.AudioContext ?? (window as any).webkitAudioContext;
   if (!Ctor) return;
   ctx = new Ctor();
+
   master = ctx.createGain();
   master.gain.value = volume;
   master.connect(ctx.destination);
+
+  // Music runs on its own bus so it can be ducked under AnSo's voice without
+  // touching the effect volumes, and so the two are independently adjustable.
+  musicBus = ctx.createGain();
+  musicBus.gain.value = musicVolume;
+  musicBus.connect(ctx.destination);
+}
+
+/** The shared context, so the music engine schedules on the same clock. */
+export function getContext(): AudioContext | null {
+  return ctx;
+}
+
+export function getMusicBus(): GainNode | null {
+  return musicBus;
+}
+
+export function setMusicVolume(v: number): void {
+  musicVolume = Math.max(0, Math.min(1, v));
+  if (musicBus && ctx) musicBus.gain.setTargetAtTime(musicVolume, ctx.currentTime, 0.1);
+}
+
+export function getMusicVolume(): number {
+  return musicVolume;
 }
 
 export function setVolume(v: number): void {

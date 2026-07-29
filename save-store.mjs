@@ -88,6 +88,14 @@ function mergeProfile(a, b) {
     name: fresher.name ?? staler.name,
     grade: fresher.grade ?? staler.grade,
     avatar: fresher.avatar ?? staler.avatar ?? 0,
+    // Whether this child may answer out loud is a decision about her, not about
+    // the laptop, so it travels with her rather than staying on one device.
+    //
+    // Left undefined when neither side has an opinion, rather than defaulted to
+    // true here: profiles predating this setting fall back to the old
+    // device-level toggle on the client, and forcing a default would silently
+    // switch the microphone back on for a parent who had turned it off.
+    micEnabled: fresher.micEnabled ?? staler.micEnabled,
     stardust: Math.max(Number(a.stardust) || 0, Number(b.stardust) || 0),
     createdAt: Math.min(
       Number(a.createdAt) || Date.now(),

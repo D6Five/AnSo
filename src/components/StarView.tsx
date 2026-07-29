@@ -4,6 +4,7 @@ import { challengesFor } from '../content';
 import { completeStar } from '../core/store';
 import { sfxStarComplete, sfxStardust, sfxWhoosh } from '../core/audio';
 import { speak, stopSpeaking } from '../core/voice';
+import { setScene } from '../core/music';
 import { AnSoGuide, type AnSoMood } from './AnSoGuide';
 import { ChallengeView, type ChallengeResult } from '../activities/ChallengeView';
 
@@ -38,6 +39,14 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
   const [awarded, setAwarded] = useState(0);
 
   useEffect(() => () => stopSpeaking(), []);
+
+  // Music steps back inside an activity and stops altogether while a passage is
+  // on screen, then hands the map its full level back on the way out.
+  useEffect(() => {
+    setScene(phase === 'passage' ? 'reading' : 'activity');
+  }, [phase]);
+
+  useEffect(() => () => setScene('map'), []);
 
   const say = useCallback((line: string, mood: 'happy' | 'encouraging' | 'thinking') => {
     setAnsoLine(line);

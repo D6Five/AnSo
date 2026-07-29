@@ -5,7 +5,14 @@
  * the machine for synthesis, and it works on a plain laptop. Recognition
  * accuracy on young children's speech is genuinely poor, so every caller is
  * expected to offer a typed or tap fallback — see `isRecognitionSupported`.
+ *
+ * Note on privacy: synthesis of a local voice happens on the device, but
+ * recognition does not. Chrome and Edge implement `SpeechRecognition` by
+ * streaming the captured audio to their own speech service. That is why the
+ * microphone is opt-out per child and every prompt works without it.
  */
+
+import { duckForSpeech } from './music';
 
 /* ------------------------------------------------------------------ */
 /* Speech synthesis — AnSo talking                                     */
@@ -91,6 +98,9 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
 
   return new Promise((resolve) => {
     const utter = new SpeechSynthesisUtterance(text);
+    // Pull the music down for the length of the line, so AnSo is never
+    // competing with her own soundtrack.
+    duckForSpeech(true);
     if (!voicesReady) cachedVoice = pickVoice();
     if (cachedVoice) utter.voice = cachedVoice;
     utter.rate = rate;
@@ -101,6 +111,7 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
     const finish = () => {
       if (settled) return;
       settled = true;
+      duckForSpeech(false);
       onEnd?.();
       resolve();
     };
@@ -122,6 +133,9 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
 
 export function stopSpeaking(): void {
   if (isSynthesisSupported()) window.speechSynthesis.cancel();
+  // Cancelling skips the utterance's end handler, so lift the duck by hand or
+  // the music stays quiet for the rest of the session.
+  duckForSpeech(false);
 }
 
 /* ------------------------------------------------------------------ */

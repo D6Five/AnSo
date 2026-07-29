@@ -17,7 +17,13 @@ const DEFAULT_SAVE: SaveData = {
   version: 1,
   profiles: [],
   activeProfileId: null,
-  settings: { volume: 0.7, voiceEnabled: true, micEnabled: true },
+  settings: {
+    volume: 0.7,
+    voiceEnabled: true,
+    micEnabled: true,
+    musicEnabled: true,
+    musicVolume: 0.35,
+  },
   deletedProfileIds: [],
 };
 
@@ -132,6 +138,7 @@ export function createProfile(name: string, grade: Grade, avatar: number): Profi
     progress: {},
     reviewQueue: [],
     createdAt: Date.now(),
+    micEnabled: true,
   };
   commit({
     ...state,
@@ -217,6 +224,24 @@ export function clearReviewWord(word: string): void {
 
 export function updateSettings(patch: Partial<SaveData['settings']>): void {
   commit({ ...state, settings: { ...state.settings, ...patch } });
+}
+
+/** Turn spoken answers on or off for one child. */
+export function setProfileMic(profileId: string, enabled: boolean): void {
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) => (p.id === profileId ? { ...p, micEnabled: enabled } : p)),
+  });
+}
+
+/**
+ * Whether this child may answer out loud. Profiles created before the setting
+ * moved onto the profile have no value, so they inherit the old device-level
+ * one rather than silently changing behaviour.
+ */
+export function micEnabledFor(profile: Profile | null): boolean {
+  if (!profile) return false;
+  return profile.micEnabled ?? state.settings.micEnabled;
 }
 
 /**

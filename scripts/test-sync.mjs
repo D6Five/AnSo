@@ -175,6 +175,24 @@ console.log('\n  Empty and malformed input is survivable');
 }
 
 /* ------------------------------------------------------------------ */
+console.log('\n  Microphone preference follows the child');
+{
+  const older = { profiles: [profile({ micEnabled: true, progress: { s: star(1, 1, 1000) } })] };
+  const newer = { profiles: [profile({ micEnabled: false, progress: { s: star(1, 1, 9000) } })] };
+
+  check('turning it off on one device wins', mergeSaves(older, newer).profiles[0].micEnabled === false);
+  check('order does not matter', mergeSaves(newer, older).profiles[0].micEnabled === false);
+  // Deliberately left unset rather than defaulted, so a profile predating this
+  // setting still honours the old device-level toggle on the client instead of
+  // having the microphone switched back on for it.
+  check('profiles predating the setting keep no opinion',
+    mergeSaves({ profiles: [profile()] }, { profiles: [] }).profiles[0].micEnabled === undefined);
+  check('an explicit off is never lost to a profile with no opinion',
+    mergeSaves({ profiles: [profile({ micEnabled: false })] }, { profiles: [profile()] })
+      .profiles[0].micEnabled === false);
+}
+
+/* ------------------------------------------------------------------ */
 console.log('\n  Review queue');
 {
   const a = { profiles: [profile({ reviewQueue: ['orbit', 'vast'] })] };

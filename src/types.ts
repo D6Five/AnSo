@@ -202,17 +202,31 @@ export interface Profile {
   /** Words the child has struggled with, surfaced again later. */
   reviewQueue: string[];
   createdAt: number;
+  /**
+   * Whether this child may answer out loud. Per-child rather than per-device:
+   * recognition works well for an older reader and poorly for a younger one, so
+   * the right answer genuinely differs between two sisters on the same laptop.
+   * Undefined means enabled.
+   */
+  micEnabled?: boolean;
 }
 
 export interface SaveData {
   version: 1;
   profiles: Profile[];
   activeProfileId: string | null;
-  /** Master volume 0..1 and voice toggles, shared across profiles. */
+  /**
+   * Device-level settings, shared across profiles. Volume and music describe
+   * the room the app is being used in, not the child using it — unlike the
+   * microphone, which now lives on the profile.
+   */
   settings: {
     volume: number;
     voiceEnabled: boolean;
+    /** Retained as the default for profiles created before mic went per-child. */
     micEnabled: boolean;
+    musicEnabled: boolean;
+    musicVolume: number;
   };
   /**
    * Ids of profiles deleted on this device. Without these, sync would merge a

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import type { Star } from './types';
-import { selectProfile, useActiveProfile, useSave } from './core/store';
+import { micEnabledFor, selectProfile, useActiveProfile, useSave } from './core/store';
+import { startMusic, stopMusic } from './core/music';
 import { initVoices, setVoiceEnabled, stopSpeaking } from './core/voice';
 import { initSync } from './core/sync';
-import { setVolume, unlockAudio } from './core/audio';
+import { setMusicVolume, setVolume, unlockAudio } from './core/audio';
 import { ProfilePicker } from './components/ProfilePicker';
 import { GalaxyMap } from './components/GalaxyMap';
 import { StarView } from './components/StarView';
@@ -18,6 +19,7 @@ export function App() {
   const [screen, setScreen] = useState<Screen>(profile ? 'map' : 'picker');
   const [activeStar, setActiveStar] = useState<Star | null>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [audioReady, setAudioReady] = useState(false);
 
   useEffect(() => {
     initVoices();
@@ -30,11 +32,23 @@ export function App() {
   useEffect(() => {
     setVolume(save.settings.volume);
     setVoiceEnabled(save.settings.voiceEnabled);
-  }, [save.settings.volume, save.settings.voiceEnabled]);
+    setMusicVolume(save.settings.musicVolume);
+  }, [save.settings.volume, save.settings.voiceEnabled, save.settings.musicVolume]);
 
-  // Any first gesture is enough to unlock the audio context.
   useEffect(() => {
-    const unlock = () => unlockAudio();
+    if (audioReady && profile && save.settings.musicEnabled) startMusic();
+    else stopMusic();
+  }, [audioReady, profile, save.settings.musicEnabled]);
+
+  // Any first gesture is enough to unlock the audio context. This is tracked in
+  // state rather than fired and forgotten, because a returning visitor already
+  // has a profile selected — so the music effect below would otherwise run
+  // before any click had unlocked audio, fail silently, and never retry.
+  useEffect(() => {
+    const unlock = () => {
+      unlockAudio();
+      setAudioReady(true);
+    };
     window.addEventListener('pointerdown', unlock, { once: true });
     window.addEventListener('keydown', unlock, { once: true });
     return () => {
@@ -74,7 +88,7 @@ export function App() {
             star={activeStar}
             profile={profile}
             voiceEnabled={save.settings.voiceEnabled}
-            micEnabled={save.settings.micEnabled}
+            micEnabled={micEnabledFor(profile)}
             onExit={leaveStar}
           />
         ) : (
