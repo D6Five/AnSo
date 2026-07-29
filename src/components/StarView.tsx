@@ -41,8 +41,10 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
   const [awarded, setAwarded] = useState(0);
   const [newReward, setNewReward] = useState<string | null>(null);
   const [rewardSeen, setRewardSeen] = useState(false);
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
 
   useEffect(() => () => stopSpeaking(), []);
+
 
   // Music steps back inside an activity and stops altogether while a passage is
   // on screen, then hands the map its full level back on the way out.
@@ -77,6 +79,57 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
     setAnsoMood('idle');
   };
 
+  const finishStar = useCallback(
+    (finalScore: number, ranOutOfTime = false) => {
+      // A treasure is granted only for a star finished for the first time, so
+      // replaying a favourite cannot farm the whole wardrobe in an afternoon.
+      const firstTime = (profile.progress[star.id]?.completions ?? 0) === 0;
+      const collectedBefore = starsCompleted(profile);
+
+      const stardust = completeStar(star.id, finalScore, challenges.length);
+      setAwarded(stardust);
+      if (firstTime) {
+        const treasure = rewardForMilestone(collectedBefore + 1);
+        setNewReward(treasure ? treasure.id : null);
+      }
+      setPhase('done');
+      setSecondsLeft(null);
+      sfxStarComplete();
+      window.setTimeout(sfxStardust, 700);
+
+      const perfect = finalScore === challenges.length;
+      const line = ranOutOfTime
+        ? `Time is up. You got ${finalScore} of them, and they all still count. ${stardust} stardust.`
+        : perfect
+          ? `Every single one. You earned ${stardust} stardust.`
+          : finalScore >= challenges.length * 0.7
+            ? `${finalScore} out of ${challenges.length}. Strong work. ${stardust} stardust.`
+            : `${finalScore} out of ${challenges.length}. This star will be here whenever you want another go. ${stardust} stardust.`;
+      setAnsoLine(line);
+      setAnsoMood(perfect && !ranOutOfTime ? 'happy' : 'encouraging');
+    },
+    [profile, star.id, challenges.length],
+  );
+
+  /**
+   * Countdown for timed stars. Running out finishes the star with whatever has
+   * been answered — it never throws the work away, which would be a miserable
+   * thing to do to a child thirty questions in.
+   */
+  useEffect(() => {
+    if (phase !== 'playing' || !star.timeLimitSeconds) return;
+    if (secondsLeft === null) {
+      setSecondsLeft(star.timeLimitSeconds);
+      return;
+    }
+    if (secondsLeft <= 0) {
+      finishStar(score, true);
+      return;
+    }
+    const tick = window.setTimeout(() => setSecondsLeft((s) => (s === null ? null : s - 1)), 1000);
+    return () => window.clearTimeout(tick);
+  }, [phase, secondsLeft, star.timeLimitSeconds, score, finishStar]);
+
   const handleResult = (result: ChallengeResult) => {
     const nextScore = score + (result.correct ? 1 : 0);
     setScore(nextScore);
@@ -87,30 +140,7 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
       setAnsoMood('idle');
       return;
     }
-
-    // A treasure is granted only for a star finished for the first time, so
-    // replaying a favourite cannot farm the whole wardrobe in an afternoon.
-    const firstTime = (profile.progress[star.id]?.completions ?? 0) === 0;
-    const collectedBefore = starsCompleted(profile);
-
-    const stardust = completeStar(star.id, nextScore, challenges.length);
-    setAwarded(stardust);
-    if (firstTime) {
-      const treasure = rewardForMilestone(collectedBefore + 1);
-      setNewReward(treasure ? treasure.id : null);
-    }
-    setPhase('done');
-    sfxStarComplete();
-    window.setTimeout(sfxStardust, 700);
-
-    const perfect = nextScore === challenges.length;
-    const line = perfect
-      ? `Every single one. You earned ${stardust} stardust.`
-      : nextScore >= challenges.length * 0.7
-        ? `${nextScore} out of ${challenges.length}. Strong work. ${stardust} stardust.`
-        : `${nextScore} out of ${challenges.length}. This star will be here whenever you want another go. ${stardust} stardust.`;
-    setAnsoLine(line);
-    setAnsoMood(perfect ? 'happy' : 'encouraging');
+    finishStar(nextScore);
   };
 
   const passage = star.content.kind === 'passage' ? star.content.passage : null;
@@ -138,6 +168,11 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
                 {index + 1} / {challenges.length}
               </span>
             </div>
+          ) : null}
+          {phase === 'playing' && secondsLeft !== null ? (
+            <p className={`star-timer ${secondsLeft <= 60 ? 'low' : ''}`}>
+              ⏱ {Math.floor(secondsLeft / 60)}:{String(secondsLeft % 60).padStart(2, '0')}
+            </p>
           ) : null}
         </div>
       </header>

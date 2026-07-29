@@ -29,7 +29,10 @@ export type AccessoryType =
   | 'flower'
   | 'earrings'
   | 'cape'
-  | 'wings';
+  | 'wings'
+  | 'shoes'
+  | 'bag'
+  | 'makeup';
 
 export type RoomSlot =
   | 'rug'
@@ -221,9 +224,8 @@ export const REWARDS: Reward[] = [
     'The whole ceiling, full of stars. Your own sky indoors.'),
 ];
 
-export const REWARD_BY_ID: Record<string, Reward> = Object.fromEntries(
-  REWARDS.map((r) => [r.id, r]),
-);
+/** Lookup covers shop items too, so equipping does not care where it came from. */
+export const REWARD_BY_ID: Record<string, Reward> = {};
 
 /**
  * Which part of the princess an accessory occupies. Two things cannot share a
@@ -247,8 +249,53 @@ export function accessorySlot(type: AccessoryType): string {
     case 'cape':
     case 'wings':
       return 'back';
+    case 'shoes':
+      return 'feet';
+    case 'bag':
+      return 'carry';
+    case 'makeup':
+      return 'face';
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* The stardust shop                                                   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Items bought with stardust rather than unlocked by progress.
+ *
+ * Stardust accumulates from every star, including replays, and previously it
+ * bought nothing — a counter that only went up, which is not a reward. These
+ * are the extras: the things a princess picks out for herself.
+ */
+export const SHOP: (Reward & { price: number })[] = [
+  { ...acc('s_heels', 'Glass Slippers', 'shoes', ['#e8f8fd', '#a8d8ea'], 'They actually do fit.'), price: 400 },
+  { ...acc('s_boots', 'Star Boots', 'shoes', ['#c7b4f6', '#8f74d8'], 'For walking somewhere far.'), price: 450 },
+  { ...acc('s_flats', 'Silk Flats', 'shoes', ['#f9b6ce', '#e07fa8'], 'Comfortable, and still lovely.'), price: 350 },
+  { ...acc('s_gold_heels', 'Golden Heels', 'shoes', ['#fbd98f', '#e0a83c'], 'Heard before they are seen.'), price: 700 },
+  { ...acc('s_clutch', 'Pearl Clutch', 'bag', ['#fdfbf7', '#e0d4c0'], 'Just big enough for the important things.'), price: 400 },
+  { ...acc('s_satchel', 'Book Satchel', 'bag', ['#f9c4a1', '#c98553'], 'Carries four books and a snack.'), price: 500 },
+  { ...acc('s_star_purse', 'Star Purse', 'bag', ['#a68deb', '#6f52c9'], 'It has a small sky inside.'), price: 650 },
+  { ...acc('s_lipgloss', 'Rose Lip Gloss', 'makeup', ['#f4a0bd', '#d96f97'], 'A little shine, nothing more.'), price: 300 },
+  { ...acc('s_blush', 'Peach Blush', 'makeup', ['#f9c4a1', '#f09a70'], 'For cheeks that have been outside.'), price: 300 },
+  { ...acc('s_shimmer', 'Starlight Shimmer', 'makeup', ['#e8f8fd', '#c7b4f6'], 'Catches the light when you turn.'), price: 600 },
+  { ...dress('s_gown_scarlet', 'Scarlet Gown', 'ballgown', ['#fff0f0', '#f07b7b', '#c93f3f'], 'sparkle', 'The one you wear when you mean it.'), price: 900 },
+  { ...dress('s_gown_midnight', 'Midnight Gown', 'aline', ['#e9e6ff', '#8f7ddb', '#4c3a9e'], 'sparkle', 'Deep blue, with the stars still in it.'), price: 900 },
+  { ...dress('s_sundress', 'Summer Sundress', 'aline', ['#fffdf0', '#ffe08a', '#f0b93c'], 'ribbon', 'For a hot day with nothing to do.'), price: 550 },
+  { ...dress('s_party', 'Party Dress', 'tiered', ['#fff2fa', '#ffa8d8', '#e8609f'], 'lace', 'Somebody is having a birthday.'), price: 550 },
+  { ...room('s_piano', 'Little Piano', 'desk', ['#fdfbf7', '#3a3050'], 'It is in tune, mostly.'), price: 800 },
+  { ...room('s_telescope', 'Telescope', 'plant', ['#c7b4f6', '#6f52c9'], 'For looking at the real stars.'), price: 750 },
+];
+
+export const SHOP_BY_ID: Record<string, (typeof SHOP)[number]> = Object.fromEntries(
+  SHOP.map((s) => [s.id, s]),
+);
+
+// Populated after both lists exist so a shop item can be equipped exactly like
+// an earned one.
+for (const r of REWARDS) REWARD_BY_ID[r.id] = r;
+for (const s of SHOP) REWARD_BY_ID[s.id] = s;
 
 /**
  * Which items a princess has earned, given how many distinct stars she has

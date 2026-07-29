@@ -3,13 +3,14 @@ import type { Profile } from '../types';
 import { princessOrDefault } from '../content/princesses';
 import {
   REWARD_BY_ID,
+  SHOP,
   TOTAL_REWARDS,
   accessorySlot,
   type AccessoryReward,
   type DressReward,
   type RoomReward,
 } from '../content/rewards';
-import { earnedRewards, equipDress, starsCompleted, toggleAccessory } from '../core/store';
+import { buyItem, earnedRewards, equipDress, starsCompleted, toggleAccessory } from '../core/store';
 import { sfxTap, sfxStardust } from '../core/audio';
 import { PrincessArt } from './PrincessArt';
 import { RoomArt } from './RoomArt';
@@ -28,7 +29,13 @@ interface PrincessScreenProps {
   onBack: () => void;
 }
 
-type Tab = 'wardrobe' | 'room';
+type Tab = 'wardrobe' | 'room' | 'shop';
+
+const TAB_LABEL: Record<Tab, string> = {
+  wardrobe: '👗 Wardrobe',
+  room: '🛏️ Her Royal Chamber',
+  shop: '✨ Stardust Shop',
+};
 
 export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
   const [tab, setTab] = useState<Tab>('wardrobe');
@@ -64,13 +71,18 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
             {princess.englishName} · {princess.meaning}
           </p>
         </div>
-        <div className="treasure-count" title="Treasures earned">
-          👑 {earned.length} / {TOTAL_REWARDS}
+        <div className="header-counts">
+          <span className="treasure-count" title="Treasures earned">
+            👑 {earned.length} / {TOTAL_REWARDS}
+          </span>
+          <span className="stardust-count" title="Stardust to spend in the shop">
+            ✨ {profile.stardust.toLocaleString()}
+          </span>
         </div>
       </header>
 
       <div className="tab-row">
-        {(['wardrobe', 'room'] as Tab[]).map((t) => (
+        {(['wardrobe', 'room', 'shop'] as Tab[]).map((t) => (
           <button
             key={t}
             type="button"
@@ -80,7 +92,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
               setTab(t);
             }}
           >
-            {t === 'wardrobe' ? '👗 Wardrobe' : '🛏️ Her Room'}
+            {TAB_LABEL[t]}
           </button>
         ))}
       </div>
@@ -156,9 +168,62 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
             )}
           </div>
         </div>
+      ) : tab === 'shop' ? (
+        <div className="shop">
+          <p className="shop-intro">
+            Stardust is earned from every star, including ones you play again. Spend
+            it on whatever you like — these never appear as rewards.
+          </p>
+          <div className="shop-grid">
+            {SHOP.map((item) => {
+              const owned = (profile.purchased ?? []).includes(item.id);
+              const affordable = profile.stardust >= item.price;
+              const swatch =
+                item.kind === 'dress'
+                  ? [item.palette[1], item.palette[2]]
+                  : [item.palette[0], item.palette[1]];
+              return (
+                <div
+                  key={item.id}
+                  className={`shop-card ${owned ? 'owned' : ''}`}
+                  style={{ ['--sw-a' as string]: swatch[0], ['--sw-b' as string]: swatch[1] }}
+                >
+                  <span className="shop-icon" aria-hidden="true">
+                    {item.kind === 'dress' ? '👗' : item.kind === 'room' ? '🪑' : '💎'}
+                  </span>
+                  <span className="shop-name">{item.name}</span>
+                  <span className="shop-blurb">{item.blurb}</span>
+                  <button
+                    type="button"
+                    className="btn shop-buy"
+                    disabled={owned || !affordable}
+                    onClick={() => {
+                      if (buyItem(profile.id, item.id)) sfxStardust();
+                      else sfxTap();
+                    }}
+                  >
+                    {owned ? 'Owned' : `✨ ${item.price}`}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       ) : (
         <div className="room-view">
-          <RoomArt princess={princess} items={roomItems} width={620} />
+          {/* The princess stands in her own chamber — a room she has filled but
+              never occupies is a showroom, not a bedroom. */}
+          <div className="chamber">
+            <RoomArt princess={princess} items={roomItems} width={620} />
+            <div className="chamber-figure">
+              <PrincessArt
+                princess={princess}
+                dress={wornDress && wornDress.kind === 'dress' ? wornDress : null}
+                accessories={wornAccessories}
+                size={132}
+              />
+            </div>
+          </div>
           <p className="room-caption">
             {roomItems.length === 0
               ? 'Nothing in here yet. Every few stars adds something.'

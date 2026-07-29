@@ -103,6 +103,9 @@ function mergeProfile(a, b) {
     princess: fresher.princess ?? staler.princess,
     equippedDress: fresher.equippedDress ?? staler.equippedDress,
     equippedAccessories: fresher.equippedAccessories ?? staler.equippedAccessories ?? [],
+    // Shop purchases are a union: something bought on the tablet must not be
+    // lost because the laptop synced afterwards without knowing about it.
+    purchased: [...new Set([...(a.purchased ?? []), ...(b.purchased ?? [])])].sort(),
     stardust: Math.max(Number(a.stardust) || 0, Number(b.stardust) || 0),
     createdAt: Math.min(
       Number(a.createdAt) || Date.now(),

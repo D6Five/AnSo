@@ -624,6 +624,64 @@ body {
 .swatch.worn { border-color: #16123a; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7); }
 .swatch-name { line-height: 1.25; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55); }
 
+.header-counts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.stardust-count {
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(139, 233, 253, 0.12);
+  border: 1px solid rgba(139, 233, 253, 0.3);
+  border-radius: 999px;
+  padding: 8px 18px;
+}
+
+/* Shop */
+
+.shop { display: flex; flex-direction: column; gap: 16px; }
+.shop-intro { margin: 0; color: var(--ink-dim); max-width: 640px; }
+.shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+
+.shop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  color: var(--card-ink);
+  background: linear-gradient(155deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 46%),
+    linear-gradient(155deg, var(--sw-a) 0%, var(--sw-b) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.36);
+}
+
+.shop-card.owned { opacity: 0.62; }
+.shop-icon { font-size: 1.7rem; }
+.shop-name { font-weight: 800; }
+.shop-blurb { font-size: 0.82rem; color: rgba(22, 18, 58, 0.72); line-height: 1.4; flex: 1; }
+
+.shop-buy {
+  margin-top: 6px;
+  min-height: 42px;
+  background: rgba(22, 18, 58, 0.85);
+  color: #fff;
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.shop-buy:disabled { background: rgba(22, 18, 58, 0.3); }
+
+/* Chamber */
+
+.chamber { position: relative; display: inline-block; }
+
+.chamber-figure {
+  position: absolute;
+  right: 7%;
+  bottom: 4%;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+  pointer-events: none;
+}
+
 .room-view { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .room-view svg { max-width: 100%; height: auto; border-radius: 18px; box-shadow: var(--shadow); }
 .room-caption { margin: 0; color: var(--ink-dim); }
@@ -741,6 +799,20 @@ body {
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--ink);
+}
+
+.star-timer {
+  margin: 8px 0 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.star-timer.low { color: var(--bad); animation: pulse-timer 1s ease-in-out infinite; }
+
+@keyframes pulse-timer {
+  50% { opacity: 0.55; }
 }
 
 .intro-panel, .done-panel {
@@ -862,6 +934,22 @@ body {
 }
 
 .hint-line { margin: 0; color: #b45309; font-size: 1rem; font-weight: 600; }
+
+.pronounce-btn {
+  align-self: center;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--card-ink);
+  background: var(--card-surface-alt);
+  border: 2px solid var(--card-border);
+  border-radius: 999px;
+  padding: 8px 20px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.pronounce-btn:hover { background: #e4dffb; border-color: #7c3aed; }
 
 .continue-btn { align-self: flex-end; }
 

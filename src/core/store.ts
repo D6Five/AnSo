@@ -12,6 +12,7 @@ import { useSyncExternalStore } from 'react';
 import type { Grade, Profile, SaveData, StarProgress } from '../types';
 import {
   REWARD_BY_ID,
+  SHOP_BY_ID,
   accessorySlot,
   rewardsEarned,
   type Reward,
@@ -245,9 +246,39 @@ export function starsCompleted(profile: Profile | null): number {
   return Object.values(profile.progress).filter((p) => p.completions > 0).length;
 }
 
-/** Everything this princess has earned so far. */
+/** Everything this princess owns: earned through stars, plus anything bought. */
 export function earnedRewards(profile: Profile | null): Reward[] {
-  return rewardsEarned(starsCompleted(profile));
+  const earned = rewardsEarned(starsCompleted(profile));
+  const bought = (profile?.purchased ?? [])
+    .map((id) => REWARD_BY_ID[id])
+    .filter((r): r is Reward => !!r);
+  return [...earned, ...bought];
+}
+
+/**
+ * Spend stardust on a shop item. Returns false when it is already owned or
+ * unaffordable, so the caller never has to re-check the balance itself.
+ */
+export function buyItem(profileId: string, itemId: string): boolean {
+  const item = SHOP_BY_ID[itemId];
+  const profile = state.profiles.find((p) => p.id === profileId);
+  if (!item || !profile) return false;
+  if ((profile.purchased ?? []).includes(itemId)) return false;
+  if (profile.stardust < item.price) return false;
+
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) =>
+      p.id === profileId
+        ? {
+            ...p,
+            stardust: p.stardust - item.price,
+            purchased: [...(p.purchased ?? []), itemId],
+          }
+        : p,
+    ),
+  });
+  return true;
 }
 
 export function setPrincess(profileId: string, princess: string): void {

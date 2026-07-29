@@ -37,6 +37,7 @@ function meaningChallenge(entry: WordEntry, idx: number, starId: string): Challe
     id: `${starId}_w${idx}_mean`,
     prompt: `What does the word "${entry.word}" mean?`,
     display: entry.word,
+    pronounce: entry.word,
     options,
     correct,
     teach: entry.note ?? `"${entry.word}" means ${entry.meaning}.`,
@@ -66,6 +67,8 @@ function produceChallenge(entry: WordEntry, idx: number, starId: string): Challe
     prompt: `I am thinking of a word that means: ${entry.meaning}. What is the word?`,
     accept: [entry.word],
     sampleAnswer: entry.word,
+    // No `pronounce` here on purpose — saying the word aloud would give away
+    // the answer to the one challenge that asks the child to produce it.
     hint: `It starts with the letter ${entry.word[0].toUpperCase()}.`,
     teach: `Yes — ${entry.word}.`,
   };

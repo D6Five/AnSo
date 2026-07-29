@@ -11,6 +11,7 @@ import type {
 import { isNearMiss, matchAnswer } from '../core/match';
 import { createRng } from '../core/rng';
 import { sfxCorrect, sfxKey, sfxKeyMiss, sfxTap, sfxTryAgain } from '../core/audio';
+import { speak } from '../core/voice';
 import { MicButton } from './MicButton';
 
 /**
@@ -76,6 +77,30 @@ function HintLine({ hint, show }: { hint?: string; show: boolean }) {
   return <p className="hint-line">💡 {hint}</p>;
 }
 
+/**
+ * Speaks a vocabulary word on demand, and once automatically when it appears.
+ * A word learned only by sight cannot be used in conversation or recognised
+ * when somebody else says it.
+ */
+function PronounceButton({ word }: { word: string }) {
+  useEffect(() => {
+    // Slightly slow and clearly separated from AnSo's own chatter.
+    const timer = window.setTimeout(() => void speak(word, { rate: 0.78 }), 350);
+    return () => window.clearTimeout(timer);
+  }, [word]);
+
+  return (
+    <button
+      type="button"
+      className="pronounce-btn"
+      onClick={() => void speak(word, { rate: 0.7 })}
+      aria-label={`Hear the word ${word} again`}
+    >
+      🔊 Hear it again
+    </button>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /* Choice                                                              */
 /* ------------------------------------------------------------------ */
@@ -117,6 +142,7 @@ function ChoiceView({
   return (
     <div className="challenge choice-challenge">
       {challenge.display ? <p className="challenge-display">{challenge.display}</p> : null}
+      {challenge.pronounce ? <PronounceButton word={challenge.pronounce} /> : null}
       <h2 className="challenge-prompt">{challenge.prompt}</h2>
 
       <div className="option-grid">

@@ -46,6 +46,12 @@ interface ChallengeBase {
   hint?: string;
   /** Read aloud after a correct answer — the "why", not just "well done". */
   teach?: string;
+  /**
+   * A word to pronounce on demand, shown with a speaker button. Vocabulary is
+   * half sound: a child who has only ever seen a word in print cannot use it in
+   * conversation, and cannot recognise it when someone else says it.
+   */
+  pronounce?: string;
 }
 
 /** Pick one of several options. The workhorse shape. */
@@ -182,6 +188,12 @@ export interface Star {
   blurb: string;
   /** Estimated minutes. The content report sums these for the hours total. */
   minutes: number;
+  /**
+   * Seconds allowed for the whole star. Used by maths, where fluency is part of
+   * the skill. Running out ends the star with whatever was answered — it never
+   * discards the work already done.
+   */
+  timeLimitSeconds?: number;
   content: StarContent;
 }
 
@@ -217,6 +229,9 @@ export interface Profile {
   princess?: string;
   equippedDress?: string;
   equippedAccessories?: string[];
+  /** Ids bought from the stardust shop. Unlike earned treasures these must be
+   *  stored, since spending is a decision rather than a consequence of progress. */
+  purchased?: string[];
   /**
    * Whether this child may answer out loud. Per-child rather than per-device:
    * recognition works well for an older reader and poorly for a younger one, so
