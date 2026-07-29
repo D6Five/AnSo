@@ -53,6 +53,14 @@ Set these in Railway → **Variables**:
 
 Then Railway → **Settings → Networking → Generate Domain**.
 
+Deployment uses the `Dockerfile` rather than Railway's build detection. That is
+deliberate: Railway's own builder mounts a cache directory inside
+`/app/node_modules`, and `npm ci` clears `node_modules` before installing, so
+every build after the first failed with `EBUSY` trying to remove a mount point.
+A Docker layer has no such mount. The runtime image carries only `dist/`,
+`server.mjs` and `save-store.mjs` — the server uses nothing but Node built-ins,
+so there are no production dependencies at all.
+
 **Add a Volume mounted at `/data`.** Without one, `DATA_DIR` points inside the
 container and every redeploy wipes all saved progress. The server prints a
 warning at startup when `DATA_DIR` is unset, but a mounted volume is the thing
