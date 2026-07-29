@@ -193,6 +193,33 @@ console.log('\n  Microphone preference follows the child');
 }
 
 /* ------------------------------------------------------------------ */
+console.log('\n  Princess and wardrobe follow the child');
+{
+  const older = {
+    profiles: [profile({ princess: 'seoyeon', equippedDress: 'd_first', progress: { s: star(1, 1, 1000) } })],
+  };
+  const newer = {
+    profiles: [profile({ princess: 'yuna', equippedDress: 'd_sky',
+      equippedAccessories: ['a_ribbon'], progress: { s: star(1, 1, 9000) } })],
+  };
+
+  const merged = mergeSaves(older, newer).profiles[0];
+  check('most recently used device wins the princess', merged.princess === 'yuna');
+  check('and the outfit', merged.equippedDress === 'd_sky');
+  check('accessories carry across', merged.equippedAccessories.includes('a_ribbon'));
+
+  // The collection is derived from progress, so merged progress must be what
+  // grows it — never a separately stored inventory that could disagree.
+  const a = { profiles: [profile({ progress: { s1: star(1, 5, 100), s2: star(1, 5, 200) } })] };
+  const b = { profiles: [profile({ progress: { s3: star(1, 5, 300) } })] };
+  const combined = mergeSaves(a, b).profiles[0];
+  check('collection size follows merged progress',
+    Object.keys(combined.progress).length === 3,
+    `got ${Object.keys(combined.progress).length}`);
+  check('no separate inventory is stored', combined.unlockedItems === undefined);
+}
+
+/* ------------------------------------------------------------------ */
 console.log('\n  Review queue');
 {
   const a = { profiles: [profile({ reviewQueue: ['orbit', 'vast'] })] };

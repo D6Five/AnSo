@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import type { Grade } from '../types';
-import { AVATARS, createProfile, deleteProfile, selectProfile, useSave } from '../core/store';
+import {
+  AVATARS,
+  createProfile,
+  deleteProfile,
+  selectProfile,
+  setPrincess,
+  useSave,
+} from '../core/store';
+import { PRINCESSES, princessOrDefault, type PrincessId } from '../content/princesses';
+import { PrincessArt } from './PrincessArt';
 import { useSyncStatus } from '../core/sync';
 import { sfxTap, sfxUnlock, unlockAudio } from '../core/audio';
 import { AnSoGuide } from './AnSoGuide';
@@ -19,11 +28,13 @@ interface ProfilePickerProps {
 
 export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
   const save = useSave();
-  const { status, lastSyncedAt } = useSyncStatus();
+  const { settled } = useSyncStatus();
   const [addingAnother, setAddingAnother] = useState(false);
   const [name, setName] = useState('');
   const [grade, setGrade] = useState<Grade>(1);
   const [avatar, setAvatar] = useState(0);
+  const [princess, setPrincessChoice] = useState<PrincessId>(PRINCESSES[0].id);
+  const chosenPrincess = princessOrDefault(princess);
 
   // Derived rather than stored: profiles can arrive from the server a moment
   // after first paint — on a new device or after a cleared cache — and holding
@@ -33,9 +44,10 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
 
   // Between first paint and the first sync answering, we genuinely do not know
   // whether this device has explorers. Saying so is better than showing an
-  // empty state that is about to be contradicted.
-  const awaitingFirstSync =
-    save.profiles.length === 0 && lastSyncedAt === null && (status === 'syncing' || status === 'off');
+  // empty state that is about to be contradicted — but this must key off
+  // "the attempt finished", not off its outcome, or a device with no server
+  // waits here forever and no explorer can ever be created.
+  const awaitingFirstSync = save.profiles.length === 0 && !settled;
 
   const pick = (id: string) => {
     unlockAudio();
@@ -47,7 +59,8 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
   const create = () => {
     unlockAudio();
     if (!name.trim()) return;
-    createProfile(name, grade, avatar);
+    const created = createProfile(name, grade, avatar);
+    setPrincess(created.id, princess);
     setAddingAnother(false);
     sfxUnlock();
     onReady();
@@ -154,6 +167,39 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
                 </button>
               ))}
             </div>
+          </fieldset>
+
+          <fieldset className="field">
+            <legend>Choose your princess</legend>
+            <div className="princess-choice">
+              {PRINCESSES.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  className={`princess-option ${princess === p.id ? 'selected' : ''}`}
+                  style={{
+                    ['--card-hue' as string]: p.accent,
+                    ['--card-hue-deep' as string]: p.accentDeep,
+                  }}
+                  onClick={() => {
+                    sfxTap();
+                    setPrincessChoice(p.id);
+                  }}
+                >
+                  <PrincessArt princess={p} dress={null} accessories={[]} size={62} />
+                  <span className="option-name">{p.name}</span>
+                  <span className="option-hangul">{p.hangul}</span>
+                </button>
+              ))}
+            </div>
+            <p className="princess-meaning">
+              <strong>
+                {chosenPrincess.name} {chosenPrincess.hangul}
+              </strong>{' '}
+              — {chosenPrincess.meaning}. Also goes by {chosenPrincess.englishName}.
+              <br />
+              {chosenPrincess.personality}
+            </p>
           </fieldset>
 
           <fieldset className="field">

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Profile, Star } from '../types';
 import { challengesFor } from '../content';
-import { completeStar } from '../core/store';
+import { completeStar, starsCompleted } from '../core/store';
+import { rewardForMilestone } from '../content/rewards';
+import { RewardReveal } from './PrincessScreen';
 import { sfxStarComplete, sfxStardust, sfxWhoosh } from '../core/audio';
 import { speak, stopSpeaking } from '../core/voice';
 import { setScene } from '../core/music';
@@ -37,6 +39,8 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
   const [ansoLine, setAnsoLine] = useState(star.blurb);
   const [ansoMood, setAnsoMood] = useState<AnSoMood>('talking');
   const [awarded, setAwarded] = useState(0);
+  const [newReward, setNewReward] = useState<string | null>(null);
+  const [rewardSeen, setRewardSeen] = useState(false);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -84,9 +88,17 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
       return;
     }
 
-    // Finished the star.
+    // A treasure is granted only for a star finished for the first time, so
+    // replaying a favourite cannot farm the whole wardrobe in an afternoon.
+    const firstTime = (profile.progress[star.id]?.completions ?? 0) === 0;
+    const collectedBefore = starsCompleted(profile);
+
     const stardust = completeStar(star.id, nextScore, challenges.length);
     setAwarded(stardust);
+    if (firstTime) {
+      const treasure = rewardForMilestone(collectedBefore + 1);
+      setNewReward(treasure ? treasure.id : null);
+    }
     setPhase('done');
     sfxStarComplete();
     window.setTimeout(sfxStardust, 700);
@@ -216,9 +228,14 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
               </p>
               <p className="stardust-earned">+{awarded} stardust</p>
             </div>
-            <button type="button" className="btn btn-primary btn-large" onClick={onExit}>
-              Back to the map →
-            </button>
+
+            {newReward && !rewardSeen ? (
+              <RewardReveal rewardId={newReward} onSeen={() => setRewardSeen(true)} />
+            ) : (
+              <button type="button" className="btn btn-primary btn-large" onClick={onExit}>
+                Back to the map →
+              </button>
+            )}
           </div>
         ) : null}
       </div>

@@ -96,6 +96,13 @@ function mergeProfile(a, b) {
     // device-level toggle on the client, and forcing a default would silently
     // switch the microphone back on for a parent who had turned it off.
     micEnabled: fresher.micEnabled ?? staler.micEnabled,
+    // Which princess she plays as, and what that princess is wearing. Both
+    // describe the child rather than the device, so they travel with her. The
+    // treasure collection itself is not stored — it is derived from progress,
+    // which merges above, so it cannot drift out of step with the map.
+    princess: fresher.princess ?? staler.princess,
+    equippedDress: fresher.equippedDress ?? staler.equippedDress,
+    equippedAccessories: fresher.equippedAccessories ?? staler.equippedAccessories ?? [],
     stardust: Math.max(Number(a.stardust) || 0, Number(b.stardust) || 0),
     createdAt: Math.min(
       Number(a.createdAt) || Date.now(),

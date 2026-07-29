@@ -9,9 +9,10 @@ import { ProfilePicker } from './components/ProfilePicker';
 import { GalaxyMap } from './components/GalaxyMap';
 import { StarView } from './components/StarView';
 import { SettingsPanel } from './components/SettingsPanel';
+import { PrincessScreen } from './components/PrincessScreen';
 import { StarField } from './components/StarField';
 
-type Screen = 'picker' | 'map' | 'star';
+type Screen = 'picker' | 'map' | 'star' | 'princess';
 
 export function App() {
   const save = useSave();
@@ -97,11 +98,14 @@ export function App() {
             micEnabled={micEnabledFor(profile)}
             onExit={leaveStar}
           />
+        ) : screen === 'princess' ? (
+          <PrincessScreen profile={profile} onBack={() => setScreen('map')} />
         ) : (
           <GalaxyMap
             profile={profile}
             voiceEnabled={save.settings.voiceEnabled}
             onOpenStar={openStar}
+            onOpenPrincess={() => setScreen('princess')}
             onSwitchProfile={() => {
               stopSpeaking();
               selectProfile(null);

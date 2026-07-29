@@ -209,6 +209,15 @@ export interface Profile {
   reviewQueue: string[];
   createdAt: number;
   /**
+   * Which of the five princesses this explorer plays as. The collection of
+   * dresses, accessories and room items is derived from how many distinct stars
+   * she has finished, so there is no separate inventory to drift out of step
+   * with her progress.
+   */
+  princess?: string;
+  equippedDress?: string;
+  equippedAccessories?: string[];
+  /**
    * Whether this child may answer out loud. Per-child rather than per-device:
    * recognition works well for an older reader and poorly for a younger one, so
    * the right answer genuinely differs between two sisters on the same laptop.

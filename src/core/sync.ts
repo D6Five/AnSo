@@ -20,9 +20,18 @@ export type SyncStatus = 'off' | 'syncing' | 'synced' | 'offline' | 'error';
 interface SyncState {
   status: SyncStatus;
   lastSyncedAt: number | null;
+  /**
+   * True once the first sync attempt has finished, whatever the outcome.
+   *
+   * The UI needs to distinguish "we do not know yet whether this device has
+   * profiles" from "we asked and there are none". Without this the profile
+   * picker waits on a condition that never becomes false when there is no
+   * server, and a new explorer can never be created at all.
+   */
+  settled: boolean;
 }
 
-let state: SyncState = { status: 'off', lastSyncedAt: null };
+let state: SyncState = { status: 'off', lastSyncedAt: null, settled: false };
 const listeners = new Set<() => void>();
 
 function setState(next: Partial<SyncState>): void {
@@ -121,6 +130,9 @@ async function push(): Promise<void> {
     setState({ status: 'offline' });
   } finally {
     inFlight = false;
+    // Every path through this function is a completed attempt, including the
+    // failures — so the UI is never left waiting on an answer that will not come.
+    setState({ settled: true });
     if (pendingWhileInFlight) {
       pendingWhileInFlight = false;
       schedule(300);
@@ -152,6 +164,10 @@ export function initSync(): void {
   // Pull straight away so a device picks up progress made elsewhere before the
   // child starts playing.
   void push();
+
+  // Belt and braces: if the request somehow never settles — a proxy holding the
+  // connection open, say — the app must still become usable.
+  window.setTimeout(() => setState({ settled: true }), 4000);
 
   subscribeToSave(() => {
     // Ignore the store change we just caused ourselves.

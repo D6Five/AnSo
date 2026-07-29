@@ -517,6 +517,200 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
+/* Princess                                                            */
+/* ------------------------------------------------------------------ */
+
+.princess-banner {
+  font: inherit;
+  color: var(--card-ink);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  padding: 14px 22px;
+  margin-bottom: 26px;
+  text-align: left;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 46%),
+    linear-gradient(160deg, var(--card-hue) 0%, var(--card-hue-deep) 100%);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4), 0 0 46px -18px var(--card-hue);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.princess-banner:hover { transform: translateY(-3px); }
+.banner-text { display: flex; flex-direction: column; gap: 3px; }
+.banner-text strong { font-size: 1.2rem; font-weight: 800; }
+.banner-text span { font-size: 0.88rem; color: rgba(22, 18, 58, 0.72); font-weight: 600; }
+.hangul { font-weight: 500; opacity: 0.75; }
+
+.princess-header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.princess-title h1 { margin: 0; font-size: 1.7rem; }
+.princess-sub { margin: 2px 0 0; color: var(--ink-dim); font-size: 0.92rem; }
+
+.treasure-count {
+  margin-left: auto;
+  font-weight: 700;
+  color: var(--accent-warm);
+  background: rgba(255, 212, 121, 0.12);
+  border: 1px solid rgba(255, 212, 121, 0.3);
+  border-radius: 999px;
+  padding: 8px 18px;
+}
+
+.tab-row { display: flex; gap: 10px; margin-bottom: 22px; }
+
+.tab-btn {
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 11px 22px;
+  cursor: pointer;
+}
+
+.tab-btn.active { background: var(--card-surface); color: var(--card-ink); border-color: transparent; }
+
+.wardrobe { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 24px; align-items: start; }
+
+.princess-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  border-radius: 22px;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.14) 0%, transparent 65%),
+    rgba(24, 21, 60, 0.75);
+  border: 1px solid var(--border);
+}
+
+.worn-label { margin: 8px 0 0; font-weight: 700; color: var(--accent); }
+
+.closet {
+  background: var(--card-surface);
+  color: var(--card-ink);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+}
+
+.closet h2 { margin: 0 0 12px; font-size: 1.1rem; }
+.closet h2:not(:first-child) { margin-top: 24px; }
+.closet-empty { margin: 0; color: var(--card-ink-dim); font-size: 0.95rem; }
+
+.swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+
+.swatch {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--card-ink);
+  min-height: 64px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 12px;
+  border: 3px solid transparent;
+  background: linear-gradient(150deg, var(--sw-a) 0%, var(--sw-b) 100%);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.swatch:hover { transform: translateY(-2px); }
+.swatch.worn { border-color: #16123a; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7); }
+.swatch-name { line-height: 1.25; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55); }
+
+.room-view { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.room-view svg { max-width: 100%; height: auto; border-radius: 18px; box-shadow: var(--shadow); }
+.room-caption { margin: 0; color: var(--ink-dim); }
+.room-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+.room-chip {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 13px;
+}
+
+/* Choosing a princess */
+
+.princess-choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 10px; }
+
+.princess-option {
+  font: inherit;
+  color: var(--card-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: 16px;
+  border: 3px solid transparent;
+  background: linear-gradient(160deg, var(--card-hue) 0%, var(--card-hue-deep) 100%);
+  cursor: pointer;
+  transition: transform 0.12s ease;
+}
+
+.princess-option:hover { transform: translateY(-3px); }
+.princess-option.selected { border-color: #16123a; }
+.option-name { font-size: 0.85rem; font-weight: 800; }
+.option-hangul { font-size: 0.78rem; opacity: 0.75; }
+
+.princess-meaning {
+  margin: 12px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--card-ink-dim);
+  background: var(--card-surface-alt);
+  border-left: 4px solid #a78bfa;
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+
+/* Reward reveal */
+
+.reward-reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px 28px;
+  border-radius: var(--radius);
+  background: var(--card-surface);
+  color: var(--card-ink);
+  box-shadow: var(--shadow);
+  animation: bubble-in 0.35s ease-out;
+}
+
+.reward-orb {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  font-size: 2.4rem;
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--sw-a) 0%, var(--sw-b) 100%);
+  box-shadow: 0 0 34px -6px var(--sw-a);
+  animation: burst 0.6s ease-out;
+}
+
+.reward-kind { margin: 6px 0 0; font-size: 0.78rem; letter-spacing: 0.09em; text-transform: uppercase; color: var(--card-ink-dim); font-weight: 700; }
+.reward-name { margin: 0; font-size: 1.35rem; }
+.reward-blurb { margin: 0 0 8px; text-align: center; max-width: 340px; color: var(--card-ink-dim); }
+.reward-reveal .btn { background: var(--card-surface-alt); color: var(--card-ink); border-color: var(--card-border); }
+
+@media (max-width: 720px) {
+  .wardrobe { grid-template-columns: 1fr; }
+}
+
+/* ------------------------------------------------------------------ */
 /* Star view                                                           */
 /* ------------------------------------------------------------------ */
 

@@ -10,6 +10,12 @@
 
 import { useSyncExternalStore } from 'react';
 import type { Grade, Profile, SaveData, StarProgress } from '../types';
+import {
+  REWARD_BY_ID,
+  accessorySlot,
+  rewardsEarned,
+  type Reward,
+} from '../content/rewards';
 
 const STORAGE_KEY = 'anso.save.v1';
 
@@ -227,6 +233,60 @@ export function clearReviewWord(word: string): void {
 
 export function updateSettings(patch: Partial<SaveData['settings']>): void {
   commit({ ...state, settings: { ...state.settings, ...patch } });
+}
+
+/* ------------------------------------------------------------------ */
+/* Princess and treasures                                              */
+/* ------------------------------------------------------------------ */
+
+/** Distinct stars finished. This alone determines the size of her collection. */
+export function starsCompleted(profile: Profile | null): number {
+  if (!profile) return 0;
+  return Object.values(profile.progress).filter((p) => p.completions > 0).length;
+}
+
+/** Everything this princess has earned so far. */
+export function earnedRewards(profile: Profile | null): Reward[] {
+  return rewardsEarned(starsCompleted(profile));
+}
+
+export function setPrincess(profileId: string, princess: string): void {
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) => (p.id === profileId ? { ...p, princess } : p)),
+  });
+}
+
+export function equipDress(profileId: string, dressId: string): void {
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) =>
+      p.id === profileId ? { ...p, equippedDress: dressId } : p,
+    ),
+  });
+}
+
+/**
+ * Accessories toggle rather than replace, so a princess can wear a crown and a
+ * necklace at once — but only one per slot, or a crown would sit inside a
+ * flower crown.
+ */
+export function toggleAccessory(profileId: string, accessoryId: string, slotKey: string): void {
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) => {
+      if (p.id !== profileId) return p;
+      const worn = p.equippedAccessories ?? [];
+      if (worn.includes(accessoryId)) {
+        return { ...p, equippedAccessories: worn.filter((a) => a !== accessoryId) };
+      }
+      const withoutSameSlot = worn.filter((id) => {
+        const other = REWARD_BY_ID[id];
+        return !(other && other.kind === 'accessory' && accessorySlot(other.type) === slotKey);
+      });
+      return { ...p, equippedAccessories: [...withoutSameSlot, accessoryId] };
+    }),
+  });
 }
 
 /** Turn spoken answers on or off for one child. */

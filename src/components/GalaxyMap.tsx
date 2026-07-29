@@ -4,6 +4,10 @@ import { SUBJECTS, starsForSubject } from '../content';
 import { sfxLaunch, sfxTap, sfxWhoosh } from '../core/audio';
 import { AnSoGuide } from './AnSoGuide';
 import { SyncBadge } from './SyncBadge';
+import { PrincessArt } from './PrincessArt';
+import { princessOrDefault } from '../content/princesses';
+import { REWARD_BY_ID, type AccessoryReward, type DressReward } from '../content/rewards';
+import { earnedRewards } from '../core/store';
 
 /**
  * The universe of learning.
@@ -18,6 +22,7 @@ interface GalaxyMapProps {
   profile: Profile;
   voiceEnabled: boolean;
   onOpenStar: (star: Star) => void;
+  onOpenPrincess: () => void;
   onSwitchProfile: () => void;
   onOpenSettings: () => void;
 }
@@ -39,6 +44,7 @@ export function GalaxyMap({
   profile,
   voiceEnabled,
   onOpenStar,
+  onOpenPrincess,
   onSwitchProfile,
   onOpenSettings,
 }: GalaxyMapProps) {
@@ -53,6 +59,24 @@ export function GalaxyMap({
     }
     return out;
   }, [profile.grade, profile.progress]);
+
+  const princess = princessOrDefault(profile.princess);
+  const treasures = earnedRewards(profile);
+
+  const wornDress = useMemo(() => {
+    const equipped = profile.equippedDress ? REWARD_BY_ID[profile.equippedDress] : null;
+    if (equipped && equipped.kind === 'dress') return equipped;
+    const dresses = treasures.filter((r): r is DressReward => r.kind === 'dress');
+    return dresses[dresses.length - 1] ?? null;
+  }, [profile.equippedDress, treasures]);
+
+  const wornAccessories = useMemo(
+    () =>
+      (profile.equippedAccessories ?? [])
+        .map((id) => REWARD_BY_ID[id])
+        .filter((r): r is AccessoryReward => !!r && r.kind === 'accessory'),
+    [profile.equippedAccessories],
+  );
 
   const greeting = useMemo(() => {
     const totalDone = Object.values(progressBySubject).reduce((n, p) => n + p.done, 0);
@@ -168,6 +192,36 @@ export function GalaxyMap({
       <div className="galaxy-greeting">
         <AnSoGuide mood="idle" says={greeting} voice={voiceEnabled} size={110} />
       </div>
+
+      {/* Her princess sits above the constellations, so the reason for doing
+          the work is visible before the work is. */}
+      <button
+        type="button"
+        className="princess-banner"
+        style={{
+          ['--card-hue' as string]: princess.accent,
+          ['--card-hue-deep' as string]: princess.accentDeep,
+        }}
+        onClick={() => {
+          sfxWhoosh();
+          onOpenPrincess();
+        }}
+      >
+        <PrincessArt
+          princess={princess}
+          dress={wornDress}
+          accessories={wornAccessories}
+          size={92}
+        />
+        <span className="banner-text">
+          <strong>
+            {princess.name} <span className="hangul">{princess.hangul}</span>
+          </strong>
+          <span>
+            👑 {treasures.length} treasure{treasures.length === 1 ? '' : 's'} · tap to dress her
+          </span>
+        </span>
+      </button>
 
       <div className="constellation-grid">
         {SUBJECTS.map((subject) => {
