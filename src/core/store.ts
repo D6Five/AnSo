@@ -27,13 +27,15 @@ const DEFAULT_SAVE: SaveData = {
   deletedProfileIds: [],
 };
 
+/** Drawn from the same family as the constellation palette so a profile card
+ *  sits alongside the map without clashing with it. */
 export const AVATARS = [
-  { name: 'Comet', color: '#ff9ecd', accent: '#fff0f7' },
-  { name: 'Nova', color: '#8be9fd', accent: '#e8fbff' },
-  { name: 'Luna', color: '#c9a7ff', accent: '#f3ecff' },
-  { name: 'Sol', color: '#ffd479', accent: '#fff8e6' },
-  { name: 'Iris', color: '#7ee7b4', accent: '#e9fff5' },
-  { name: 'Vega', color: '#ffa8a8', accent: '#fff0f0' },
+  { name: 'Comet', color: '#f9b6ce', deep: '#ee87af' },
+  { name: 'Nova', color: '#8fe0f0', deep: '#4fbfd9' },
+  { name: 'Luna', color: '#c7b4f6', deep: '#a68deb' },
+  { name: 'Sol', color: '#fbd98f', deep: '#f3bc5c' },
+  { name: 'Iris', color: '#9ee6c4', deep: '#63d6a2' },
+  { name: 'Vega', color: '#f9c4a1', deep: '#efa271' },
 ] as const;
 
 let state: SaveData = load();

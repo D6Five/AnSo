@@ -65,7 +65,13 @@ export function GalaxyMap({
     const stars = starsForSubject(profile.grade, openSubject);
 
     return (
-      <div className="constellation-view" style={{ ['--subject-color' as string]: subject.color }}>
+      <div
+        className="constellation-view"
+        style={{
+          ['--subject-color' as string]: subject.color,
+          ['--subject-deep' as string]: subject.colorDeep,
+        }}
+      >
         <header className="constellation-header">
           <button
             type="button"
@@ -172,7 +178,10 @@ export function GalaxyMap({
               key={subject.id}
               type="button"
               className="constellation-card"
-              style={{ ['--subject-color' as string]: subject.color }}
+              style={{
+                ['--subject-color' as string]: subject.color,
+                ['--subject-deep' as string]: subject.colorDeep,
+              }}
               onClick={() => {
                 sfxWhoosh();
                 setOpenSubject(subject.id);

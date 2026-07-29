@@ -22,7 +22,13 @@ export interface Subject {
   name: string;
   /** Constellation name shown on the galaxy map. */
   constellation: string;
+  /**
+   * Card face colours, light to deep. A pair rather than one value because a
+   * flat block of saturated colour looks harsh against the dark sky, while a
+   * gentle gradient reads as a lit surface.
+   */
   color: string;
+  colorDeep: string;
   glyph: string;
   description: string;
 }

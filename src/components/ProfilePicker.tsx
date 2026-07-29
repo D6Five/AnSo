@@ -89,7 +89,10 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
                   <button
                     type="button"
                     className="profile-card"
-                    style={{ ['--avatar-color' as string]: look.color }}
+                    style={{
+                      ['--avatar-color' as string]: look.color,
+                      ['--avatar-deep' as string]: look.deep,
+                    }}
                     onClick={() => pick(profile.id)}
                   >
                     <span className="avatar-orb" aria-hidden="true" />
@@ -161,7 +164,10 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
                   key={look.name}
                   type="button"
                   className={`avatar-swatch ${avatar === i ? 'selected' : ''}`}
-                  style={{ ['--avatar-color' as string]: look.color }}
+                  style={{
+                    ['--avatar-color' as string]: look.color,
+                    ['--avatar-deep' as string]: look.deep,
+                  }}
                   onClick={() => {
                     sfxTap();
                     setAvatar(i);
