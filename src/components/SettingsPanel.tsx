@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   micEnabledFor,
   resetAll,
@@ -6,7 +7,15 @@ import {
   useActiveProfile,
   useSave,
 } from '../core/store';
-import { isRecognitionSupported, isSynthesisSupported, setVoiceEnabled } from '../core/voice';
+import {
+  bestVoiceIsLegacy,
+  isRecognitionSupported,
+  isSynthesisSupported,
+  listVoices,
+  setPreferredVoice,
+  setVoiceEnabled,
+  speak,
+} from '../core/voice';
 import { setVolume } from '../core/audio';
 import { totalMinutes } from '../content';
 
@@ -15,6 +24,20 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const save = useSave();
   const profile = useActiveProfile();
   const { settings } = save;
+  // Voice lists populate asynchronously, so re-read once they arrive rather
+  // than rendering an empty dropdown on first open.
+  const [voices, setVoices] = useState(listVoices());
+
+  useEffect(() => {
+    if (voices.length > 0) return;
+    const refresh = () => setVoices(listVoices());
+    window.speechSynthesis?.addEventListener('voiceschanged', refresh);
+    const retry = window.setTimeout(refresh, 400);
+    return () => {
+      window.speechSynthesis?.removeEventListener('voiceschanged', refresh);
+      window.clearTimeout(retry);
+    };
+  }, [voices.length]);
 
   return (
     <div className="modal-backdrop" onClick={onClose} role="presentation">
@@ -58,6 +81,53 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             }}
           />
         </label>
+
+        {settings.voiceEnabled && voices.length > 0 ? (
+          <>
+            <label className="setting-row">
+              <span>AnSo's voice</span>
+              <select
+                className="voice-select"
+                value={settings.voiceName ?? ''}
+                onChange={(e) => {
+                  const name = e.target.value || null;
+                  updateSettings({ voiceName: name });
+                  setPreferredVoice(name);
+                  void speak('Hello. I am AnSo, and this is my voice.');
+                }}
+              >
+                <option value="">Best available</option>
+                {voices.map((v) => (
+                  <option key={v.name} value={v.name}>
+                    {v.name.replace(/ - English \(.*\)$/, '')}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="setting-row">
+              <span />
+              <button
+                type="button"
+                className="btn"
+                onClick={() => void speak('Hello. I am AnSo, and this is my voice.')}
+              >
+                🔊 Hear it
+              </button>
+            </div>
+
+            {bestVoiceIsLegacy() ? (
+              <p className="setting-note">
+                This computer only has older, robotic-sounding voices installed. Windows
+                has far more natural ones available free: open <strong>Settings →
+                Time &amp; language → Speech</strong>, click <strong>Add voices</strong>,
+                and install one marked <strong>Natural</strong> — Aria or Jenny are good
+                choices. Reload this page afterwards and it will be picked up
+                automatically. Microsoft Edge also has natural voices built in.
+              </p>
+            ) : null}
+          </>
+        ) : null}
 
         <label className="setting-row">
           <span>Background music</span>

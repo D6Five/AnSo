@@ -22,30 +22,82 @@ let cachedVoice: SpeechSynthesisVoice | null = null;
 let voicesReady = false;
 let enabled = true;
 
-/**
- * Voices Chrome/Edge/Windows commonly ship, warmest first. Falls back to any
- * en-* voice, then to the platform default.
- */
-const PREFERRED_VOICES = [
-  'Microsoft Aria Online (Natural) - English (United States)',
-  'Microsoft Jenny Online (Natural) - English (United States)',
-  'Microsoft Michelle Online (Natural) - English (United States)',
-  'Google US English',
-  'Microsoft Zira - English (United States)',
-  'Samantha',
+/** Names that reliably mark a modern neural voice across platforms. */
+const NATURAL_MARKERS = ['natural', 'online', 'neural', 'premium', 'enhanced'];
+
+/** Warm female voices, best first. AnSo is written as a "she". */
+const PREFERRED_NAMES = [
+  'aria', 'jenny', 'michelle', 'ava', 'emma', 'sonia', 'libby',
+  'samantha', 'serena', 'allison', 'zira', 'hazel', 'susan',
 ];
+
+/** Old SAPI voices. Usable, but the flat robotic ones — a last resort. */
+const LEGACY_NAMES = ['david', 'mark', 'george', 'james', 'ravi'];
+
+/**
+ * Score a voice for how well it suits AnSo.
+ *
+ * Scored rather than matched against exact names, because voice names vary by
+ * platform, locale and browser version, and an exact-match list silently falls
+ * through to whatever happens to be first. Network voices are ranked *above*
+ * local ones: the local SAPI voices Windows ships by default are precisely the
+ * robotic-sounding ones.
+ */
+function scoreVoice(voice: SpeechSynthesisVoice): number {
+  const name = voice.name.toLowerCase();
+  let score = 0;
+
+  if (!voice.lang.toLowerCase().startsWith('en')) return -1;
+
+  if (NATURAL_MARKERS.some((m) => name.includes(m))) score += 100;
+  // Google's web voices are network-backed and markedly better than SAPI.
+  if (name.includes('google')) score += 60;
+  if (!voice.localService) score += 40;
+
+  const preferredIndex = PREFERRED_NAMES.findIndex((n) => name.includes(n));
+  if (preferredIndex >= 0) score += 30 - preferredIndex;
+
+  if (LEGACY_NAMES.some((n) => name.includes(n))) score -= 25;
+  // US English is what the curriculum is written in.
+  if (voice.lang.toLowerCase().startsWith('en-us')) score += 5;
+
+  return score;
+}
+
+/** Every English voice this browser offers, best candidate first. */
+export function listVoices(): SpeechSynthesisVoice[] {
+  const voices = window.speechSynthesis?.getVoices() ?? [];
+  return voices
+    .filter((v) => v.lang.toLowerCase().startsWith('en'))
+    .sort((a, b) => scoreVoice(b) - scoreVoice(a));
+}
+
+/**
+ * True when the best available voice is still an old robotic one, so the app
+ * can offer the grown-up a way to install something better.
+ */
+export function bestVoiceIsLegacy(): boolean {
+  const best = listVoices()[0];
+  return !best || scoreVoice(best) < 40;
+}
+
+let preferredName: string | null = null;
+
+/** Pin a specific voice by name. Pass null to go back to automatic choice. */
+export function setPreferredVoice(name: string | null): void {
+  preferredName = name;
+  cachedVoice = pickVoice();
+}
 
 function pickVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis?.getVoices() ?? [];
   if (voices.length === 0) return null;
 
-  for (const name of PREFERRED_VOICES) {
-    const hit = voices.find((v) => v.name === name);
-    if (hit) return hit;
+  if (preferredName) {
+    const chosen = voices.find((v) => v.name === preferredName);
+    if (chosen) return chosen;
   }
-  const localEnglish = voices.find((v) => v.lang.startsWith('en') && v.localService);
-  if (localEnglish) return localEnglish;
-  return voices.find((v) => v.lang.startsWith('en')) ?? voices[0];
+  return listVoices()[0] ?? voices[0];
 }
 
 /** Voice lists populate asynchronously; call once at startup. */
@@ -87,7 +139,10 @@ export interface SpeakOptions {
  * speaking) when voice is disabled or unsupported, so callers can always await.
  */
 export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
-  const { rate = 0.95, pitch = 1.15, onEnd, interrupt = true } = opts;
+  // Pitch sits near neutral. Raising it makes a modern neural voice sound
+  // younger, but makes an old SAPI voice sound thin and chipmunk-like — and the
+  // old voices are exactly the ones already struggling to sound human.
+  const { rate = 0.92, pitch = 1.02, onEnd, interrupt = true } = opts;
 
   if (!enabled || !isSynthesisSupported() || !text.trim()) {
     onEnd?.();

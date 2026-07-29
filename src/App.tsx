@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Star } from './types';
 import { micEnabledFor, selectProfile, useActiveProfile, useSave } from './core/store';
 import { startMusic, stopMusic } from './core/music';
-import { initVoices, setVoiceEnabled, stopSpeaking } from './core/voice';
+import { initVoices, setPreferredVoice, setVoiceEnabled, stopSpeaking } from './core/voice';
 import { initSync } from './core/sync';
 import { setMusicVolume, setVolume, unlockAudio } from './core/audio';
 import { ProfilePicker } from './components/ProfilePicker';
@@ -33,7 +33,13 @@ export function App() {
     setVolume(save.settings.volume);
     setVoiceEnabled(save.settings.voiceEnabled);
     setMusicVolume(save.settings.musicVolume);
-  }, [save.settings.volume, save.settings.voiceEnabled, save.settings.musicVolume]);
+    setPreferredVoice(save.settings.voiceName ?? null);
+  }, [
+    save.settings.volume,
+    save.settings.voiceEnabled,
+    save.settings.musicVolume,
+    save.settings.voiceName,
+  ]);
 
   useEffect(() => {
     if (audioReady && profile && save.settings.musicEnabled) startMusic();

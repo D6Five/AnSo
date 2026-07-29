@@ -233,6 +233,11 @@ export interface SaveData {
     micEnabled: boolean;
     musicEnabled: boolean;
     musicVolume: number;
+    /**
+     * Chosen speech-synthesis voice by name. Device-level, because which voices
+     * exist varies by machine and browser. Null means pick the best available.
+     */
+    voiceName?: string | null;
   };
   /**
    * Ids of profiles deleted on this device. Without these, sync would merge a

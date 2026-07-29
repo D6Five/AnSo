@@ -23,6 +23,7 @@ const DEFAULT_SAVE: SaveData = {
     micEnabled: true,
     musicEnabled: true,
     musicVolume: 0.35,
+    voiceName: null,
   },
   deletedProfileIds: [],
 };

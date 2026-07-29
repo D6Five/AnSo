@@ -868,6 +868,20 @@ body {
 .setting-row input[type='checkbox'] { width: 26px; height: 26px; accent-color: #7c3aed; flex-shrink: 0; }
 .setting-row input[type='range'] { width: 180px; accent-color: #7c3aed; flex-shrink: 0; }
 
+.voice-select {
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--card-ink);
+  background: #fff;
+  border: 2px solid var(--card-border);
+  border-radius: 12px;
+  padding: 9px 12px;
+  max-width: 230px;
+  cursor: pointer;
+}
+
+.voice-select:focus { outline: none; border-color: #7c3aed; }
+
 .setting-note {
   margin: -6px 0 0;
   font-size: 0.86rem;
