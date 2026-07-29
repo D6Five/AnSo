@@ -1,9 +1,11 @@
 /**
  * Profile and progress persistence.
  *
- * Everything lives in localStorage on the family's own machine — no accounts,
- * no server, no child data leaving the device. The store is a tiny external
- * store read through `useSyncExternalStore`.
+ * localStorage is the source of truth for this device and always works, server
+ * or not. When the app is hosted, `sync.ts` mirrors profiles to the server so
+ * progress follows each child between devices and survives a cleared cache.
+ * Volume, microphone and which child is selected stay local — those describe
+ * the device, not the child.
  */
 
 import { useSyncExternalStore } from 'react';
@@ -16,6 +18,7 @@ const DEFAULT_SAVE: SaveData = {
   profiles: [],
   activeProfileId: null,
   settings: { volume: 0.7, voiceEnabled: true, micEnabled: true },
+  deletedProfileIds: [],
 };
 
 export const AVATARS = [
@@ -40,6 +43,7 @@ function load(): SaveData {
       ...DEFAULT_SAVE,
       ...parsed,
       settings: { ...DEFAULT_SAVE.settings, ...parsed.settings },
+      deletedProfileIds: parsed.deletedProfileIds ?? [],
     };
   } catch {
     // A corrupt save must never brick the app for a child.
@@ -72,6 +76,41 @@ function snapshot(): SaveData {
 
 export function useSave(): SaveData {
   return useSyncExternalStore(subscribe, snapshot, snapshot);
+}
+
+/** Current save, for non-React callers such as the sync layer. */
+export function getSave(): SaveData {
+  return state;
+}
+
+/** Subscribe to any save change. Returns an unsubscribe function. */
+export function subscribeToSave(fn: () => void): () => void {
+  return subscribe(fn);
+}
+
+/**
+ * Replace the local profile list with the server's merged version.
+ *
+ * Settings and the selected child are deliberately preserved: they belong to
+ * this device. The selected child is re-matched by name and grade because the
+ * merge may have settled on a different canonical id for the same girl, and
+ * dropping her back to the profile picker mid-session would be baffling.
+ */
+export function applyRemoteProfiles(profiles: Profile[], deletedProfileIds: string[]): void {
+  const previous = state.profiles.find((p) => p.id === state.activeProfileId);
+
+  let activeProfileId: string | null = null;
+  if (previous) {
+    const sameId = profiles.find((p) => p.id === previous.id);
+    const sameChild = profiles.find(
+      (p) =>
+        p.name.trim().toLowerCase() === previous.name.trim().toLowerCase() &&
+        p.grade === previous.grade,
+    );
+    activeProfileId = (sameId ?? sameChild)?.id ?? null;
+  }
+
+  commit({ ...state, profiles, deletedProfileIds, activeProfileId });
 }
 
 export function useActiveProfile(): Profile | null {
@@ -111,6 +150,10 @@ export function deleteProfile(id: string): void {
   commit({
     ...state,
     profiles,
+    // Record a tombstone, or the next device to sync would merge this profile
+    // straight back in — it has no way to tell a deletion from a device that
+    // simply has not seen the profile yet.
+    deletedProfileIds: [...new Set([...(state.deletedProfileIds ?? []), id])],
     activeProfileId: state.activeProfileId === id ? null : state.activeProfileId,
   });
 }
@@ -176,7 +219,17 @@ export function updateSettings(patch: Partial<SaveData['settings']>): void {
   commit({ ...state, settings: { ...state.settings, ...patch } });
 }
 
-/** Wipe everything. Used by the grown-up settings panel. */
+/**
+ * Wipe everything. Used by the grown-up settings panel.
+ *
+ * Every existing profile is tombstoned, otherwise the next sync would pull them
+ * all back from the server and "erase everything" would quietly mean nothing.
+ */
 export function resetAll(): void {
-  commit({ ...DEFAULT_SAVE });
+  commit({
+    ...DEFAULT_SAVE,
+    deletedProfileIds: [
+      ...new Set([...(state.deletedProfileIds ?? []), ...state.profiles.map((p) => p.id)]),
+    ],
+  });
 }

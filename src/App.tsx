@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Star } from './types';
 import { selectProfile, useActiveProfile, useSave } from './core/store';
 import { initVoices, setVoiceEnabled, stopSpeaking } from './core/voice';
+import { initSync } from './core/sync';
 import { setVolume, unlockAudio } from './core/audio';
 import { ProfilePicker } from './components/ProfilePicker';
 import { GalaxyMap } from './components/GalaxyMap';
@@ -20,6 +21,9 @@ export function App() {
 
   useEffect(() => {
     initVoices();
+    // Mirrors progress to the server when the app is hosted. Fails quietly and
+    // leaves the app fully working on localStorage when there is no server.
+    initSync();
   }, []);
 
   // Keep the audio and voice engines in step with saved settings.

@@ -13,7 +13,8 @@
     "start": "node server.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
-    "content:report": "node scripts/content-report.mjs"
+    "content:report": "node scripts/content-report.mjs",
+    "test:sync": "node scripts/test-sync.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

@@ -18,6 +18,7 @@ import { stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { readSave, saveFilePath, syncSave } from './save-store.mjs';
 
 const ROOT = resolve(fileURLToPath(new URL('./dist', import.meta.url)));
 const PORT = Number(process.env.PORT) || 8080;
@@ -304,23 +305,82 @@ async function handleLogin(req, res) {
   res.end();
 }
 
+function sendJson(res, status, body) {
+  res.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  res.end(JSON.stringify(body));
+}
+
+/**
+ * Merge a device's save into the shared one and hand back the result.
+ *
+ * A single endpoint rather than a GET and a PUT: the device sends what it has,
+ * the server merges it with what everyone else has, and the device adopts the
+ * answer. That keeps the merge in one place and makes the exchange atomic.
+ */
+async function handleSync(req, res) {
+  const raw = await readBody(req, 512 * 1024);
+  if (!raw) {
+    sendJson(res, 400, { error: 'Empty request body' });
+    return;
+  }
+
+  let incoming;
+  try {
+    incoming = JSON.parse(raw);
+  } catch {
+    sendJson(res, 400, { error: 'Malformed JSON' });
+    return;
+  }
+
+  if (!incoming || typeof incoming !== 'object' || !Array.isArray(incoming.profiles)) {
+    sendJson(res, 400, { error: 'Expected { profiles: [] }' });
+    return;
+  }
+
+  try {
+    const merged = await syncSave(incoming);
+    sendJson(res, 200, merged);
+  } catch (err) {
+    // A failed sync must never break the app — the device keeps its local copy.
+    console.error('Sync failed:', err.message);
+    sendJson(res, 500, { error: 'Could not save' });
+  }
+}
+
 const server = createServer(async (req, res) => {
   const url = req.url || '/';
+  const path = url.split('?')[0];
 
-  if (req.method === 'POST' && url.split('?')[0] === '/login') {
+  if (req.method === 'POST' && path === '/login') {
     await handleLogin(req, res);
     return;
   }
 
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
+  const isSyncRequest = req.method === 'POST' && path === '/api/sync';
+
+  if (!isSyncRequest && req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD, POST' });
     res.end('Method not allowed');
     return;
   }
 
-  // Nothing below this line is reachable without a valid session.
+  // Nothing below this line is reachable without a valid session, the sync
+  // endpoint very much included.
   if (!isValidSession(readCookie(req.headers.cookie, COOKIE))) {
+    if (isSyncRequest) {
+      sendJson(res, 401, { error: 'Not signed in' });
+      return;
+    }
     sendHtml(res, 401, loginPage());
+    return;
+  }
+
+  if (isSyncRequest) {
+    await handleSync(req, res);
     return;
   }
 
@@ -354,6 +414,20 @@ const server = createServer(async (req, res) => {
     .pipe(res);
 });
 
-server.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, async () => {
   console.log(`AnSo serving ${ROOT} on http://${HOST}:${PORT} (password gate active)`);
+
+  const stored = await readSave();
+  console.log(`Progress store: ${saveFilePath()} (${stored.profiles.length} profile(s))`);
+
+  // Without a mounted volume the save file lives in the container filesystem
+  // and is destroyed on every redeploy. That failure is silent and only shows
+  // up as lost progress weeks later, so it is worth shouting about.
+  if (!process.env.DATA_DIR) {
+    console.warn(
+      '\n  WARNING: DATA_DIR is not set, so progress is being written inside the\n' +
+        '  container and WILL BE LOST on the next redeploy. In Railway, add a\n' +
+        '  Volume mounted at /data and set DATA_DIR=/data.\n',
+    );
+  }
 });

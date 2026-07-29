@@ -191,6 +191,8 @@ body {
 
 .profile-list { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; }
 
+.restoring-note { margin: 18px 0 0; color: var(--ink-dim); font-size: 1.02rem; }
+
 .profile-row { position: relative; }
 
 .profile-card {
@@ -292,7 +294,23 @@ body {
   padding: 8px 18px;
 }
 
-.header-actions { display: flex; gap: 6px; }
+.header-actions { display: flex; gap: 6px; align-items: center; }
+
+.sync-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  cursor: default;
+}
+
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 .galaxy-greeting { display: flex; justify-content: center; margin-bottom: 34px; }
 

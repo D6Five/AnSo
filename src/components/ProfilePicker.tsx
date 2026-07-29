@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Grade } from '../types';
 import { AVATARS, createProfile, deleteProfile, selectProfile, useSave } from '../core/store';
+import { useSyncStatus } from '../core/sync';
 import { sfxTap, sfxUnlock, unlockAudio } from '../core/audio';
 import { AnSoGuide } from './AnSoGuide';
 
@@ -18,10 +19,23 @@ interface ProfilePickerProps {
 
 export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
   const save = useSave();
-  const [creating, setCreating] = useState(save.profiles.length === 0);
+  const { status, lastSyncedAt } = useSyncStatus();
+  const [addingAnother, setAddingAnother] = useState(false);
   const [name, setName] = useState('');
   const [grade, setGrade] = useState<Grade>(1);
   const [avatar, setAvatar] = useState(0);
+
+  // Derived rather than stored: profiles can arrive from the server a moment
+  // after first paint — on a new device or after a cleared cache — and holding
+  // this in state would strand the parent on the "create an explorer" form with
+  // their children's profiles already recovered behind it.
+  const creating = addingAnother || save.profiles.length === 0;
+
+  // Between first paint and the first sync answering, we genuinely do not know
+  // whether this device has explorers. Saying so is better than showing an
+  // empty state that is about to be contradicted.
+  const awaitingFirstSync =
+    save.profiles.length === 0 && lastSyncedAt === null && (status === 'syncing' || status === 'off');
 
   const pick = (id: string) => {
     unlockAudio();
@@ -34,9 +48,21 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
     unlockAudio();
     if (!name.trim()) return;
     createProfile(name, grade, avatar);
+    setAddingAnother(false);
     sfxUnlock();
     onReady();
   };
+
+  if (awaitingFirstSync) {
+    return (
+      <div className="profile-picker">
+        <div className="picker-hero">
+          <AnSoGuide mood="thinking" says="" voice={false} size={140} />
+          <p className="restoring-note">Looking for your explorers…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profile-picker">
@@ -89,7 +115,7 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
             })}
           </div>
 
-          <button type="button" className="btn" onClick={() => setCreating(true)}>
+          <button type="button" className="btn" onClick={() => setAddingAnother(true)}>
             + Add another explorer
           </button>
         </>
@@ -148,7 +174,7 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
 
           <div className="create-actions">
             {save.profiles.length > 0 ? (
-              <button type="button" className="btn btn-quiet" onClick={() => setCreating(false)}>
+              <button type="button" className="btn btn-quiet" onClick={() => setAddingAnother(false)}>
                 Cancel
               </button>
             ) : null}

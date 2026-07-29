@@ -42,14 +42,21 @@ The app is deployed behind a password. **Nothing** is served without a valid
 session — not the HTML, not the JavaScript, not a single asset. The server
 refuses to start if no password is set, so it cannot accidentally become public.
 
-Set one variable in Railway → **Variables**:
+Set these in Railway → **Variables**:
 
 | Variable | Required | Notes |
 | --- | --- | --- |
 | `AUTH_PASSWORD` | yes | Minimum 8 characters. Server exits without it. |
+| `DATA_DIR` | yes for sync | Where progress is stored. Set to `/data`. |
+| `PORT` | no | Defaults to 8080. Pin it to match the generated domain. |
 | `SESSION_DAYS` | no | Days a device stays signed in. Default 180. |
 
 Then Railway → **Settings → Networking → Generate Domain**.
+
+**Add a Volume mounted at `/data`.** Without one, `DATA_DIR` points inside the
+container and every redeploy wipes all saved progress. The server prints a
+warning at startup when `DATA_DIR` is unset, but a mounted volume is the thing
+that actually protects the data.
 
 Signing in once per device sets an HttpOnly, Secure, SameSite=Strict cookie that
 lasts six months, so the girls are not asked for a password each time. Changing
@@ -63,6 +70,36 @@ To run the production server locally:
 
 ```bash
 $env:AUTH_PASSWORD="something-long"; npm start
+```
+
+## How progress is saved
+
+Each device keeps its own copy in `localStorage`, so the app works with no
+server and no connection. When hosted, `src/core/sync.ts` also mirrors profiles
+to the server: the device sends what it has, the server merges it with every
+other device's copy, and the device adopts the result. All conflict resolution
+lives in `save-store.mjs` so there is one implementation rather than one per
+device.
+
+That means progress follows each girl to any device, and survives a cleared
+cache — which in practice matters more than the multi-device part.
+
+Merging is field-level, never last-write-wins, because two devices can both
+make progress while neither has seen the other:
+
+- Completions and best scores take the higher value; stardust takes the higher
+  total rather than the sum, so replays cannot inflate it.
+- The same child created separately on two devices is stitched into one
+  explorer by name and grade.
+- Deleting a profile writes a tombstone, or the next device to sync would
+  merge it straight back.
+- Output is canonically ordered, so devices converge to an identical file.
+- Volume, microphone and which child is selected stay per-device.
+
+The merge is covered by tests — run them after touching any of it:
+
+```bash
+npm run test:sync
 ```
 
 ## How much content is here

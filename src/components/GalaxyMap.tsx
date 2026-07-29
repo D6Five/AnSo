@@ -3,6 +3,7 @@ import type { Profile, Star, SubjectId } from '../types';
 import { SUBJECTS, starsForSubject } from '../content';
 import { sfxLaunch, sfxTap, sfxWhoosh } from '../core/audio';
 import { AnSoGuide } from './AnSoGuide';
+import { SyncBadge } from './SyncBadge';
 
 /**
  * The universe of learning.
@@ -148,6 +149,7 @@ export function GalaxyMap({
           ✨ {profile.stardust.toLocaleString()}
         </div>
         <div className="header-actions">
+          <SyncBadge />
           <button type="button" className="btn btn-quiet" onClick={onSwitchProfile}>
             Switch explorer
           </button>

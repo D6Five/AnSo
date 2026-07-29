@@ -214,4 +214,12 @@ export interface SaveData {
     voiceEnabled: boolean;
     micEnabled: boolean;
   };
+  /**
+   * Ids of profiles deleted on this device. Without these, sync would merge a
+   * deleted profile straight back from whichever device had not seen the
+   * deletion yet. Tombstones make removal stick across all devices.
+   */
+  deletedProfileIds?: string[];
+  /** Last time this device's copy changed. Used to settle settings conflicts. */
+  updatedAt?: number;
 }
