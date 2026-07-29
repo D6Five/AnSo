@@ -4,9 +4,13 @@
   "version": "0.1.0",
   "type": "module",
   "description": "AnSo — a universe of learning for two young explorers",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "start": "node server.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "content:report": "node scripts/content-report.mjs"
