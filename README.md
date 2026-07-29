@@ -36,6 +36,35 @@ To produce a build you can open without a dev server:
 npm run build
 ```
 
+## Deploying it privately
+
+The app is deployed behind a password. **Nothing** is served without a valid
+session — not the HTML, not the JavaScript, not a single asset. The server
+refuses to start if no password is set, so it cannot accidentally become public.
+
+Set one variable in Railway → **Variables**:
+
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `AUTH_PASSWORD` | yes | Minimum 8 characters. Server exits without it. |
+| `SESSION_DAYS` | no | Days a device stays signed in. Default 180. |
+
+Then Railway → **Settings → Networking → Generate Domain**.
+
+Signing in once per device sets an HttpOnly, Secure, SameSite=Strict cookie that
+lasts six months, so the girls are not asked for a password each time. Changing
+`AUTH_PASSWORD` signs every device out immediately — that is the way to revoke
+access.
+
+After 8 wrong guesses from one address, that address is locked out for 15
+minutes, including for the correct password.
+
+To run the production server locally:
+
+```bash
+$env:AUTH_PASSWORD="something-long"; npm start
+```
+
 ## How much content is here
 
 Run this any time — it measures the real content files rather than quoting a

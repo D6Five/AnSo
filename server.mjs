@@ -1,9 +1,15 @@
 /**
- * Static file server for the production build.
+ * Static file server with a password gate.
  *
- * Written against Node's built-in http/fs so deploying adds no dependencies —
- * the app itself has none beyond React, and there is no reason for hosting it
- * to change that. Railway sets PORT; everything else has a sensible default.
+ * Written against Node's built-ins so deploying adds no dependencies. The gate
+ * exists because this is a family app on a public URL: without a valid session
+ * cookie nothing is served at all — not the HTML, not the JavaScript, not a
+ * single asset. There is no unauthenticated surface beyond the login page.
+ *
+ * Configuration (Railway → Variables):
+ *   AUTH_PASSWORD   required. The shared password. The server refuses to start
+ *                   without it, so the app cannot accidentally become public.
+ *   SESSION_DAYS    optional, default 180. How long a device stays signed in.
  */
 
 import { createServer } from 'node:http';
@@ -11,10 +17,180 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const ROOT = resolve(fileURLToPath(new URL('./dist', import.meta.url)));
 const PORT = Number(process.env.PORT) || 8080;
 const HOST = process.env.HOST || '0.0.0.0';
+const PASSWORD = process.env.AUTH_PASSWORD ?? '';
+const SESSION_DAYS = Number(process.env.SESSION_DAYS) || 180;
+const COOKIE = 'anso_session';
+
+// Fail closed. A missing password must never mean "serve it to everyone".
+if (!PASSWORD) {
+  console.error(
+    '\nRefusing to start: AUTH_PASSWORD is not set.\n' +
+      'Set it in Railway under Variables, or locally with:\n' +
+      '  $env:AUTH_PASSWORD="your-password"; npm start\n',
+  );
+  process.exit(1);
+}
+
+if (PASSWORD.length < 8) {
+  console.error('\nRefusing to start: AUTH_PASSWORD must be at least 8 characters.\n');
+  process.exit(1);
+}
+
+/**
+ * Cookies are signed with a key derived from the password, so there is only one
+ * variable to manage. Derivation is deterministic on purpose: a redeploy or a
+ * restart must not sign every device out. Changing the password does invalidate
+ * all existing sessions, which is exactly what changing it should mean.
+ */
+const SIGNING_KEY = createHmac('sha256', 'anso.session.v1').update(PASSWORD).digest();
+
+/* ------------------------------------------------------------------ */
+/* Sessions                                                            */
+/* ------------------------------------------------------------------ */
+
+function sign(value) {
+  return createHmac('sha256', SIGNING_KEY).update(value).digest('base64url');
+}
+
+function issueSession() {
+  const expires = Date.now() + SESSION_DAYS * 86400000;
+  return `${expires}.${sign(String(expires))}`;
+}
+
+function isValidSession(token) {
+  if (!token) return false;
+  const dot = token.lastIndexOf('.');
+  if (dot < 1) return false;
+
+  const expires = token.slice(0, dot);
+  const provided = token.slice(dot + 1);
+  if (!/^\d+$/.test(expires)) return false;
+  if (Number(expires) < Date.now()) return false;
+
+  const expected = sign(expires);
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+/** Constant-time password check, so timing cannot reveal the password. */
+function isCorrectPassword(attempt) {
+  const a = createHmac('sha256', SIGNING_KEY).update(String(attempt)).digest();
+  const b = createHmac('sha256', SIGNING_KEY).update(PASSWORD).digest();
+  return timingSafeEqual(a, b);
+}
+
+function readCookie(header, name) {
+  if (!header) return null;
+  for (const part of header.split(';')) {
+    const eq = part.indexOf('=');
+    if (eq === -1) continue;
+    if (part.slice(0, eq).trim() === name) return decodeURIComponent(part.slice(eq + 1).trim());
+  }
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/* Brute-force throttling                                              */
+/* ------------------------------------------------------------------ */
+
+const attempts = new Map();
+const MAX_ATTEMPTS = 8;
+const WINDOW_MS = 15 * 60 * 1000;
+
+function clientIp(req) {
+  // Railway terminates TLS upstream, so the real address is in the header.
+  const forwarded = req.headers['x-forwarded-for'];
+  if (typeof forwarded === 'string' && forwarded) return forwarded.split(',')[0].trim();
+  return req.socket.remoteAddress ?? 'unknown';
+}
+
+function isThrottled(ip) {
+  const record = attempts.get(ip);
+  if (!record) return false;
+  if (Date.now() > record.resetAt) {
+    attempts.delete(ip);
+    return false;
+  }
+  return record.count >= MAX_ATTEMPTS;
+}
+
+function recordFailure(ip) {
+  const record = attempts.get(ip);
+  if (!record || Date.now() > record.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: Date.now() + WINDOW_MS });
+    return;
+  }
+  record.count += 1;
+}
+
+// Keep the throttle map from growing without bound on a long-lived process.
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of attempts) if (now > record.resetAt) attempts.delete(ip);
+}, WINDOW_MS).unref();
+
+/* ------------------------------------------------------------------ */
+/* Login page                                                          */
+/* ------------------------------------------------------------------ */
+
+function loginPage(message = '') {
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AnSo</title>
+<style>
+  :root{color-scheme:dark}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;
+    font-family:'Segoe UI',system-ui,sans-serif;color:#f3f0ff;
+    background:radial-gradient(ellipse at 50% 0%,#0f0d2b 0%,#07061a 62%)}
+  .card{width:min(400px,100%);background:rgba(24,21,60,.82);border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;padding:40px 34px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.45)}
+  .star{font-size:3rem;line-height:1;margin-bottom:8px}
+  h1{margin:0 0 6px;font-size:1.5rem}
+  p{margin:0 0 26px;color:#b8b2dd;font-size:.95rem}
+  input{width:100%;font:inherit;font-size:1.05rem;color:#f3f0ff;background:rgba(0,0,0,.32);
+    border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:14px 18px;margin-bottom:14px}
+  input:focus{outline:none;border-color:#8be9fd}
+  button{width:100%;font:inherit;font-weight:700;font-size:1.05rem;color:#0b0a1f;cursor:pointer;
+    background:linear-gradient(135deg,#8be9fd,#a78bfa);border:0;border-radius:999px;padding:15px}
+  button:hover{filter:brightness(1.08)}
+  .msg{margin:0 0 16px;color:#ff8fa3;font-size:.92rem}
+</style></head>
+<body>
+  <form class="card" method="POST" action="/login">
+    <div class="star">⭐</div>
+    <h1>AnSo</h1>
+    <p>A universe of learning</p>
+    ${message ? `<p class="msg">${message}</p>` : ''}
+    <input type="password" name="password" placeholder="Password" autocomplete="current-password"
+           autofocus required aria-label="Password">
+    <button type="submit">Enter</button>
+  </form>
+</body></html>`;
+}
+
+function sendHtml(res, status, html, headers = {}) {
+  res.writeHead(status, {
+    'Content-Type': 'text/html; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer',
+    ...headers,
+  });
+  res.end(html);
+}
+
+/* ------------------------------------------------------------------ */
+/* Static files                                                        */
+/* ------------------------------------------------------------------ */
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -32,7 +208,6 @@ const MIME = {
   '.woff': 'font/woff',
   '.woff2': 'font/woff2',
   '.txt': 'text/plain; charset=utf-8',
-  '.map': 'application/json; charset=utf-8',
 };
 
 /**
@@ -41,7 +216,12 @@ const MIME = {
  * place a request is allowed to become a filesystem path.
  */
 function safePath(urlPath) {
-  const decoded = decodeURIComponent(urlPath.split('?')[0].split('#')[0]);
+  let decoded;
+  try {
+    decoded = decodeURIComponent(urlPath.split('?')[0].split('#')[0]);
+  } catch {
+    return null;
+  }
   const candidate = resolve(join(ROOT, normalize(decoded)));
   if (candidate !== ROOT && !candidate.startsWith(ROOT + sep)) return null;
   return candidate;
@@ -50,17 +230,15 @@ function safePath(urlPath) {
 async function findFile(pathname) {
   const target = safePath(pathname);
   if (!target) return null;
-
   try {
     const info = await stat(target);
     if (info.isFile()) return target;
     if (info.isDirectory()) {
       const index = join(target, 'index.html');
-      const indexInfo = await stat(index);
-      if (indexInfo.isFile()) return index;
+      if ((await stat(index)).isFile()) return index;
     }
   } catch {
-    /* falls through to the SPA fallback below */
+    /* falls through to the app-shell fallback */
   }
   return null;
 }
@@ -68,18 +246,85 @@ async function findFile(pathname) {
 function cacheHeaderFor(file) {
   // Vite fingerprints filenames in assets/, so those are safe to cache hard.
   // index.html must never be cached or a deploy would not reach the browser.
-  if (file.includes(`${sep}assets${sep}`)) return 'public, max-age=31536000, immutable';
-  return 'no-cache';
+  return file.includes(`${sep}assets${sep}`)
+    ? 'private, max-age=31536000, immutable'
+    : 'no-store';
+}
+
+/* ------------------------------------------------------------------ */
+/* Request handling                                                    */
+/* ------------------------------------------------------------------ */
+
+function readBody(req, limit = 4096) {
+  return new Promise((resolveBody) => {
+    let data = '';
+    req.on('data', (chunk) => {
+      data += chunk;
+      if (data.length > limit) {
+        data = data.slice(0, limit);
+        req.destroy();
+      }
+    });
+    req.on('end', () => resolveBody(data));
+    req.on('error', () => resolveBody(''));
+  });
+}
+
+async function handleLogin(req, res) {
+  const ip = clientIp(req);
+
+  if (isThrottled(ip)) {
+    sendHtml(res, 429, loginPage('Too many attempts. Wait 15 minutes and try again.'));
+    return;
+  }
+
+  const body = await readBody(req);
+  const submitted = new URLSearchParams(body).get('password') ?? '';
+
+  if (!isCorrectPassword(submitted)) {
+    recordFailure(ip);
+    sendHtml(res, 401, loginPage('That password is not right.'));
+    return;
+  }
+
+  attempts.delete(ip);
+
+  // Secure is safe to always set: Railway serves HTTPS, and a cookie that
+  // refuses to travel over plain HTTP is exactly the behaviour we want.
+  const cookie = [
+    `${COOKIE}=${issueSession()}`,
+    'Path=/',
+    'HttpOnly',
+    'Secure',
+    'SameSite=Strict',
+    `Max-Age=${SESSION_DAYS * 86400}`,
+  ].join('; ');
+
+  res.writeHead(303, { Location: '/', 'Set-Cookie': cookie, 'Cache-Control': 'no-store' });
+  res.end();
 }
 
 const server = createServer(async (req, res) => {
+  const url = req.url || '/';
+
+  if (req.method === 'POST' && url.split('?')[0] === '/login') {
+    await handleLogin(req, res);
+    return;
+  }
+
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    res.writeHead(405, { Allow: 'GET, HEAD' });
+    res.writeHead(405, { Allow: 'GET, HEAD, POST' });
     res.end('Method not allowed');
     return;
   }
 
-  const requested = await findFile(req.url || '/');
+  // Nothing below this line is reachable without a valid session.
+  if (!isValidSession(readCookie(req.headers.cookie, COOKIE))) {
+    sendHtml(res, 401, loginPage());
+    return;
+  }
+
+  const requested = await findFile(url);
   // Any unknown path serves the app shell, so refreshing a deep link works.
   const file = requested ?? join(ROOT, 'index.html');
 
@@ -91,11 +336,12 @@ const server = createServer(async (req, res) => {
     return;
   }
 
-  // The fallback is the app shell, not an error page, so it is a 200 either way.
   res.writeHead(200, {
     'Content-Type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
     'Cache-Control': cacheHeaderFor(file),
     'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer',
   });
 
   if (req.method === 'HEAD') {
@@ -104,12 +350,10 @@ const server = createServer(async (req, res) => {
   }
 
   createReadStream(file)
-    .on('error', () => {
-      res.end();
-    })
+    .on('error', () => res.end())
     .pipe(res);
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`AnSo is serving ${ROOT} on http://${HOST}:${PORT}`);
+  console.log(`AnSo serving ${ROOT} on http://${HOST}:${PORT} (password gate active)`);
 });
