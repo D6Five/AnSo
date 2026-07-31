@@ -14,6 +14,7 @@ import { buyItem, earnedRewards, equipDress, starsCompleted, toggleAccessory } f
 import { sfxTap, sfxStardust } from '../core/audio';
 import { PrincessArt } from './PrincessArt';
 import { RoomArt } from './RoomArt';
+import { BackButton } from './BackButton';
 
 /**
  * Wardrobe and bedroom.
@@ -59,10 +60,9 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
 
   return (
     <div className="princess-screen">
+      <BackButton label="Back to the map" onClick={onBack} />
+
       <header className="princess-header">
-        <button type="button" className="btn btn-quiet" onClick={onBack}>
-          ← Back to the map
-        </button>
         <div className="princess-title">
           <h1>
             {princess.name} <span className="hangul">{princess.hangul}</span>

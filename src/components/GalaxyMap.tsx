@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 import type { Profile, Star, SubjectId } from '../types';
 import { SUBJECTS, starsForSubject } from '../content';
-import { sfxLaunch, sfxTap, sfxWhoosh } from '../core/audio';
+import { sfxLaunch, sfxWhoosh } from '../core/audio';
 import { AnSoGuide } from './AnSoGuide';
 import { SyncBadge } from './SyncBadge';
 import { PrincessArt } from './PrincessArt';
+import { BackButton } from './BackButton';
 import { princessOrDefault } from '../content/princesses';
 import { REWARD_BY_ID, type AccessoryReward, type DressReward } from '../content/rewards';
 import { earnedRewards } from '../core/store';
@@ -27,18 +28,6 @@ interface GalaxyMapProps {
   onOpenSettings: () => void;
 }
 
-function isUnlocked(stars: Star[], index: number, profile: Profile): boolean {
-  if (index === 0) return true;
-  const previous = stars[index - 1];
-  return (profile.progress[previous.id]?.completions ?? 0) > 0;
-}
-
-/** Deterministic scatter so stars look like a constellation, not a list. */
-function starOffset(index: number): { x: number; y: number } {
-  const wave = Math.sin(index * 1.1) * 26;
-  const drift = Math.cos(index * 0.7) * 12;
-  return { x: wave, y: drift };
-}
 
 export function GalaxyMap({
   profile,
@@ -88,6 +77,11 @@ export function GalaxyMap({
     const subject = SUBJECTS.find((s) => s.id === openSubject)!;
     const stars = starsForSubject(profile.grade, openSubject);
 
+    // Unlocking is sequential, so the first unfinished star is the one that is
+    // open. Everything after it stays out of sight until she gets there.
+    const nextStar = stars.find((s) => (profile.progress[s.id]?.completions ?? 0) === 0);
+    const litStars = stars.filter((s) => (profile.progress[s.id]?.completions ?? 0) > 0);
+
     return (
       <div
         className="constellation-view"
@@ -96,23 +90,13 @@ export function GalaxyMap({
           ['--subject-deep' as string]: subject.colorDeep,
         }}
       >
+        <BackButton label="All constellations" onClick={() => setOpenSubject(null)} />
+
         <header className="constellation-header">
-          <button
-            type="button"
-            className="btn btn-quiet"
-            onClick={() => {
-              sfxWhoosh();
-              setOpenSubject(null);
-            }}
-          >
-            ← All constellations
-          </button>
-          <div>
-            <h1>
-              <span aria-hidden="true">{subject.glyph}</span> {subject.constellation}
-            </h1>
-            <p className="constellation-sub">{subject.description}</p>
-          </div>
+          <h1>
+            <span aria-hidden="true">{subject.glyph}</span> {subject.constellation}
+          </h1>
+          <p className="constellation-sub">{subject.description}</p>
         </header>
 
         {stars.length === 0 ? (
@@ -122,47 +106,73 @@ export function GalaxyMap({
               <code>src/content/bsfWeeks.ts</code> and they will appear here.
             </p>
           </div>
-        ) : (
-          <ol className="star-path">
-            {stars.map((star, i) => {
-              const unlocked = isUnlocked(stars, i, profile);
-              const record = profile.progress[star.id];
-              const done = (record?.completions ?? 0) > 0;
-              const offset = starOffset(i);
+        ) : nextStar ? (
+          <>
+            {/*
+             * Only the one star she can actually open. A list of twenty rows,
+             * seventeen of them locked, is a wall rather than a path — it shows
+             * a child mostly what she cannot do yet, and the choice itself is
+             * work she does not need at six.
+             */}
+            <button
+              type="button"
+              className="next-star"
+              onClick={() => {
+                sfxLaunch();
+                onOpenStar(nextStar);
+              }}
+            >
+              <span className="next-label">Your next star</span>
+              <span className="next-title">{nextStar.title}</span>
+              <span className="next-blurb">{nextStar.blurb}</span>
+              <span className="next-go">Start ▸</span>
+            </button>
 
-              return (
-                <li
+            {litStars.length > 0 ? (
+              <section className="lit-section">
+                <h2 className="lit-heading">
+                  ⭐ {litStars.length} star{litStars.length === 1 ? '' : 's'} you have lit
+                </h2>
+                <p className="lit-note">You can play any of these again whenever you like.</p>
+                <div className="lit-row">
+                  {litStars.map((star) => (
+                    <button
+                      key={star.id}
+                      type="button"
+                      className="lit-chip"
+                      onClick={() => {
+                        sfxLaunch();
+                        onOpenStar(star);
+                      }}
+                    >
+                      ⭐ {star.title}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </>
+        ) : (
+          <div className="constellation-done">
+            <p className="done-glyph" aria-hidden="true">👑</p>
+            <h2>Every star here is lit.</h2>
+            <p>You finished the whole constellation. Play any of them again below.</p>
+            <div className="lit-row">
+              {litStars.map((star) => (
+                <button
                   key={star.id}
-                  className="star-node"
-                  style={{ transform: `translate(${offset.x}px, ${offset.y}px)` }}
+                  type="button"
+                  className="lit-chip"
+                  onClick={() => {
+                    sfxLaunch();
+                    onOpenStar(star);
+                  }}
                 >
-                  <button
-                    type="button"
-                    className={`star-button ${done ? 'lit' : ''} ${unlocked ? '' : 'locked'}`}
-                    onClick={() => {
-                      if (!unlocked) {
-                        sfxTap();
-                        return;
-                      }
-                      sfxLaunch();
-                      onOpenStar(star);
-                    }}
-                    disabled={!unlocked}
-                    aria-label={`${star.title}${unlocked ? '' : ' (locked)'}`}
-                  >
-                    <span className="star-icon" aria-hidden="true">
-                      {done ? '⭐' : unlocked ? '☆' : '🔒'}
-                    </span>
-                    <span className="star-node-title">{star.title}</span>
-                    <span className="star-node-meta">
-                      {unlocked ? `${star.minutes} min` : 'Finish the one before'}
-                      {record ? ` · best ${record.bestScore}` : ''}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
+                  ⭐ {star.title}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     );

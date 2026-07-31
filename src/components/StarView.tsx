@@ -4,6 +4,7 @@ import { challengesFor } from '../content';
 import { completeStar, starsCompleted } from '../core/store';
 import { rewardForMilestone } from '../content/rewards';
 import { RewardReveal } from './PrincessScreen';
+import { BackButton } from './BackButton';
 import { sfxStarComplete, sfxStardust, sfxWhoosh } from '../core/audio';
 import { speak, stopSpeaking } from '../core/voice';
 import { setScene } from '../core/music';
@@ -153,9 +154,7 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
   return (
     <div className="star-view">
       <header className="star-header">
-        <button type="button" className="btn btn-quiet" onClick={onExit}>
-          ← Back to the map
-        </button>
+        <BackButton label="Back to the map" onClick={onExit} />
         <div className="star-title-block">
           <h1>{star.title}</h1>
           {phase === 'playing' ? (

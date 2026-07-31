@@ -443,6 +443,101 @@ body {
 
 /* Constellation detail */
 
+/* The way back. Same size, same place, same colour on every screen. */
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--card-ink);
+  background: var(--card-surface);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  padding: 12px 26px 12px 20px;
+  min-height: 54px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.38);
+  transition: transform 0.13s ease;
+}
+
+.back-button:hover { transform: translateX(-4px); }
+.back-arrow { font-size: 1.35rem; line-height: 1; }
+
+/* The single next lesson. Everything beyond it stays hidden. */
+.next-star {
+  font: inherit;
+  color: var(--card-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  width: min(560px, 100%);
+  padding: 26px 30px;
+  text-align: left;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 46%),
+    linear-gradient(160deg, var(--subject-color) 0%, var(--subject-deep) 100%);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.44), 0 0 52px -16px var(--subject-color);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.next-star:hover { transform: translateY(-4px); }
+
+.next-label {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(22, 18, 58, 0.62);
+}
+
+.next-title { font-size: 1.6rem; font-weight: 800; line-height: 1.2; }
+.next-blurb { font-size: 0.98rem; color: rgba(22, 18, 58, 0.78); line-height: 1.5; }
+
+.next-go {
+  margin-top: 10px;
+  align-self: stretch;
+  text-align: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(22, 18, 58, 0.85);
+  border-radius: 999px;
+  padding: 14px;
+}
+
+.lit-section { margin-top: 34px; }
+.lit-heading { margin: 0 0 4px; font-size: 1.05rem; color: var(--ink); }
+.lit-note { margin: 0 0 14px; font-size: 0.9rem; color: var(--ink-faint); }
+.lit-row { display: flex; flex-wrap: wrap; gap: 9px; }
+
+.lit-chip {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-dim);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 10px 16px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.lit-chip:hover { background: rgba(255, 255, 255, 0.14); color: var(--ink); }
+
+.constellation-done { text-align: center; padding: 20px 0; }
+.constellation-done .done-glyph { font-size: 3.4rem; margin: 0; }
+.constellation-done h2 { margin: 8px 0 4px; }
+.constellation-done p { color: var(--ink-dim); margin: 0 0 18px; }
+.constellation-done .lit-row { justify-content: center; }
+
 .constellation-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
 .constellation-header h1 { margin: 0; font-size: 1.9rem; color: var(--subject-color); }
 .constellation-sub { margin: 0; color: var(--ink-dim); }
