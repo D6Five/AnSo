@@ -31,7 +31,15 @@ function identityKey(profile) {
   return `${String(profile.name ?? '').trim().toLowerCase()}|${profile.grade}`;
 }
 
-/** How recently this profile was actually used, for settling name/avatar edits. */
+/**
+ * How recently this copy of the profile was touched, for settling edits to
+ * single-value fields like the outfit or the name.
+ *
+ * `updatedAt` is the authority and is stamped on every change. Deriving
+ * freshness from progress alone was a real bug: changing a dress alters no
+ * progress, so both copies looked equally fresh, the stored one won by tie
+ * break, and the outfit reverted the moment the device synced.
+ */
 function lastActivity(profile) {
   let latest = Number(profile.createdAt) || 0;
   for (const record of Object.values(profile.progress ?? {})) {
@@ -39,6 +47,20 @@ function lastActivity(profile) {
     if (played > latest) latest = played;
   }
   return latest;
+}
+
+/**
+ * Which copy's version of a single-value field wins.
+ *
+ * `updatedAt` alone when either side has it, because it answers exactly the
+ * right question: when did this copy last change. Folding play activity into
+ * the comparison was the bug — a large `lastPlayed` swamps the stamp, both
+ * copies tie, and the stored one wins by accident, reverting the change.
+ * Activity is only the fallback for profiles written before the stamp existed.
+ */
+function editStamp(profile) {
+  const stamped = Number(profile.updatedAt) || 0;
+  return stamped > 0 ? stamped : lastActivity(profile);
 }
 
 function mergeStarProgress(a, b) {
@@ -66,8 +88,8 @@ function canonical(record) {
 }
 
 function mergeProfile(a, b) {
-  // Descriptive fields follow whichever copy was used most recently.
-  const [fresher, staler] = lastActivity(a) >= lastActivity(b) ? [a, b] : [b, a];
+  // Single-value fields follow whichever copy was edited most recently.
+  const [fresher, staler] = editStamp(a) >= editStamp(b) ? [a, b] : [b, a];
 
   const combined = { ...(a.progress ?? {}) };
   for (const [starId, record] of Object.entries(b.progress ?? {})) {
@@ -111,6 +133,7 @@ function mergeProfile(a, b) {
       Number(a.createdAt) || Date.now(),
       Number(b.createdAt) || Date.now(),
     ),
+    updatedAt: Math.max(Number(a.updatedAt) || 0, Number(b.updatedAt) || 0),
     progress,
     reviewQueue,
   };

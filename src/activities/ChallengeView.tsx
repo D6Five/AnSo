@@ -82,22 +82,34 @@ function HintLine({ hint, show }: { hint?: string; show: boolean }) {
  * A word learned only by sight cannot be used in conversation or recognised
  * when somebody else says it.
  */
-function PronounceButton({ word }: { word: string }) {
+function PronounceButton({ word, meaning }: { word: string; meaning?: string }) {
   useEffect(() => {
     // Slightly slow and clearly separated from AnSo's own chatter.
-    const timer = window.setTimeout(() => void speak(word, { rate: 0.78 }), 350);
+    const timer = window.setTimeout(() => void speak(word, { rate: 0.72 }), 350);
     return () => window.clearTimeout(timer);
   }, [word]);
 
   return (
-    <button
-      type="button"
-      className="pronounce-btn"
-      onClick={() => void speak(word, { rate: 0.7 })}
-      aria-label={`Hear the word ${word} again`}
-    >
-      🔊 Hear it again
-    </button>
+    <div className="pronounce-row">
+      <button
+        type="button"
+        className="pronounce-btn"
+        onClick={() => void speak(word, { rate: 0.62 })}
+        aria-label={`Hear the word ${word} again`}
+      >
+        🔊 Say the word
+      </button>
+      {meaning ? (
+        <button
+          type="button"
+          className="pronounce-btn"
+          onClick={() => void speak(meaning, { rate: 0.85 })}
+          aria-label={`Hear what ${word} means`}
+        >
+          📖 What it means
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -142,7 +154,9 @@ function ChoiceView({
   return (
     <div className="challenge choice-challenge">
       {challenge.display ? <p className="challenge-display">{challenge.display}</p> : null}
-      {challenge.pronounce ? <PronounceButton word={challenge.pronounce} /> : null}
+      {challenge.pronounce ? (
+        <PronounceButton word={challenge.pronounce} meaning={challenge.pronounceMeaning} />
+      ) : null}
       <h2 className="challenge-prompt">{challenge.prompt}</h2>
 
       <div className="option-grid">

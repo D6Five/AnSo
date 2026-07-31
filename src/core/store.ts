@@ -175,13 +175,26 @@ export function deleteProfile(id: string): void {
   });
 }
 
+/**
+ * Apply a change to one profile and stamp it.
+ *
+ * Every mutation must go through here. A profile edited without bumping
+ * `updatedAt` looks stale to the sync merge and gets overwritten by whatever
+ * the server already had.
+ */
+function updateProfile(profileId: string, mutate: (p: Profile) => Profile): void {
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) =>
+      p.id === profileId ? { ...mutate(p), updatedAt: Date.now() } : p,
+    ),
+  });
+}
+
 function updateActive(mutate: (p: Profile) => Profile): void {
   const { activeProfileId } = state;
   if (!activeProfileId) return;
-  commit({
-    ...state,
-    profiles: state.profiles.map((p) => (p.id === activeProfileId ? mutate(p) : p)),
-  });
+  updateProfile(activeProfileId, mutate);
 }
 
 /**
@@ -266,35 +279,20 @@ export function buyItem(profileId: string, itemId: string): boolean {
   if ((profile.purchased ?? []).includes(itemId)) return false;
   if (profile.stardust < item.price) return false;
 
-  commit({
-    ...state,
-    profiles: state.profiles.map((p) =>
-      p.id === profileId
-        ? {
-            ...p,
-            stardust: p.stardust - item.price,
-            purchased: [...(p.purchased ?? []), itemId],
-          }
-        : p,
-    ),
-  });
+  updateProfile(profileId, (p) => ({
+    ...p,
+    stardust: p.stardust - item.price,
+    purchased: [...(p.purchased ?? []), itemId],
+  }));
   return true;
 }
 
 export function setPrincess(profileId: string, princess: string): void {
-  commit({
-    ...state,
-    profiles: state.profiles.map((p) => (p.id === profileId ? { ...p, princess } : p)),
-  });
+  updateProfile(profileId, (p) => ({ ...p, princess }));
 }
 
 export function equipDress(profileId: string, dressId: string): void {
-  commit({
-    ...state,
-    profiles: state.profiles.map((p) =>
-      p.id === profileId ? { ...p, equippedDress: dressId } : p,
-    ),
-  });
+  updateProfile(profileId, (p) => ({ ...p, equippedDress: dressId }));
 }
 
 /**
@@ -303,20 +301,16 @@ export function equipDress(profileId: string, dressId: string): void {
  * flower crown.
  */
 export function toggleAccessory(profileId: string, accessoryId: string, slotKey: string): void {
-  commit({
-    ...state,
-    profiles: state.profiles.map((p) => {
-      if (p.id !== profileId) return p;
-      const worn = p.equippedAccessories ?? [];
-      if (worn.includes(accessoryId)) {
-        return { ...p, equippedAccessories: worn.filter((a) => a !== accessoryId) };
-      }
-      const withoutSameSlot = worn.filter((id) => {
-        const other = REWARD_BY_ID[id];
-        return !(other && other.kind === 'accessory' && accessorySlot(other.type) === slotKey);
-      });
-      return { ...p, equippedAccessories: [...withoutSameSlot, accessoryId] };
-    }),
+  updateProfile(profileId, (p) => {
+    const worn = p.equippedAccessories ?? [];
+    if (worn.includes(accessoryId)) {
+      return { ...p, equippedAccessories: worn.filter((a) => a !== accessoryId) };
+    }
+    const withoutSameSlot = worn.filter((id) => {
+      const other = REWARD_BY_ID[id];
+      return !(other && other.kind === 'accessory' && accessorySlot(other.type) === slotKey);
+    });
+    return { ...p, equippedAccessories: [...withoutSameSlot, accessoryId] };
   });
 }
 

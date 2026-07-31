@@ -301,58 +301,239 @@ function money(rng: Rng, simple: boolean): Built {
   };
 }
 
-function wordProblem(rng: Rng, grade3: boolean): Built {
+const PLACES = ['the park', 'the garden', 'the beach', 'her classroom', 'the library', 'her room'];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+/**
+ * Word problems for grade 1.
+ *
+ * Ten shapes rather than two, because the skill being practised is reading a
+ * situation and deciding what to do with it — and a child who has seen the same
+ * two sentences forty times is pattern-matching rather than reading. Numbers
+ * stay inside 20 so the arithmetic never becomes the obstacle to the reading.
+ */
+function wordProblemEasy(rng: Rng): Built {
   const name = rng.pick(NAMES);
+  const friend = rng.pick(NAMES.filter((n) => n !== rng.pick(NAMES)));
   const thing = rng.pick(THINGS);
+  const place = rng.pick(PLACES);
+  const day = rng.pick(DAYS);
 
-  if (!grade3) {
-    const start = rng.int(3, 12);
-    const change = rng.int(1, 8);
-    const gives = rng.chance(0.5) && change < start;
-    const answer = gives ? start - change : start + change;
-    return {
-      expression: gives ? `${start} − ${change}` : `${start} + ${change}`,
-      answer,
-      prompt: gives
-        ? `${name} had ${start} ${thing}. She gave ${change} to a friend. How many does she have now?`
-        : `${name} had ${start} ${thing}. She found ${change} more. How many does she have now?`,
-      hint: gives ? `Giving away means we take away.` : `Finding more means we add.`,
-      teach: `${name} has ${answer} ${thing}.`,
-    };
+  switch (rng.int(0, 9)) {
+    case 0: {
+      const start = rng.int(4, 14);
+      const more = rng.int(2, 6);
+      return {
+        expression: `${start} + ${more}`,
+        answer: start + more,
+        prompt: `${name} had ${start} ${thing}. At ${place} she found ${more} more. How many does she have now?`,
+        hint: 'Finding more means we add.',
+        teach: `${start} and ${more} more makes ${start + more}.`,
+      };
+    }
+    case 1: {
+      const start = rng.int(6, 16);
+      const gone = rng.int(2, 5);
+      return {
+        expression: `${start} − ${gone}`,
+        answer: start - gone,
+        prompt: `${name} had ${start} ${thing}. She gave ${gone} to ${friend}. How many are left?`,
+        hint: 'Giving away means we take away.',
+        teach: `${start} take away ${gone} leaves ${start - gone}.`,
+      };
+    }
+    case 2: {
+      const each = rng.int(2, 5);
+      const groups = rng.int(2, 4);
+      return {
+        expression: `${groups} groups of ${each}`,
+        answer: each * groups,
+        prompt: `${name} has ${groups} baskets. Each basket holds ${each} ${thing}. How many ${thing} altogether?`,
+        hint: `Count by ${each}s, ${groups} times.`,
+        teach: `${groups} groups of ${each} is ${each * groups}.`,
+      };
+    }
+    case 3: {
+      const total = rng.int(8, 18);
+      const some = rng.int(3, total - 2);
+      return {
+        expression: `${some} + ? = ${total}`,
+        answer: total - some,
+        prompt: `${name} needs ${total} ${thing} for a project. She already has ${some}. How many more does she need?`,
+        hint: `Count up from ${some} to ${total}.`,
+        teach: `She needs ${total - some} more.`,
+      };
+    }
+    case 4: {
+      const mine = rng.int(3, 10);
+      const extra = rng.int(2, 6);
+      return {
+        expression: `${mine} + ${extra}`,
+        answer: mine + extra,
+        prompt: `${name} has ${mine} ${thing}. ${friend} has ${extra} more than ${name}. How many does ${friend} have?`,
+        hint: '"More than" means we add.',
+        teach: `${friend} has ${mine + extra}.`,
+      };
+    }
+    case 5: {
+      const big = rng.int(9, 18);
+      const small = rng.int(2, 7);
+      return {
+        expression: `${big} − ${small}`,
+        answer: big - small,
+        prompt: `${name} has ${big} ${thing} and ${friend} has ${small}. How many more does ${name} have?`,
+        hint: '"How many more" means we find the difference.',
+        teach: `${big} minus ${small} is ${big - small} more.`,
+      };
+    }
+    case 6: {
+      const a = rng.int(2, 7);
+      const b = rng.int(2, 7);
+      const c = rng.int(2, 6);
+      return {
+        expression: `${a} + ${b} + ${c}`,
+        answer: a + b + c,
+        prompt: `${name} picked ${a} ${thing} on ${day}, ${b} the next day, and ${c} the day after. How many in all?`,
+        hint: 'Add the first two, then add the last one.',
+        teach: `${a} plus ${b} is ${a + b}, plus ${c} makes ${a + b + c}.`,
+      };
+    }
+    case 7: {
+      const total = rng.int(10, 20);
+      const eaten = rng.int(3, 8);
+      return {
+        expression: `${total} − ${eaten}`,
+        answer: total - eaten,
+        prompt: `There were ${total} ${thing} in a bowl. ${name} and ${friend} took ${eaten} altogether. How many are still in the bowl?`,
+        hint: 'Taken away means subtract.',
+        teach: `${total} minus ${eaten} leaves ${total - eaten}.`,
+      };
+    }
+    case 8: {
+      const pairs = rng.int(2, 6);
+      return {
+        expression: `${pairs} × 2`,
+        answer: pairs * 2,
+        prompt: `${name} lined up ${pairs} pairs of shoes. How many shoes is that?`,
+        hint: 'A pair means two.',
+        teach: `${pairs} pairs is ${pairs * 2} shoes.`,
+      };
+    }
+    default: {
+      const start = rng.int(8, 16);
+      const lost = rng.int(2, 5);
+      const found = rng.int(1, 4);
+      return {
+        expression: `${start} − ${lost} + ${found}`,
+        answer: start - lost + found,
+        prompt: `${name} had ${start} ${thing}. She lost ${lost} at ${place}, then found ${found} in her bag. How many now?`,
+        hint: 'Two steps: take away first, then add.',
+        teach: `${start} minus ${lost} is ${start - lost}, plus ${found} makes ${start - lost + found}.`,
+      };
+    }
   }
+}
 
+/** Word problems for grade 3. Multi-step, and the numbers can be awkward. */
+function wordProblemHard(rng: Rng): Built {
+  const name = rng.pick(NAMES);
+  const friend = rng.pick(NAMES);
+  const thing = rng.pick(THINGS);
+  const day = rng.pick(DAYS);
   const groups = rng.int(3, 9);
   const each = rng.int(3, 9);
-  const style = rng.int(0, 2);
-  if (style === 0) {
-    return {
-      expression: `${groups} × ${each}`,
-      answer: groups * each,
-      prompt: `${name} packed ${groups} boxes with ${each} ${thing} in each box. How many ${thing} altogether?`,
-      hint: `Equal groups means multiply.`,
-      teach: `${groups} boxes of ${each} is ${groups * each} ${thing}.`,
-    };
+
+  switch (rng.int(0, 7)) {
+    case 0:
+      return {
+        expression: `${groups} × ${each}`,
+        answer: groups * each,
+        prompt: `${name} packed ${groups} boxes with ${each} ${thing} in each box. How many ${thing} altogether?`,
+        hint: 'Equal groups means multiply.',
+        teach: `${groups} boxes of ${each} is ${groups * each}.`,
+      };
+    case 1:
+      return {
+        expression: `${groups * each} ÷ ${groups}`,
+        answer: each,
+        prompt: `${name} shared ${groups * each} ${thing} equally among ${groups} friends. How many did each friend get?`,
+        hint: 'Sharing equally means divide.',
+        teach: `Each friend got ${each}.`,
+      };
+    case 2: {
+      const a = rng.int(20, 80);
+      const b = rng.int(10, 40);
+      const c = rng.int(5, 20);
+      return {
+        expression: `${a} + ${b} − ${c}`,
+        answer: a + b - c,
+        prompt: `${name} collected ${a} ${thing} on ${day} and ${b} more the next day. She gave away ${c}. How many are left?`,
+        hint: 'Add the two days first, then subtract.',
+        teach: `${a} plus ${b} is ${a + b}, minus ${c} leaves ${a + b - c}.`,
+      };
+    }
+    case 3: {
+      const price = rng.int(4, 12);
+      const count = rng.int(3, 8);
+      return {
+        expression: `${count} × ${price}`,
+        answer: count * price,
+        prompt: `Each ${thing.replace(/s$/, '')} costs ${price} dollars. ${name} buys ${count} of them. What does she spend?`,
+        hint: 'Same price each time means multiply.',
+        teach: `${count} times ${price} is ${count * price} dollars.`,
+      };
+    }
+    case 4: {
+      const total = rng.int(40, 90);
+      const per = rng.pick([4, 5, 6]);
+      const full = Math.floor(total / per);
+      return {
+        expression: `${total} ÷ ${per}`,
+        answer: full,
+        prompt: `${name} has ${total} ${thing} and puts ${per} in each bag. How many bags does she fill completely?`,
+        hint: 'Divide, and ignore anything left over.',
+        teach: `She fills ${full} bags, with ${total - full * per} left over.`,
+      };
+    }
+    case 5: {
+      const start = rng.int(30, 70);
+      const each2 = rng.int(3, 7);
+      const days = rng.int(3, 6);
+      return {
+        expression: `${start} − ${each2} × ${days}`,
+        answer: start - each2 * days,
+        prompt: `${name} had ${start} ${thing}. She used ${each2} every day for ${days} days. How many are left?`,
+        hint: 'Work out how many she used altogether first.',
+        teach: `${each2} times ${days} is ${each2 * days}, and ${start} minus that is ${start - each2 * days}.`,
+      };
+    }
+    case 6: {
+      const mine = rng.int(12, 40);
+      const times = rng.int(2, 4);
+      return {
+        expression: `${mine} × ${times}`,
+        answer: mine * times,
+        prompt: `${name} has ${mine} ${thing}. ${friend} has ${times} times as many. How many does ${friend} have?`,
+        hint: '"Times as many" means multiply.',
+        teach: `${mine} times ${times} is ${mine * times}.`,
+      };
+    }
+    default: {
+      const total = rng.int(50, 95);
+      const part = rng.int(15, 40);
+      return {
+        expression: `${total} − ${part}`,
+        answer: total - part,
+        prompt: `${total} children came to the fair. ${part} of them were in the first group. How many were in the rest?`,
+        hint: 'The rest means everyone who was not in that group.',
+        teach: `${total} minus ${part} is ${total - part}.`,
+      };
+    }
   }
-  if (style === 1) {
-    const total = groups * each;
-    return {
-      expression: `${total} ÷ ${groups}`,
-      answer: each,
-      prompt: `${name} shared ${total} ${thing} equally among ${groups} friends. How many did each friend get?`,
-      hint: `Sharing equally means divide.`,
-      teach: `Each friend got ${each} ${thing}.`,
-    };
-  }
-  const a = rng.int(20, 80);
-  const b = rng.int(10, 40);
-  const c = rng.int(5, 20);
-  return {
-    expression: `${a} + ${b} − ${c}`,
-    answer: a + b - c,
-    prompt: `${name} collected ${a} ${thing} on Monday and ${b} more on Tuesday. She gave away ${c}. How many are left?`,
-    hint: `Do it in order: add the two days first, then subtract.`,
-    teach: `${a} plus ${b} is ${a + b}, minus ${c} leaves ${a + b - c}.`,
-  };
+}
+
+function wordProblem(rng: Rng, grade3: boolean): Built {
+  return grade3 ? wordProblemHard(rng) : wordProblemEasy(rng);
 }
 
 /* ------------------------------------------------------------------ */
@@ -382,7 +563,10 @@ function build(skill: MathSkill, rng: Rng): Built {
     case 'area-perimeter': return areaPerimeter(rng);
     case 'elapsed-time': return elapsedTime(rng);
     case 'money': return money(rng, rng.chance(0.5));
-    case 'word-problem': return wordProblem(rng, rng.chance(0.5));
+    // Two explicit skills rather than one that picks at random. A grade 1 star
+    // asking for word problems must never roll a multi-step grade 3 one.
+    case 'word-problem': return wordProblem(rng, false);
+    case 'word-problem-hard': return wordProblem(rng, true);
   }
 }
 

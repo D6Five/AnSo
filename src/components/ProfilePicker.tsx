@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { Grade } from '../types';
 import {
-  AVATARS,
   createProfile,
   deleteProfile,
   selectProfile,
@@ -32,9 +31,10 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
   const [addingAnother, setAddingAnother] = useState(false);
   const [name, setName] = useState('');
   const [grade, setGrade] = useState<Grade>(1);
-  const [avatar, setAvatar] = useState(0);
   const [princess, setPrincessChoice] = useState<PrincessId>(PRINCESSES[0].id);
   const chosenPrincess = princessOrDefault(princess);
+  // Kept in step with the princess so the stored value never contradicts her.
+  const avatar = Math.max(0, PRINCESSES.findIndex((p) => p.id === princess));
 
   // Derived rather than stored: profiles can arrive from the server a moment
   // after first paint — on a new device or after a cleared cache — and holding
@@ -96,22 +96,26 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
         <>
           <div className="profile-list">
             {save.profiles.map((profile) => {
-              const look = AVATARS[profile.avatar % AVATARS.length];
+              // Her colour comes from her princess, not from a separate
+              // setting. Two independent colour choices meant picking Ji-woo
+              // and still getting a pink card, which reads as the app losing
+              // the choice she just made.
+              const hers = princessOrDefault(profile.princess);
               return (
                 <div key={profile.id} className="profile-row">
                   <button
                     type="button"
                     className="profile-card"
                     style={{
-                      ['--avatar-color' as string]: look.color,
-                      ['--avatar-deep' as string]: look.deep,
+                      ['--avatar-color' as string]: hers.accent,
+                      ['--avatar-deep' as string]: hers.accentDeep,
                     }}
                     onClick={() => pick(profile.id)}
                   >
-                    <span className="avatar-orb" aria-hidden="true" />
+                    <PrincessArt princess={hers} dress={null} accessories={[]} size={64} />
                     <span className="profile-name">{profile.name}</span>
                     <span className="profile-meta">
-                      Grade {profile.grade} · ✨ {profile.stardust.toLocaleString()}
+                      {hers.name} · Grade {profile.grade}
                     </span>
                   </button>
                   <button
@@ -202,27 +206,9 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
             </p>
           </fieldset>
 
-          <fieldset className="field">
-            <legend>Pick your star colour</legend>
-            <div className="avatar-choice">
-              {AVATARS.map((look, i) => (
-                <button
-                  key={look.name}
-                  type="button"
-                  className={`avatar-swatch ${avatar === i ? 'selected' : ''}`}
-                  style={{
-                    ['--avatar-color' as string]: look.color,
-                    ['--avatar-deep' as string]: look.deep,
-                  }}
-                  onClick={() => {
-                    sfxTap();
-                    setAvatar(i);
-                  }}
-                  aria-label={look.name}
-                />
-              ))}
-            </div>
-          </fieldset>
+          {/* There is deliberately no separate colour picker. The princess is
+              the identity, and her colour follows her — a second, independent
+              colour choice only ever contradicted the first. */}
 
           <div className="create-actions">
             {save.profiles.length > 0 ? (

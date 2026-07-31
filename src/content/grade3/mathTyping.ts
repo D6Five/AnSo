@@ -32,13 +32,13 @@ export const grade3Math: Star[] = [
     id: 'g3_math_04', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
     title: 'Groups of Things',
     blurb: 'Multiplication is just adding the same number over and over, faster.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts', 'word-problem-hard'] } },
   },
   {
     id: 'g3_math_05', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
     title: 'Sharing Equally',
     blurb: 'Division. The opposite question to multiplication.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['div-facts'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['div-facts', 'word-problem-hard'] } },
   },
   {
     id: 'g3_math_06', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
@@ -50,7 +50,7 @@ export const grade3Math: Star[] = [
     id: 'g3_math_07', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
     title: 'Bigger Multiplication',
     blurb: 'Two-digit times one-digit. Break the big number apart first.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-two-digit'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-two-digit', 'word-problem-hard'] } },
   },
   {
     id: 'g3_math_08', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
@@ -74,7 +74,7 @@ export const grade3Math: Star[] = [
     id: 'g3_math_11', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
     title: 'Around and Inside',
     blurb: 'Area and perimeter. One is the walk around, one is the space within.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['area-perimeter'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['area-perimeter', 'word-problem-hard'] } },
   },
   {
     id: 'g3_math_12', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
@@ -86,19 +86,19 @@ export const grade3Math: Star[] = [
     id: 'g3_math_13', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
     title: 'Making Change',
     blurb: 'Money problems. Counting up is usually easier than subtracting.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['money'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['money', 'word-problem-hard'] } },
   },
   {
     id: 'g3_math_14', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
     title: 'Problems in Words',
     blurb: 'The maths is hidden inside a story. Find it first, then solve it.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem-hard'] } },
   },
   {
     id: 'g3_math_15', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
     title: 'Harder Stories',
     blurb: 'These take two steps. Do the first one before you look for the second.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem', 'mult-facts', 'div-facts'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem-hard', 'mult-facts', 'div-facts'] } },
   },
   {
     id: 'g3_math_16', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
@@ -116,7 +116,7 @@ export const grade3Math: Star[] = [
     id: 'g3_math_18', subject: 'math', grade: 3, minutes: 15, timeLimitSeconds: 600,
     title: 'The Whole Ladder',
     blurb: 'Everything from this constellation, all mixed together.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'mult-facts', 'div-facts', 'fractions-compare', 'rounding', 'word-problem'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'mult-facts', 'div-facts', 'fractions-compare', 'rounding', 'word-problem-hard'] } },
   },
   {
     id: 'g3_math_19', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
@@ -128,7 +128,7 @@ export const grade3Math: Star[] = [
     id: 'g3_math_20', subject: 'math', grade: 3, minutes: 16, timeLimitSeconds: 600,
     title: 'The Counting Crown',
     blurb: 'The final star. Twenty problems, every skill you have. Go carefully.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'mult-two-digit', 'div-facts', 'fractions-equivalent', 'rounding', 'area-perimeter', 'elapsed-time', 'money', 'word-problem'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'mult-two-digit', 'div-facts', 'fractions-equivalent', 'rounding', 'area-perimeter', 'elapsed-time', 'money', 'word-problem-hard'] } },
   },
 ];
 

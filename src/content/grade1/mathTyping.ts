@@ -15,33 +15,39 @@ import { GRADE1_SENTENCES, GRADE1_WORDS } from '../generators/typing';
  * needs single letters and two-letter clusters long before whole sentences.
  */
 
-/** 30 questions at roughly 20 seconds each. */
-const MATH_TIME = 600;
+/**
+ * 30 questions at roughly 30 seconds each.
+ *
+ * Deliberately generous for this age. The clock is there to build fluency, not
+ * to create pressure — a six-year-old who feels chased stops thinking and
+ * starts guessing, which practises exactly the wrong thing.
+ */
+const MATH_TIME = 900;
 
 export const grade1Math: Star[] = [
   {
     id: 'g1_math_01', subject: 'math', grade: 1, minutes: 11, timeLimitSeconds: MATH_TIME,
     title: 'Counting Up to Ten',
     blurb: 'Thirty questions, and a clock. Do not rush — steady is faster than frantic.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-within-10', 'sub-within-10'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-within-10', 'sub-within-10'], multipleChoice: true } },
   },
   {
     id: 'g1_math_02', subject: 'math', grade: 1, minutes: 11, timeLimitSeconds: MATH_TIME,
     title: 'Taking Away',
     blurb: 'Counting backwards is its own kind of brave.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['sub-within-10', 'sub-within-20'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['sub-within-10', 'sub-within-20'], multipleChoice: true } },
   },
   {
     id: 'g1_math_03', subject: 'math', grade: 1, minutes: 12, timeLimitSeconds: MATH_TIME,
     title: 'Past Ten',
     blurb: 'The numbers get bigger. You are ready for them.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-within-20', 'sub-within-20'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-within-20', 'sub-within-20'], multipleChoice: true } },
   },
   {
     id: 'g1_math_04', subject: 'math', grade: 1, minutes: 12, timeLimitSeconds: MATH_TIME,
     title: 'The Missing Number',
     blurb: 'Something is hiding in each of these. Your job is to find it.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['missing-addend', 'add-within-20'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['missing-addend', 'add-within-20'], multipleChoice: true } },
   },
   {
     id: 'g1_math_05', subject: 'math', grade: 1, minutes: 12, timeLimitSeconds: MATH_TIME,
@@ -116,28 +122,28 @@ export const grade1Math: Star[] = [
     content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-two-digit', 'sub-two-digit', 'skip-count', 'money', 'word-problem'] } },
   },
   {
-    id: 'g1_math_17', subject: 'math', grade: 1, minutes: 15, timeLimitSeconds: MATH_TIME,
-    title: 'Into the Hundreds',
-    blurb: 'Three-digit numbers. Hundreds, then tens, then ones.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit'] } },
+    id: 'g1_math_17', subject: 'math', grade: 1, minutes: 14, timeLimitSeconds: MATH_TIME,
+    title: 'Reading the Problem',
+    blurb: 'Every one of these is a story. Read it, picture it, then work it out.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem'] } },
   },
   {
-    id: 'g1_math_18', subject: 'math', grade: 1, minutes: 15, timeLimitSeconds: MATH_TIME,
-    title: 'Big Take-Aways',
-    blurb: 'Subtracting past a hundred. This one is genuinely hard.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['sub-three-digit'] } },
+    id: 'g1_math_18', subject: 'math', grade: 1, minutes: 14, timeLimitSeconds: MATH_TIME,
+    title: 'How Many More',
+    blurb: 'Stories where you have to work out the difference, not the total.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem', 'missing-addend'] } },
   },
   {
-    id: 'g1_math_19', subject: 'math', grade: 1, minutes: 15, timeLimitSeconds: MATH_TIME,
+    id: 'g1_math_19', subject: 'math', grade: 1, minutes: 14, timeLimitSeconds: MATH_TIME,
     title: 'Everything So Far',
     blurb: 'No hints about which kind is which. Read each one properly.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'missing-addend', 'place-value', 'money'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-within-20', 'sub-within-20', 'missing-addend', 'place-value', 'money', 'word-problem'] } },
   },
   {
-    id: 'g1_math_20', subject: 'math', grade: 1, minutes: 16, timeLimitSeconds: MATH_TIME,
+    id: 'g1_math_20', subject: 'math', grade: 1, minutes: 15, timeLimitSeconds: MATH_TIME,
     title: 'The Counting Crown',
     blurb: 'The last star of this constellation. Everything, all at once.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'missing-addend', 'compare', 'place-value', 'skip-count', 'money', 'word-problem'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-two-digit', 'sub-two-digit', 'missing-addend', 'compare', 'place-value', 'skip-count', 'money', 'word-problem'] } },
   },
 ];
 

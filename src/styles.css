@@ -935,8 +935,9 @@ body {
 
 .hint-line { margin: 0; color: #b45309; font-size: 1rem; font-weight: 600; }
 
+.pronounce-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
 .pronounce-btn {
-  align-self: center;
   font: inherit;
   font-size: 0.92rem;
   font-weight: 700;

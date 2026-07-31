@@ -38,6 +38,7 @@ function meaningChallenge(entry: WordEntry, idx: number, starId: string): Challe
     prompt: `What does the word "${entry.word}" mean?`,
     display: entry.word,
     pronounce: entry.word,
+    pronounceMeaning: `${entry.word}. ${entry.meaning}. For example. ${entry.cloze.replace('____', entry.word)}`,
     options,
     correct,
     teach: entry.note ?? `"${entry.word}" means ${entry.meaning}.`,

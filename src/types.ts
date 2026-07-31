@@ -52,6 +52,8 @@ interface ChallengeBase {
    * conversation, and cannot recognise it when someone else says it.
    */
   pronounce?: string;
+  /** Definition read aloud on request, alongside the word itself. */
+  pronounceMeaning?: string;
 }
 
 /** Pick one of several options. The workhorse shape. */
@@ -154,7 +156,8 @@ export type MathSkill =
   | 'area-perimeter'
   | 'elapsed-time'
   | 'money'
-  | 'word-problem';
+  | 'word-problem'
+  | 'word-problem-hard';
 
 export interface MathGenerator {
   type: 'math';
@@ -220,6 +223,13 @@ export interface Profile {
   /** Words the child has struggled with, surfaced again later. */
   reviewQueue: string[];
   createdAt: number;
+  /**
+   * When this copy of the profile last changed. Stamped on every mutation and
+   * used by the sync merge to decide which device's version of a single-value
+   * field wins. Without it, changing an outfit altered no progress, so both
+   * copies looked equally fresh and the change was silently reverted.
+   */
+  updatedAt?: number;
   /**
    * Which of the five princesses this explorer plays as. The collection of
    * dresses, accessories and room items is derived from how many distinct stars

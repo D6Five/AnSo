@@ -220,6 +220,35 @@ console.log('\n  Princess and wardrobe follow the child');
 }
 
 /* ------------------------------------------------------------------ */
+console.log('\n  Changing an outfit is not reverted by sync');
+{
+  // The regression: changing a dress alters no progress, so both copies once
+  // looked equally fresh, the stored one won the tie, and the outfit snapped
+  // back the instant the device synced. updatedAt is what settles it now.
+  const onServer = {
+    profiles: [profile({ equippedDress: 'd_first', equippedAccessories: [], updatedAt: 1000,
+      progress: { s: star(1, 5, 5000) } })],
+  };
+  const justChanged = {
+    profiles: [profile({ equippedDress: 'd_ocean', equippedAccessories: ['a_crownSmall'],
+      updatedAt: 2000, progress: { s: star(1, 5, 5000) } })],
+  };
+
+  const merged = mergeSaves(onServer, justChanged).profiles[0];
+  check('the new dress survives', merged.equippedDress === 'd_ocean', `got ${merged.equippedDress}`);
+  check('the new accessory survives', merged.equippedAccessories.includes('a_crownSmall'));
+  check('order does not matter',
+    mergeSaves(justChanged, onServer).profiles[0].equippedDress === 'd_ocean');
+  check('updatedAt carries the newer stamp',
+    mergeSaves(onServer, justChanged).profiles[0].updatedAt === 2000);
+
+  // An older device syncing later must not drag the outfit backwards.
+  const stale = { profiles: [profile({ equippedDress: 'd_first', updatedAt: 500 })] };
+  check('a stale device cannot undo it',
+    mergeSaves(mergeSaves(onServer, justChanged), stale).profiles[0].equippedDress === 'd_ocean');
+}
+
+/* ------------------------------------------------------------------ */
 console.log('\n  Review queue');
 {
   const a = { profiles: [profile({ reviewQueue: ['orbit', 'vast'] })] };
