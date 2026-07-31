@@ -46,15 +46,66 @@ export const AVATARS = [
   { name: 'Vega', color: '#f9c4a1', deep: '#efa271' },
 ] as const;
 
+/**
+ * Explorers the app ships with, so there is something to test against without
+ * setting anything up first.
+ *
+ * Seeded only when there is no save at all. A save that exists but has no
+ * profiles means every explorer was deleted on purpose, and re-creating them
+ * would make deletion look broken. Both start with stardust and no progress, so
+ * the shop can be exercised while the treasure collection is still empty.
+ */
+const SEED_PROFILES: Profile[] = [
+  {
+    id: 'seed_mia',
+    name: 'Mia',
+    grade: 3,
+    avatar: 0,
+    stardust: 3500,
+    progress: {},
+    reviewQueue: [],
+    createdAt: 1,
+    updatedAt: 1,
+    princess: 'luna',
+    equippedAccessories: [],
+    purchased: [],
+    micEnabled: true,
+  },
+  {
+    id: 'seed_zen',
+    name: 'Zen',
+    grade: 1,
+    avatar: 2,
+    stardust: 2000,
+    progress: {},
+    reviewQueue: [],
+    createdAt: 2,
+    updatedAt: 1,
+    princess: 'solara',
+    equippedAccessories: [],
+    purchased: [],
+    micEnabled: true,
+  },
+];
+
 let state: SaveData = load();
 const listeners = new Set<() => void>();
+
+function firstRunSave(): SaveData {
+  return {
+    ...DEFAULT_SAVE,
+    profiles: SEED_PROFILES.map((p) => ({ ...p })),
+  };
+}
 
 function load(): SaveData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...DEFAULT_SAVE };
+    // No save at all means a genuinely first run, which is the only time the
+    // seed explorers appear.
+    if (!raw) return firstRunSave();
     const parsed = JSON.parse(raw) as SaveData;
-    if (parsed.version !== 1) return { ...DEFAULT_SAVE };
+    if (parsed.version !== 1) return firstRunSave();
     return {
       ...DEFAULT_SAVE,
       ...parsed,
@@ -63,7 +114,7 @@ function load(): SaveData {
     };
   } catch {
     // A corrupt save must never brick the app for a child.
-    return { ...DEFAULT_SAVE };
+    return firstRunSave();
   }
 }
 
