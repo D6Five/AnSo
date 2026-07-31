@@ -98,6 +98,25 @@ function firstRunSave(): SaveData {
   };
 }
 
+/**
+ * Add back any seed explorer that is missing and has not been deleted.
+ *
+ * Seeding only on a completely empty save was too narrow: any browser that had
+ * ever opened the app already had a save, so the test explorers never appeared
+ * there. They are now restored whenever they are absent, which is what "ships
+ * with Mia and Zen" has to mean to be useful.
+ *
+ * Deletion still wins — a tombstoned seed stays gone — so this cannot become a
+ * profile that keeps coming back.
+ */
+function withSeedProfiles(save: SaveData): SaveData {
+  const tombstoned = new Set(save.deletedProfileIds ?? []);
+  const present = new Set(save.profiles.map((p) => p.id));
+  const missing = SEED_PROFILES.filter((p) => !present.has(p.id) && !tombstoned.has(p.id));
+  if (missing.length === 0) return save;
+  return { ...save, profiles: [...save.profiles, ...missing.map((p) => ({ ...p }))] };
+}
+
 function load(): SaveData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -106,12 +125,12 @@ function load(): SaveData {
     if (!raw) return firstRunSave();
     const parsed = JSON.parse(raw) as SaveData;
     if (parsed.version !== 1) return firstRunSave();
-    return {
+    return withSeedProfiles({
       ...DEFAULT_SAVE,
       ...parsed,
       settings: { ...DEFAULT_SAVE.settings, ...parsed.settings },
       deletedProfileIds: parsed.deletedProfileIds ?? [],
-    };
+    });
   } catch {
     // A corrupt save must never brick the app for a child.
     return firstRunSave();
@@ -177,7 +196,10 @@ export function applyRemoteProfiles(profiles: Profile[], deletedProfileIds: stri
     activeProfileId = (sameId ?? sameChild)?.id ?? null;
   }
 
-  commit({ ...state, profiles, deletedProfileIds, activeProfileId });
+  // Top up the seeds here too. The server's copy of the profile list replaces
+  // the local one wholesale, so without this a device whose server save predates
+  // the seed explorers would lose them again on the first sync.
+  commit(withSeedProfiles({ ...state, profiles, deletedProfileIds, activeProfileId }));
 }
 
 export function useActiveProfile(): Profile | null {
