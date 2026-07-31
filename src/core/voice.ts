@@ -128,6 +128,13 @@ export interface SpeakOptions {
   /** 1 is normal. Slightly slow suits early readers. */
   rate?: number;
   pitch?: number;
+  /**
+   * BCP-47 tag, e.g. 'ko-KR'. Uses a matching installed voice when there is
+   * one. If there is not, the utterance still speaks with the default voice
+   * rather than falling silent — an approximate Korean pronunciation is more
+   * use to a child than none, and the romanisation is on screen regardless.
+   */
+  lang?: string;
   /** Called when the utterance finishes or is cancelled. */
   onEnd?: () => void;
   /** Cancel anything already speaking. Defaults to true. */
@@ -142,7 +149,7 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
   // Pitch sits near neutral. Raising it makes a modern neural voice sound
   // younger, but makes an old SAPI voice sound thin and chipmunk-like — and the
   // old voices are exactly the ones already struggling to sound human.
-  const { rate = 0.92, pitch = 1.02, onEnd, interrupt = true } = opts;
+  const { rate = 0.92, pitch = 1.02, lang, onEnd, interrupt = true } = opts;
 
   if (!enabled || !isSynthesisSupported() || !text.trim()) {
     onEnd?.();
@@ -157,7 +164,18 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
     // competing with her own soundtrack.
     duckForSpeech(true);
     if (!voicesReady) cachedVoice = pickVoice();
-    if (cachedVoice) utter.voice = cachedVoice;
+
+    if (lang) {
+      utter.lang = lang;
+      const prefix = lang.toLowerCase().split('-')[0];
+      const match = (window.speechSynthesis?.getVoices() ?? []).find((v) =>
+        v.lang.toLowerCase().startsWith(prefix),
+      );
+      utter.voice = match ?? cachedVoice;
+    } else if (cachedVoice) {
+      utter.voice = cachedVoice;
+    }
+
     utter.rate = rate;
     utter.pitch = pitch;
     utter.volume = 1;

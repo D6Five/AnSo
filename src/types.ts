@@ -12,6 +12,7 @@ export type Grade = 1 | 3;
 export type SubjectId =
   | 'reading'
   | 'vocabulary'
+  | 'korean'
   | 'math'
   | 'thinking'
   | 'typing'
@@ -52,8 +53,12 @@ interface ChallengeBase {
    * conversation, and cannot recognise it when someone else says it.
    */
   pronounce?: string;
+  /** BCP-47 tag for the pronounced word, e.g. 'ko-KR'. Defaults to English. */
+  pronounceLang?: string;
   /** Definition read aloud on request, alongside the word itself. */
   pronounceMeaning?: string;
+  /** Key into the picture set. Carries the meaning where words cannot yet. */
+  picture?: string;
 }
 
 /** Pick one of several options. The workhorse shape. */

@@ -29,6 +29,15 @@ export const SUBJECTS: Subject[] = [
     description: 'Collect new words and learn what they really mean.',
   },
   {
+    id: 'korean',
+    name: 'Korean Words',
+    constellation: 'The Lantern Road',
+    color: '#f9a8a8',
+    colorDeep: '#e97070',
+    glyph: '한',
+    description: 'Learn to read and say your first words in Korean.',
+  },
+  {
     id: 'math',
     name: 'Numbers',
     constellation: 'The Counting Crown',

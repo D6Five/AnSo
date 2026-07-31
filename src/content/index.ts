@@ -12,6 +12,7 @@ import { grade3Vocabulary } from './grade3/vocabulary';
 import { grade3Thinking } from './grade3/thinking';
 import { grade3Math, grade3Typing } from './grade3/mathTyping';
 
+import { koreanStars } from './korean';
 import { buildBsfStars } from './bsf';
 import { BSF_WEEKS } from './bsfWeeks';
 import { generateMath } from './generators/math';
@@ -22,6 +23,7 @@ export { SUBJECTS, SUBJECT_BY_ID } from './subjects';
 const GRADE1: Star[] = [
   ...grade1Reading,
   ...grade1Vocabulary,
+  ...koreanStars(1),
   ...grade1Math,
   ...grade1Thinking,
   ...grade1Typing,
@@ -31,6 +33,7 @@ const GRADE1: Star[] = [
 const GRADE3: Star[] = [
   ...grade3Reading,
   ...grade3Vocabulary,
+  ...koreanStars(3),
   ...grade3Math,
   ...grade3Thinking,
   ...grade3Typing,

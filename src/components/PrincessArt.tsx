@@ -194,9 +194,13 @@ function FrontHair({ princess }: { princess: Princess }) {
 
       {hair === 'bun' ? (
         <>
-          <ellipse cx="100" cy="14" rx="20" ry="16" fill={hairColor} />
-          <ellipse cx="100" cy="14" rx="20" ry="16" fill={streak} opacity="0.22" />
-          <ellipse cx="93" cy="9" rx="7.5" ry="4.5" fill={hairShine} opacity="0.6" />
+          {/* Smaller, set back and tucked behind the crown of the head. At full
+              size and centred it read as a hat sitting on top of her. */}
+          <ellipse cx="100" cy="19" rx="15" ry="12" fill={hairColor} />
+          <ellipse cx="100" cy="19" rx="15" ry="12" fill={streak} opacity="0.2" />
+          <ellipse cx="95" cy="15" rx="6" ry="3.5" fill={hairShine} opacity="0.55" />
+          {/* Strands sweeping up into it, so it grows out of the hair. */}
+          <path d="M84 30 C 90 22, 110 22, 116 30 C 108 26, 92 26, 84 30 Z" fill={hairColor} />
         </>
       ) : null}
 
@@ -251,9 +255,21 @@ function Eye({ cx, cy, color, flip }: { cx: number; cy: number; color: string; f
       <path d={outline} fill="#fffcfa" />
 
       <g clipPath={`url(#${id})`}>
-        <ellipse cx={cx + 0.5} cy={cy - 1} rx="6.6" ry="7.6" fill={color} />
-        <ellipse cx={cx + 0.5} cy={cy - 1} rx="6.6" ry="7.6" fill={`url(#iris-${id})`} />
-        <ellipse cx={cx + 0.5} cy={cy - 1} rx="3" ry="3.8" fill="#150d13" />
+        <ellipse cx={cx + 0.5} cy={cy - 1} rx="7.2" ry="8.2" fill={color} />
+        <ellipse cx={cx + 0.5} cy={cy - 1} rx="7.2" ry="8.2" fill={`url(#iris-${id})`} />
+        {/* A darker ring around the iris. Without it the eye reads as a flat
+            disc of colour rather than something with depth. */}
+        <ellipse
+          cx={cx + 0.5}
+          cy={cy - 1}
+          rx="7.2"
+          ry="8.2"
+          fill="none"
+          stroke="#2a1420"
+          strokeWidth="1.6"
+          opacity="0.65"
+        />
+        <ellipse cx={cx + 0.5} cy={cy - 1} rx="3.2" ry="4" fill="#150d13" />
         {/* Upper lid, thick and soft-ended. */}
         <path
           d={`M${cx - 11} ${cy + 1} C ${cx - 9} ${cy - 8}, ${cx + 3} ${cy - 10}, ${cx + 11} ${cy - 3}`}
@@ -263,6 +279,17 @@ function Eye({ cx, cy, color, flip }: { cx: number; cy: number; color: string; f
           strokeLinecap="round"
         />
       </g>
+
+      {/* Eyelid crease, a hair above the lash line. Small, and it is most of
+          what makes an eye look drawn rather than stamped on. */}
+      <path
+        d={`M${cx - 8} ${cy - 7.5} C ${cx - 5} ${cy - 12}, ${cx + 4} ${cy - 13}, ${cx + 10} ${cy - 8}`}
+        stroke="#8a5c68"
+        strokeWidth="1.1"
+        fill="none"
+        strokeLinecap="round"
+        opacity="0.55"
+      />
 
       {/* Lashes: three separated strokes sweeping up at the outer corner. */}
       <g stroke="#1d1219" strokeWidth="1.6" fill="none" strokeLinecap="round">
@@ -408,12 +435,29 @@ function Accessory({ item }: { item: AccessoryReward }) {
         </g>
       );
     case 'shoes':
-      // Peeking out below the hem, which is all you ever see of a gown's shoes.
+      /*
+       * Drawn in front of the hem and standing clear of it. Tucked behind the
+       * skirt they were technically correct and completely invisible, which is
+       * a poor reward for something a child chose on purpose.
+       */
       return (
         <g>
-          <path d="M84 256 q 8 -6, 15 0 q 1 6, -7 7 q -8 0, -8 -7 Z" fill={light} stroke={deep} strokeWidth="1.2" />
-          <path d="M101 256 q 8 -6, 15 0 q 0 7, -8 7 q -8 -1, -7 -7 Z" fill={light} stroke={deep} strokeWidth="1.2" />
-          <path d="M88 263 l 2 5 M110 263 l 2 5" stroke={deep} strokeWidth="2" strokeLinecap="round" />
+          <ellipse cx="100" cy="256" rx="42" ry="9" fill="#000" opacity="0.18" />
+          {[80, 120].map((x) => (
+            <g key={x}>
+              {/* A little ankle, so the shoe reads as worn rather than placed. */}
+              <rect x={x - 5} y={240} width="10" height="14" rx="4" fill="#f2cdb0" />
+              <path
+                d={`M${x - 12} 254 q 12 -8, 24 0 q 2 10, -12 11 q -14 -1, -12 -11 Z`}
+                fill={light}
+                stroke={deep}
+                strokeWidth="1.6"
+              />
+              <path d={`M${x - 11} 258 q 11 4, 22 0`} stroke={deep} strokeWidth="1.4" fill="none" opacity="0.7" />
+              <ellipse cx={x - 4} cy={256} rx="4" ry="2" fill="#fff" opacity="0.45" />
+              <path d={`M${x + 8} 265 l 3 6`} stroke={deep} strokeWidth="3" strokeLinecap="round" />
+            </g>
+          ))}
         </g>
       );
     case 'bag':
@@ -442,8 +486,7 @@ function Accessory({ item }: { item: AccessoryReward }) {
   }
 }
 
-/** Drawn before the body. Shoes go here too, so the hem overlaps them. */
-const BEHIND: AccessoryReward['type'][] = ['wings', 'cape', 'shoes'];
+const BEHIND: AccessoryReward['type'][] = ['wings', 'cape'];
 
 /* ------------------------------------------------------------------ */
 

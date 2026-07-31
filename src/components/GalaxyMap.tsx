@@ -90,7 +90,7 @@ export function GalaxyMap({
           ['--subject-deep' as string]: subject.colorDeep,
         }}
       >
-        <BackButton label="All constellations" onClick={() => setOpenSubject(null)} />
+        <BackButton label="Go Home" onClick={() => setOpenSubject(null)} />
 
         <header className="constellation-header">
           <h1>
@@ -199,39 +199,17 @@ export function GalaxyMap({
         </div>
       </header>
 
+      {/*
+       * Two columns: the journey on the left, her princess down the right,
+       * running alongside the greeting and the constellations rather than
+       * sitting as a wide band above them. The reward for the work, next to
+       * the work.
+       */}
+      <div className="galaxy-body">
+      <div className="galaxy-main">
       <div className="galaxy-greeting">
         <AnSoGuide mood="idle" says={greeting} voice={voiceEnabled} size={110} />
       </div>
-
-      {/* Her princess sits above the constellations, so the reason for doing
-          the work is visible before the work is. */}
-      <button
-        type="button"
-        className="princess-banner"
-        style={{
-          ['--card-hue' as string]: princess.accent,
-          ['--card-hue-deep' as string]: princess.accentDeep,
-        }}
-        onClick={() => {
-          sfxWhoosh();
-          onOpenPrincess();
-        }}
-      >
-        <PrincessArt
-          princess={princess}
-          dress={wornDress}
-          accessories={wornAccessories}
-          size={92}
-        />
-        <span className="banner-text">
-          <strong>
-            {princess.name} <span className="hangul">{princess.hangul}</span>
-          </strong>
-          <span>
-            👑 {treasures.length} treasure{treasures.length === 1 ? '' : 's'} · tap to dress her
-          </span>
-        </span>
-      </button>
 
       <div className="constellation-grid">
         {SUBJECTS.map((subject) => {
@@ -265,6 +243,35 @@ export function GalaxyMap({
             </button>
           );
         })}
+      </div>
+      </div>
+
+      <button
+        type="button"
+        className="princess-panel"
+        style={{
+          ['--card-hue' as string]: princess.accent,
+          ['--card-hue-deep' as string]: princess.accentDeep,
+        }}
+        onClick={() => {
+          sfxWhoosh();
+          onOpenPrincess();
+        }}
+      >
+        <span className="panel-name">
+          {princess.name} <span className="hangul">{princess.hangul}</span>
+        </span>
+        <PrincessArt
+          princess={princess}
+          dress={wornDress}
+          accessories={wornAccessories}
+          size={190}
+        />
+        <span className="panel-meta">
+          👑 {treasures.length} treasure{treasures.length === 1 ? '' : 's'}
+        </span>
+        <span className="panel-cta">Tap to dress her</span>
+      </button>
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ const GRADES = [1, 3];
 const SUBJECT_NAMES = {
   reading: 'Reading comprehension',
   vocabulary: 'Vocabulary',
+  korean: 'Korean words',
   math: 'Math',
   thinking: 'Critical thinking',
   typing: 'Typing',

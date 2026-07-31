@@ -551,8 +551,54 @@ body {
 .constellation-done .lit-row { justify-content: center; }
 
 .constellation-header { display: flex; flex-direction: column; gap: 10px; margin-bottom: 30px; }
-.constellation-header h1 { margin: 0; font-size: 1.9rem; color: var(--subject-color); }
-.constellation-sub { margin: 0; color: var(--ink-dim); }
+/* Title at roughly three times its old size — this is the sign over the door,
+   and a young reader should not have to look for it. */
+.constellation-header h1 {
+  margin: 0;
+  /* Three times the old 1.9rem. */
+  font-size: 5.7rem;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  color: var(--subject-color);
+}
+
+.constellation-sub { margin: 0; font-size: 1.25rem; color: var(--ink-dim); }
+
+/* The lesson introduction, scaled up 2.5x. It is the one thing on screen that
+   explains what she is about to do, and it was the smallest text on the page. */
+.intro-panel .anso-bubble {
+  max-width: min(940px, 94vw);
+  /* 2.5x the old 1.05rem, with padding scaled to match. */
+  padding: 40px 48px;
+  font-size: 2.625rem;
+  line-height: 1.4;
+  border-radius: 32px;
+}
+
+.intro-panel .btn-large { font-size: 1.7rem; padding: 26px 60px; min-height: 86px; }
+
+@media (max-width: 760px) {
+  .constellation-header h1 { font-size: 2.9rem; }
+  .intro-panel .anso-bubble { font-size: 1.5rem; padding: 26px 28px; }
+  .intro-panel .btn-large { font-size: 1.25rem; padding: 18px 38px; min-height: 64px; }
+}
+
+/* Korean vocabulary pictures */
+
+.picture-holder { display: flex; justify-content: center; }
+
+.word-picture {
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 3px solid var(--card-border);
+  border-radius: 22px;
+  padding: 8px;
+  box-shadow: 0 6px 18px rgba(22, 18, 58, 0.16);
+}
+
+/* Hangul needs to be large enough to actually make out the strokes. */
+.korean-display { font-size: 2.6rem; letter-spacing: 0.06em; }
 
 .star-path { list-style: none; margin: 0; padding: 0 0 40px; display: flex; flex-direction: column; gap: 14px; }
 
@@ -627,31 +673,54 @@ body {
 /* Princess                                                            */
 /* ------------------------------------------------------------------ */
 
-.princess-banner {
+/* Journey on the left, princess down the right. */
+.galaxy-body { display: grid; grid-template-columns: 1fr minmax(230px, 270px); gap: 22px; align-items: start; }
+.galaxy-main { min-width: 0; }
+
+.princess-panel {
   font: inherit;
   color: var(--card-ink);
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 18px;
-  width: 100%;
-  padding: 14px 22px;
-  margin-bottom: 26px;
-  text-align: left;
-  border-radius: 22px;
+  gap: 6px;
+  padding: 18px 16px 20px;
+  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   background:
     linear-gradient(160deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 46%),
     linear-gradient(160deg, var(--card-hue) 0%, var(--card-hue-deep) 100%);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4), 0 0 46px -18px var(--card-hue);
+  box-shadow: 0 16px 38px rgba(0, 0, 0, 0.42), 0 0 52px -18px var(--card-hue);
   cursor: pointer;
+  /* Follows down the page as the constellation list scrolls past. */
+  position: sticky;
+  top: 16px;
   transition: transform 0.15s ease;
 }
 
-.princess-banner:hover { transform: translateY(-3px); }
-.banner-text { display: flex; flex-direction: column; gap: 3px; }
-.banner-text strong { font-size: 1.2rem; font-weight: 800; }
-.banner-text span { font-size: 0.88rem; color: rgba(22, 18, 58, 0.72); font-weight: 600; }
+.princess-panel:hover { transform: translateY(-3px); }
+.panel-name { font-size: 1.2rem; font-weight: 800; }
+.panel-meta { font-size: 0.92rem; font-weight: 700; color: rgba(22, 18, 58, 0.8); }
+
+.panel-cta {
+  margin-top: 4px;
+  align-self: stretch;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(22, 18, 58, 0.82);
+  border-radius: 999px;
+  padding: 9px;
+}
+
 .hangul { font-weight: 500; opacity: 0.75; }
+
+@media (max-width: 860px) {
+  .galaxy-body { grid-template-columns: 1fr; }
+  .princess-panel { position: static; flex-direction: row; justify-content: center; gap: 18px; }
+  .princess-panel .panel-cta { align-self: center; padding: 9px 20px; }
+}
 
 .princess-header { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
 .princess-title h1 { margin: 0; font-size: 1.7rem; }

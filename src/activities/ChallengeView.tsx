@@ -12,6 +12,7 @@ import { isNearMiss, matchAnswer } from '../core/match';
 import { createRng } from '../core/rng';
 import { sfxCorrect, sfxKey, sfxKeyMiss, sfxTap, sfxTryAgain } from '../core/audio';
 import { speak } from '../core/voice';
+import { WordPicture } from '../components/WordPicture';
 import { MicButton } from './MicButton';
 
 /**
@@ -82,19 +83,27 @@ function HintLine({ hint, show }: { hint?: string; show: boolean }) {
  * A word learned only by sight cannot be used in conversation or recognised
  * when somebody else says it.
  */
-function PronounceButton({ word, meaning }: { word: string; meaning?: string }) {
+function PronounceButton({
+  word,
+  meaning,
+  lang,
+}: {
+  word: string;
+  meaning?: string;
+  lang?: string;
+}) {
   useEffect(() => {
     // Slightly slow and clearly separated from AnSo's own chatter.
-    const timer = window.setTimeout(() => void speak(word, { rate: 0.72 }), 350);
+    const timer = window.setTimeout(() => void speak(word, { rate: 0.72, lang }), 350);
     return () => window.clearTimeout(timer);
-  }, [word]);
+  }, [word, lang]);
 
   return (
     <div className="pronounce-row">
       <button
         type="button"
         className="pronounce-btn"
-        onClick={() => void speak(word, { rate: 0.62 })}
+        onClick={() => void speak(word, { rate: 0.62, lang })}
         aria-label={`Hear the word ${word} again`}
       >
         🔊 Say the word
@@ -166,9 +175,18 @@ function ChoiceView({
 
   return (
     <div className="challenge choice-challenge">
+      {challenge.picture ? (
+        <div className="picture-holder">
+          <WordPicture name={challenge.picture} size={150} />
+        </div>
+      ) : null}
       {challenge.display ? <p className="challenge-display">{challenge.display}</p> : null}
       {challenge.pronounce ? (
-        <PronounceButton word={challenge.pronounce} meaning={challenge.pronounceMeaning} />
+        <PronounceButton
+          word={challenge.pronounce}
+          meaning={challenge.pronounceMeaning}
+          lang={challenge.pronounceLang}
+        />
       ) : null}
       <h2 className="challenge-prompt">{challenge.prompt}</h2>
 

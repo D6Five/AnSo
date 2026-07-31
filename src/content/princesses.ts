@@ -12,7 +12,7 @@
  * things that do not.
  */
 
-export type PrincessId = 'seoyeon' | 'haeun' | 'jiwoo';
+export type PrincessId = 'luna' | 'nova' | 'solara';
 
 export type HairStyle = 'long' | 'braid' | 'bun' | 'halfUp' | 'wavy';
 
@@ -49,13 +49,13 @@ export interface Princess {
  */
 export const PRINCESSES: Princess[] = [
   {
-    id: 'seoyeon',
-    name: 'Seo-yeon',
-    hangul: '서연',
-    englishName: 'Sarah',
-    meaning: 'auspicious and graceful',
+    id: 'luna',
+    name: 'Luna',
+    hangul: '루나',
+    englishName: 'Seo-yeon 서연',
+    meaning: 'the moon — steady, and brightest when the world is quiet',
     personality:
-      'Seo-yeon reads everything twice, once for the story and once for the parts she missed.',
+      'Luna is the calm one. She reads everything twice, once for the story and once for the parts she missed, and she notices what everybody else walked past.',
     hair: 'long',
     hairColor: '#151013',
     hairShine: '#3a2c33',
@@ -67,13 +67,13 @@ export const PRINCESSES: Princess[] = [
     accentDeep: '#4fbfd9',
   },
   {
-    id: 'haeun',
-    name: 'Ha-eun',
-    hangul: '하은',
-    englishName: 'Chloe',
-    meaning: 'grace and kindness',
+    id: 'nova',
+    name: 'Nova',
+    hangul: '노바',
+    englishName: 'Ha-eun 하은',
+    meaning: 'a new star — a sudden burst of light where there was none',
     personality:
-      'Ha-eun is the one who notices when somebody has gone quiet, and goes and sits with them.',
+      'Nova is warm and quick to arrive. She is the one who notices when somebody has gone quiet, and goes and sits with them without being asked.',
     hair: 'braid',
     hairColor: '#241318',
     hairShine: '#48282f',
@@ -85,13 +85,13 @@ export const PRINCESSES: Princess[] = [
     accentDeep: '#ee87af',
   },
   {
-    id: 'jiwoo',
-    name: 'Ji-woo',
-    hangul: '지우',
-    englishName: 'Grace',
-    meaning: 'wisdom and the universe',
+    id: 'solara',
+    name: 'Solara',
+    hangul: '솔라라',
+    englishName: 'Ji-woo 지우',
+    meaning: 'of the sun — bright, warm, and impossible to ignore',
     personality:
-      'Ji-woo asks why about four hundred times a day, and she is right to.',
+      'Solara is the bold one. She asks why about four hundred times a day, and she is right to.',
     hair: 'bun',
     hairColor: '#16101c',
     hairShine: '#372a44',
