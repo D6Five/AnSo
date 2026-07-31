@@ -8,7 +8,7 @@ import { PrincessArt } from './PrincessArt';
 import { BackButton } from './BackButton';
 import { princessOrDefault } from '../content/princesses';
 import { REWARD_BY_ID, type AccessoryReward, type DressReward } from '../content/rewards';
-import { earnedRewards } from '../core/store';
+import { earnedRewards, spendableStardust } from '../core/store';
 
 /**
  * The universe of learning.
@@ -185,8 +185,8 @@ export function GalaxyMap({
           <span className="chip-name">{profile.name}</span>
           <span className="chip-grade">Grade {profile.grade}</span>
         </div>
-        <div className="stardust-counter" title="Stardust earned">
-          ✨ {profile.stardust.toLocaleString()}
+        <div className="stardust-counter" title="Stardust left to spend in the shop">
+          ✨ {spendableStardust(profile).toLocaleString()}
         </div>
         <div className="header-actions">
           <SyncBadge />

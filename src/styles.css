@@ -447,24 +447,36 @@ body {
 .back-button {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font: inherit;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--card-ink);
-  background: var(--card-surface);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: #4a3208;
+  background: linear-gradient(160deg, #ffe9a8 0%, #f3bc3c 55%, #dc9c18 100%);
+  border: 2px solid #fff3cf;
   border-radius: 999px;
-  padding: 12px 26px 12px 20px;
-  min-height: 54px;
+  padding: 13px 30px 13px 22px;
+  min-height: 58px;
   margin-bottom: 20px;
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.38);
-  transition: transform 0.13s ease;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.42), 0 0 34px -10px #f3bc3c;
+  transition: transform 0.13s ease, box-shadow 0.13s ease;
 }
 
-.back-button:hover { transform: translateX(-4px); }
-.back-arrow { font-size: 1.35rem; line-height: 1; }
+.back-button:hover {
+  transform: translateX(-3px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.48), 0 0 46px -8px #f3bc3c;
+}
+
+.back-arrow { font-size: 1.5rem; line-height: 1; animation: nudge-back 1.6s ease-in-out infinite; }
+
+/* A small, continuous leftward nudge — enough to catch the eye and read as
+   "this way out" without becoming a distraction on every screen. */
+@keyframes nudge-back {
+  0%, 100% { transform: translateX(0); }
+  45% { transform: translateX(-5px); }
+  70% { transform: translateX(0); }
+}
 
 /* The single next lesson. Everything beyond it stays hidden. */
 .next-star {
@@ -670,7 +682,8 @@ body {
 
 .tab-btn.active { background: var(--card-surface); color: var(--card-ink); border-color: transparent; }
 
-.wardrobe { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 24px; align-items: start; }
+/* The princess gets the bigger half now that she is drawn larger. */
+.wardrobe { display: grid; grid-template-columns: minmax(340px, 440px) 1fr; gap: 24px; align-items: start; }
 
 .princess-stage {
   display: flex;
@@ -697,27 +710,43 @@ body {
 .closet h2:not(:first-child) { margin-top: 24px; }
 .closet-empty { margin: 0; color: var(--card-ink-dim); font-size: 0.95rem; }
 
-.swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+/* Halved from the original, so the fittings stay out of the princess's way. */
+.swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 7px; }
 
 .swatch {
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.56rem;
   font-weight: 700;
   color: var(--card-ink);
-  min-height: 64px;
-  padding: 8px 10px;
+  min-height: 66px;
+  padding: 5px 4px 4px;
   display: flex;
-  align-items: flex-end;
-  border-radius: 12px;
-  border: 3px solid transparent;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+  border-radius: 10px;
+  border: 2px solid transparent;
   background: linear-gradient(150deg, var(--sw-a) 0%, var(--sw-b) 100%);
   cursor: pointer;
   transition: transform 0.12s ease;
 }
 
 .swatch:hover { transform: translateY(-2px); }
-.swatch.worn { border-color: #16123a; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7); }
-.swatch-name { line-height: 1.25; text-shadow: 0 1px 2px rgba(255, 255, 255, 0.55); }
+.swatch.worn { border-color: #16123a; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.75); }
+
+.swatch-name {
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+  /* Two lines at most; the picture is doing the identifying. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.reward-icon { filter: drop-shadow(0 1px 2px rgba(22, 18, 58, 0.28)); }
 
 .header-counts { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -767,7 +796,12 @@ body {
 
 /* Chamber */
 
-.chamber { position: relative; display: inline-block; }
+.chamber { position: relative; display: inline-block; max-width: 100%; }
+.chamber svg { max-width: 100%; height: auto; }
+
+/* The chamber is the point of the whole reward loop, so let it use the page. */
+.room-view { width: 100%; }
+.princess-screen { max-width: 1180px; margin: 0 auto; }
 
 .chamber-figure {
   position: absolute;

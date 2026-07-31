@@ -249,6 +249,31 @@ console.log('\n  Changing an outfit is not reverted by sync');
 }
 
 /* ------------------------------------------------------------------ */
+console.log('\n  Spending survives a sync');
+{
+  // The regression: the balance used to be stored and decremented, and the
+  // merge took the higher of the two — so a purchase was refunded the instant
+  // the device synced while the item stayed bought. stardust is now lifetime
+  // earned, and spending is derived from the purchase list.
+  const server = { profiles: [profile({ stardust: 1200, purchased: [], updatedAt: 1000 })] };
+  const afterBuying = {
+    profiles: [profile({ stardust: 1200, purchased: ['s_heels'], updatedAt: 2000 })],
+  };
+
+  const merged = mergeSaves(server, afterBuying).profiles[0];
+  check('the purchase survives', merged.purchased.includes('s_heels'));
+  check('earned total is untouched by spending', merged.stardust === 1200);
+
+  // Two devices buying different things must both keep their purchase.
+  const deviceA = { profiles: [profile({ stardust: 1200, purchased: ['s_heels'] })] };
+  const deviceB = { profiles: [profile({ stardust: 1200, purchased: ['s_clutch'] })] };
+  const both = mergeSaves(deviceA, deviceB).profiles[0];
+  check('purchases from both devices are kept',
+    both.purchased.includes('s_heels') && both.purchased.includes('s_clutch'));
+  check('nothing is double counted', both.purchased.length === 2);
+}
+
+/* ------------------------------------------------------------------ */
 console.log('\n  Review queue');
 {
   const a = { profiles: [profile({ reviewQueue: ['orbit', 'vast'] })] };

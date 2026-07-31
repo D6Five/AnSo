@@ -269,19 +269,38 @@ export function earnedRewards(profile: Profile | null): Reward[] {
 }
 
 /**
- * Spend stardust on a shop item. Returns false when it is already owned or
- * unaffordable, so the caller never has to re-check the balance itself.
+ * Stardust actually available to spend.
+ *
+ * `profile.stardust` is lifetime *earned* and only ever goes up, which is what
+ * makes the sync merge's max() correct for it. Spending is derived from the
+ * purchase list instead. Subtracting from the stored total looked simpler and
+ * was broken: the merge took the higher of the two balances, so every purchase
+ * was silently refunded the moment the device synced while the item stayed
+ * bought.
+ */
+export function spendableStardust(profile: Profile | null): number {
+  if (!profile) return 0;
+  const spent = (profile.purchased ?? []).reduce(
+    (total, id) => total + (SHOP_BY_ID[id]?.price ?? 0),
+    0,
+  );
+  return Math.max(0, profile.stardust - spent);
+}
+
+/**
+ * Buy a shop item. Returns false when it is already owned or unaffordable, so
+ * the caller never has to re-check the balance itself.
  */
 export function buyItem(profileId: string, itemId: string): boolean {
   const item = SHOP_BY_ID[itemId];
   const profile = state.profiles.find((p) => p.id === profileId);
   if (!item || !profile) return false;
   if ((profile.purchased ?? []).includes(itemId)) return false;
-  if (profile.stardust < item.price) return false;
+  if (spendableStardust(profile) < item.price) return false;
 
+  // Only the purchase is recorded. The balance falls out of it.
   updateProfile(profileId, (p) => ({
     ...p,
-    stardust: p.stardust - item.price,
     purchased: [...(p.purchased ?? []), itemId],
   }));
   return true;

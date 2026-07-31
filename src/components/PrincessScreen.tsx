@@ -10,11 +10,19 @@ import {
   type DressReward,
   type RoomReward,
 } from '../content/rewards';
-import { buyItem, earnedRewards, equipDress, starsCompleted, toggleAccessory } from '../core/store';
+import {
+  buyItem,
+  earnedRewards,
+  equipDress,
+  spendableStardust,
+  starsCompleted,
+  toggleAccessory,
+} from '../core/store';
 import { sfxTap, sfxStardust } from '../core/audio';
 import { PrincessArt } from './PrincessArt';
 import { RoomArt } from './RoomArt';
 import { BackButton } from './BackButton';
+import { RewardIcon } from './RewardIcon';
 
 /**
  * Wardrobe and bedroom.
@@ -75,8 +83,8 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
           <span className="treasure-count" title="Treasures earned">
             👑 {earned.length} / {TOTAL_REWARDS}
           </span>
-          <span className="stardust-count" title="Stardust to spend in the shop">
-            ✨ {profile.stardust.toLocaleString()}
+          <span className="stardust-count" title="Stardust left to spend in the shop">
+            ✨ {spendableStardust(profile).toLocaleString()}
           </span>
         </div>
       </header>
@@ -104,7 +112,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
               princess={princess}
               dress={wornDress && wornDress.kind === 'dress' ? wornDress : null}
               accessories={wornAccessories}
-              size={230}
+              size={345}
             />
             <p className="worn-label">
               {wornDress && wornDress.kind === 'dress' ? wornDress.name : 'Everyday dress'}
@@ -132,6 +140,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
                     }}
                     title={d.name}
                   >
+                    <RewardIcon item={d} size={38} />
                     <span className="swatch-name">{d.name}</span>
                   </button>
                 ))}
@@ -160,6 +169,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
                       }}
                       title={a.name}
                     >
+                      <RewardIcon item={a} size={38} />
                       <span className="swatch-name">{a.name}</span>
                     </button>
                   );
@@ -177,7 +187,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
           <div className="shop-grid">
             {SHOP.map((item) => {
               const owned = (profile.purchased ?? []).includes(item.id);
-              const affordable = profile.stardust >= item.price;
+              const affordable = spendableStardust(profile) >= item.price;
               const swatch =
                 item.kind === 'dress'
                   ? [item.palette[1], item.palette[2]]
@@ -188,9 +198,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
                   className={`shop-card ${owned ? 'owned' : ''}`}
                   style={{ ['--sw-a' as string]: swatch[0], ['--sw-b' as string]: swatch[1] }}
                 >
-                  <span className="shop-icon" aria-hidden="true">
-                    {item.kind === 'dress' ? '👗' : item.kind === 'room' ? '🪑' : '💎'}
-                  </span>
+                  <RewardIcon item={item} size={52} />
                   <span className="shop-name">{item.name}</span>
                   <span className="shop-blurb">{item.blurb}</span>
                   <button
@@ -214,13 +222,14 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
           {/* The princess stands in her own chamber — a room she has filled but
               never occupies is a showroom, not a bedroom. */}
           <div className="chamber">
-            <RoomArt princess={princess} items={roomItems} width={620} />
+            {/* The chamber is the reward for the work, so it gets the page. */}
+            <RoomArt princess={princess} items={roomItems} width={1100} />
             <div className="chamber-figure">
               <PrincessArt
                 princess={princess}
                 dress={wornDress && wornDress.kind === 'dress' ? wornDress : null}
                 accessories={wornAccessories}
-                size={132}
+                size={230}
               />
             </div>
           </div>
