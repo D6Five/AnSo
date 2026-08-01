@@ -1244,7 +1244,25 @@ body {
 
 .match-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .match-col { display: flex; flex-direction: column; gap: 10px; }
-.match-help { margin: 0; color: var(--card-ink-dim); text-align: center; font-weight: 600; }
+.match-help {
+  margin: 0;
+  color: var(--card-ink);
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.15rem;
+  background: var(--card-surface-alt);
+  border-radius: 12px;
+  padding: 12px 16px;
+}
+
+/* A held card is obviously picked up, so it is clear what is waiting for a
+   partner. Without this the only feedback was a faint border. */
+.match-challenge .option-btn.selected {
+  border-color: #7c3aed;
+  background: #ede9ff;
+  box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.28);
+  transform: scale(1.03);
+}
 
 /* Math */
 

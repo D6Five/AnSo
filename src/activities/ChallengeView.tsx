@@ -425,7 +425,15 @@ function MatchView({
     [challenge.id, challenge.pairs],
   );
 
-  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  /**
+   * Which card is currently picked up, and from which column.
+   *
+   * Either side can be tapped first. Requiring the left column first meant the
+   * right column sat disabled and silent, and a child tapping the English words
+   * got no response at all — which reads as the game being broken rather than
+   * as an instruction she missed.
+   */
+  const [held, setHeld] = useState<{ side: 'left' | 'right'; value: string } | null>(null);
   const [solved, setSolved] = useState<Record<string, string>>({});
   const [misses, setMisses] = useState(0);
   const [wrongFlash, setWrongFlash] = useState<string | null>(null);
@@ -438,19 +446,30 @@ function MatchView({
     onAnSoSay(challenge.teach ?? 'All matched.', 'happy');
   }, [done, challenge.teach, onAnSoSay]);
 
-  const pickRight = (right: string) => {
-    if (!selectedLeft || done) return;
-    const pair = challenge.pairs.find((p) => p.left === selectedLeft);
+  const pick = (side: 'left' | 'right', value: string) => {
+    if (done) return;
+
+    // Nothing held, or tapping the same column again: just change what is held.
+    if (!held || held.side === side) {
+      sfxTap();
+      setHeld({ side, value });
+      return;
+    }
+
+    const left = side === 'left' ? value : held.value;
+    const right = side === 'left' ? held.value : value;
+    const pair = challenge.pairs.find((p) => p.left === left);
 
     if (pair && pair.right === right) {
       sfxCorrect();
-      setSolved({ ...solved, [selectedLeft]: right });
-      setSelectedLeft(null);
+      setSolved({ ...solved, [left]: right });
+      setHeld(null);
     } else {
       sfxTryAgain();
       setMisses(misses + 1);
-      setWrongFlash(right);
+      setWrongFlash(value);
       window.setTimeout(() => setWrongFlash(null), 450);
+      // Keep hold of the first card so she can simply try another partner.
     }
   };
 
@@ -458,20 +477,27 @@ function MatchView({
     <div className="challenge match-challenge">
       <h2 className="challenge-prompt">{challenge.prompt}</h2>
 
+      {/* Instruction above the columns, where it is read before tapping
+          rather than discovered after nothing happened. */}
+      {!done ? (
+        <p className="match-help">
+          {held
+            ? `Now tap the one that goes with "${held.value}".`
+            : 'Tap a card, then tap its partner.'}
+        </p>
+      ) : null}
+
       <div className="match-columns">
         <div className="match-col">
           {challenge.pairs.map((pair) => {
             const isSolved = solved[pair.left] !== undefined;
+            const isHeld = held?.side === 'left' && held.value === pair.left;
             return (
               <button
                 key={pair.left}
                 type="button"
-                className={`option-btn ${isSolved ? 'correct' : ''} ${selectedLeft === pair.left ? 'selected' : ''}`}
-                onClick={() => {
-                  if (isSolved) return;
-                  sfxTap();
-                  setSelectedLeft(pair.left);
-                }}
+                className={`option-btn ${isSolved ? 'correct' : ''} ${isHeld ? 'selected' : ''} ${wrongFlash === pair.left ? 'wrong' : ''}`}
+                onClick={() => pick('left', pair.left)}
                 disabled={isSolved}
               >
                 {pair.left}
@@ -483,13 +509,15 @@ function MatchView({
         <div className="match-col">
           {rights.map((right) => {
             const isSolved = Object.values(solved).includes(right);
+            const isHeld = held?.side === 'right' && held.value === right;
             return (
               <button
                 key={right}
                 type="button"
-                className={`option-btn ${isSolved ? 'correct' : ''} ${wrongFlash === right ? 'wrong' : ''}`}
-                onClick={() => pickRight(right)}
-                disabled={isSolved || !selectedLeft}
+                className={`option-btn ${isSolved ? 'correct' : ''} ${isHeld ? 'selected' : ''} ${wrongFlash === right ? 'wrong' : ''}`}
+                onClick={() => pick('right', right)}
+                // Only a solved card is ever dead. Everything else responds.
+                disabled={isSolved}
               >
                 {right}
               </button>
@@ -498,14 +526,10 @@ function MatchView({
         </div>
       </div>
 
-      {!done ? (
-        <p className="match-help">
-          {selectedLeft ? `Now pick what goes with "${selectedLeft}".` : 'Pick one from the left side first.'}
-        </p>
-      ) : (
+      {done ? (
         // One miss is normal exploration; several means it was not really known.
         <ContinueButton onClick={() => onResult({ correct: misses <= 1 })} />
-      )}
+      ) : null}
     </div>
   );
 }
