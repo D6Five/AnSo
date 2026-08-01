@@ -98,6 +98,46 @@ function firstRunSave(): SaveData {
   };
 }
 
+const SEED_IDS = new Set(SEED_PROFILES.map((p) => p.id));
+
+export function isSeedProfile(id: string | null | undefined): boolean {
+  return !!id && SEED_IDS.has(id);
+}
+
+/**
+ * Put a test explorer back to the balance she shipped with.
+ *
+ * Purchases are cleared as well as the total, because the spendable balance is
+ * earned minus what has been bought — resetting the total alone would still
+ * show a reduced figure. Progress and treasures are left alone: only the
+ * stardust economy resets, which is the part worth testing repeatedly.
+ */
+function resetSeedProfile(profileId: string): void {
+  const seed = SEED_PROFILES.find((p) => p.id === profileId);
+  if (!seed) return;
+  const current = state.profiles.find((p) => p.id === profileId);
+  if (!current) return;
+  if (current.stardust === seed.stardust && (current.purchased ?? []).length === 0) return;
+
+  commit({
+    ...state,
+    profiles: state.profiles.map((p) =>
+      p.id === profileId
+        ? {
+            ...p,
+            stardust: seed.stardust,
+            purchased: [],
+            // Drop anything she was wearing that she no longer owns, so the
+            // wardrobe cannot show a bought item she has just been refunded.
+            equippedAccessories: (p.equippedAccessories ?? []).filter((id) => !SHOP_BY_ID[id]),
+            equippedDress: p.equippedDress && SHOP_BY_ID[p.equippedDress] ? undefined : p.equippedDress,
+            updatedAt: Date.now(),
+          }
+        : p,
+    ),
+  });
+}
+
 /**
  * Add back any seed explorer that is missing and has not been deleted.
  *
@@ -117,6 +157,27 @@ function withSeedProfiles(save: SaveData): SaveData {
   return { ...save, profiles: [...save.profiles, ...missing.map((p) => ({ ...p }))] };
 }
 
+/**
+ * Put every test explorer back to her starting balance at startup, except one
+ * that is still selected.
+ *
+ * Resetting on the way out covers switching explorer, but not closing the tab
+ * mid-session. Doing it again on load closes that gap. The active explorer is
+ * left alone so that reloading the page while testing her does not pull the
+ * rug — she resets as soon as she is left.
+ */
+function resetIdleSeeds(save: SaveData): SaveData {
+  return {
+    ...save,
+    profiles: save.profiles.map((p) => {
+      const seed = SEED_PROFILES.find((s) => s.id === p.id);
+      if (!seed || p.id === save.activeProfileId) return p;
+      if (p.stardust === seed.stardust && (p.purchased ?? []).length === 0) return p;
+      return { ...p, stardust: seed.stardust, purchased: [] };
+    }),
+  };
+}
+
 function load(): SaveData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -125,12 +186,14 @@ function load(): SaveData {
     if (!raw) return firstRunSave();
     const parsed = JSON.parse(raw) as SaveData;
     if (parsed.version !== 1) return firstRunSave();
-    return withSeedProfiles({
-      ...DEFAULT_SAVE,
-      ...parsed,
-      settings: { ...DEFAULT_SAVE.settings, ...parsed.settings },
-      deletedProfileIds: parsed.deletedProfileIds ?? [],
-    });
+    return resetIdleSeeds(
+      withSeedProfiles({
+        ...DEFAULT_SAVE,
+        ...parsed,
+        settings: { ...DEFAULT_SAVE.settings, ...parsed.settings },
+        deletedProfileIds: parsed.deletedProfileIds ?? [],
+      }),
+    );
   } catch {
     // A corrupt save must never brick the app for a child.
     return firstRunSave();
@@ -196,10 +259,18 @@ export function applyRemoteProfiles(profiles: Profile[], deletedProfileIds: stri
     activeProfileId = (sameId ?? sameChild)?.id ?? null;
   }
 
-  // Top up the seeds here too. The server's copy of the profile list replaces
-  // the local one wholesale, so without this a device whose server save predates
-  // the seed explorers would lose them again on the first sync.
-  commit(withSeedProfiles({ ...state, profiles, deletedProfileIds, activeProfileId }));
+  /*
+   * Test explorers are never sent to the server, so they are also never taken
+   * from it: the local copies are kept exactly as they are and the server's
+   * list supplies everyone else. Replacing them wholesale here would discard
+   * whatever was being tested mid-session.
+   */
+  const localSeeds = state.profiles.filter((p) => isSeedProfile(p.id));
+  const merged = [...localSeeds, ...profiles.filter((p) => !isSeedProfile(p.id))];
+
+  commit(
+    withSeedProfiles({ ...state, profiles: merged, deletedProfileIds, activeProfileId }),
+  );
 }
 
 export function useActiveProfile(): Profile | null {
@@ -232,6 +303,12 @@ export function createProfile(name: string, grade: Grade, avatar: number): Profi
 }
 
 export function selectProfile(id: string | null): void {
+  // Leaving a test explorer puts her stardust back, so the shop can be tried
+  // again from the same starting balance every time.
+  const leaving = state.activeProfileId;
+  if (leaving && leaving !== id && isSeedProfile(leaving)) {
+    resetSeedProfile(leaving);
+  }
   commit({ ...state, activeProfileId: id });
 }
 

@@ -13,7 +13,7 @@
 
 import { useSyncExternalStore } from 'react';
 import type { Profile, SaveData } from '../types';
-import { applyRemoteProfiles, getSave, subscribeToSave } from './store';
+import { applyRemoteProfiles, getSave, isSeedProfile, subscribeToSave } from './store';
 
 export type SyncStatus = 'off' | 'syncing' | 'synced' | 'offline' | 'error';
 
@@ -65,11 +65,19 @@ let inFlight = false;
 let pendingWhileInFlight = false;
 let timer: number | null = null;
 
-/** Only profile data crosses the wire; volume and mic settings stay per-device. */
+/**
+ * Only profile data crosses the wire; volume and mic settings stay per-device.
+ *
+ * The built-in test explorers are excluded entirely. They exist on every device
+ * already, and syncing them would fight their reset behaviour — stardust merges
+ * by max and purchases merge as a union, so the server would hand back the
+ * spent balance and the bought items the moment they were reset. Keeping them
+ * local also means test data never reaches the real save.
+ */
 function payloadFrom(save: SaveData) {
   return {
     version: 1 as const,
-    profiles: save.profiles,
+    profiles: save.profiles.filter((p) => !isSeedProfile(p.id)),
     deletedProfileIds: save.deletedProfileIds ?? [],
   };
 }
