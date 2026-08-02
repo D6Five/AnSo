@@ -189,8 +189,9 @@ function FrontHair({ princess }: { princess: Princess }) {
       <path d="M57 66 C 53 86, 53 106, 57 122 C 60 106, 60 86, 62 70 Z" fill={hairColor} />
       <path d="M143 66 C 147 86, 147 106, 143 122 C 140 106, 140 86, 138 70 Z" fill={hairColor} />
 
-      {/* The dyed streak: one lock, following the fall of the hair. */}
-      <path d="M120 36 C 129 44, 135 55, 137 68 C 136 90, 137 108, 139 122 C 135 106, 133 84, 130 65 C 127 52, 124 42, 120 36 Z" fill={streak} opacity="0.9" />
+      {/* The dyed streak: one lock, falling *outside* the jaw rather than over
+          the cheek. Crossing the face made it read as a mark on her skin. */}
+      <path d="M124 34 C 133 42, 140 54, 142 68 C 141 90, 142 108, 144 122 C 140 106, 138 84, 135 65 C 132 50, 128 40, 124 34 Z" fill={streak} opacity="0.9" />
 
       {hair === 'bun' ? (
         <>
@@ -229,18 +230,61 @@ function FrontHair({ princess }: { princess: Princess }) {
 /**
  * One eye, mirrored by the caller.
  *
- * Doll-styled rather than cartoon: a wide almond, a heavy upper lid line that
- * extends past the outer corner, separated lashes rather than a solid block,
- * an iris with a lighter lower half so it reads as translucent, and a bright
- * catchlight. The lashes are the single detail that most says "doll".
+ * The lash line is a single filled shape, not a stroke with separate hairs
+ * drawn on top. Individual lash strokes were the thing that looked wrong: they
+ * float off the eyelid like legs. In hand-drawn animation the upper lashes are
+ * one continuous mass that starts thin at the inner corner, thickens across the
+ * lid, and tapers to a point past the outer corner — with the individual hairs
+ * as clumps growing out of that mass rather than free-standing marks.
+ *
+ * The iris is large and sits high, with a big catchlight and a smaller opposite
+ * one. Everything else is kept soft so the eye is the only heavy feature.
  */
-function Eye({ cx, cy, color, flip }: { cx: number; cy: number; color: string; flip: boolean }) {
+function Eye({
+  cx,
+  cy,
+  color,
+  side,
+}: {
+  cx: number;
+  cy: number;
+  color: string;
+  side: 'left' | 'right';
+}) {
   const id = `eye-${Math.round(cx)}`;
-  const d = flip ? -1 : 1;
-  const outline = `M${cx - 11} ${cy + 1} C ${cx - 9} ${cy - 8}, ${cx + 3} ${cy - 10}, ${cx + 11} ${cy - 3} C ${cx + 7} ${cy + 7}, ${cx - 5} ${cy + 8}, ${cx - 11} ${cy + 1} Z`;
+  const outline = `M${cx - 12} ${cy + 1} C ${cx - 10} ${cy - 9}, ${cx + 3} ${cy - 11}, ${cx + 12} ${cy - 4} C ${cx + 8} ${cy + 8}, ${cx - 5} ${cy + 9}, ${cx - 12} ${cy + 1} Z`;
+
+  /**
+   * The lash mass: along the top of the eye, out to a flick, and back
+   * underneath — thicker at the outer end than the inner.
+   */
+  const lashMass =
+    `M${cx - 12} ${cy + 1} ` +
+    `C ${cx - 10} ${cy - 9}, ${cx + 3} ${cy - 11}, ${cx + 12} ${cy - 4} ` +
+    `L ${cx + 19} ${cy - 10} ` +
+    `C ${cx + 17} ${cy - 3}, ${cx + 15} ${cy - 1}, ${cx + 11} ${cy - 0.5} ` +
+    `C ${cx + 3} ${cy - 6}, ${cx - 7} ${cy - 4}, ${cx - 12} ${cy + 1} Z`;
+
+  /**
+   * A second, shorter flick just inside the main one — both sweeping up and
+   * *outward* at roughly the same shallow angle.
+   *
+   * Clumps rising vertically from the middle of the lid was the previous
+   * mistake and it read as horns. Real lashes fan outward along the line of the
+   * eye, and they only bunch at the outer corner; over the centre of the lid
+   * they are short enough to be part of the mass.
+   */
+  const lashClumps = [
+    `M${cx + 8.5} ${cy - 7.8} C ${cx + 11} ${cy - 10.5}, ${cx + 13} ${cy - 12.5}, ${cx + 15.5} ${cy - 14} ` +
+      `C ${cx + 13.5} ${cy - 10.5}, ${cx + 12} ${cy - 8.6}, ${cx + 10.5} ${cy - 6.6} Z`,
+  ];
 
   return (
-    <g>
+    // Drawn flicking outward to the right, then mirrored in place for the eye
+    // on the left, so both flicks point away from the nose.
+    <g
+      transform={side === 'left' ? `translate(${cx * 2} 0) scale(-1 1)` : undefined}
+    >
       <defs>
         <clipPath id={id}>
           <path d={outline} />
@@ -255,61 +299,59 @@ function Eye({ cx, cy, color, flip }: { cx: number; cy: number; color: string; f
       <path d={outline} fill="#fffcfa" />
 
       <g clipPath={`url(#${id})`}>
-        <ellipse cx={cx + 0.5} cy={cy - 1} rx="7.2" ry="8.2" fill={color} />
-        <ellipse cx={cx + 0.5} cy={cy - 1} rx="7.2" ry="8.2" fill={`url(#iris-${id})`} />
-        {/* A darker ring around the iris. Without it the eye reads as a flat
-            disc of colour rather than something with depth. */}
+        {/* A large iris sitting high in the opening, the way an animated eye is
+            drawn — a small iris floating in white reads as startled. */}
+        <ellipse cx={cx + 0.5} cy={cy - 1.5} rx="8" ry="9.2" fill={color} />
+        <ellipse cx={cx + 0.5} cy={cy - 1.5} rx="8" ry="9.2" fill={`url(#iris-${id})`} />
         <ellipse
           cx={cx + 0.5}
-          cy={cy - 1}
-          rx="7.2"
-          ry="8.2"
+          cy={cy - 1.5}
+          rx="8"
+          ry="9.2"
           fill="none"
           stroke="#2a1420"
-          strokeWidth="1.6"
-          opacity="0.65"
+          strokeWidth="1.4"
+          opacity="0.5"
         />
-        <ellipse cx={cx + 0.5} cy={cy - 1} rx="3.2" ry="4" fill="#150d13" />
-        {/* Upper lid, thick and soft-ended. */}
-        <path
-          d={`M${cx - 11} ${cy + 1} C ${cx - 9} ${cy - 8}, ${cx + 3} ${cy - 10}, ${cx + 11} ${cy - 3}`}
-          stroke="#1d1219"
-          strokeWidth="4"
-          fill="none"
-          strokeLinecap="round"
-        />
+        <ellipse cx={cx + 0.5} cy={cy - 1} rx="3.6" ry="4.4" fill="#170e15" />
+        {/* Shadow cast by the lid onto the top of the eye. */}
+        <ellipse cx={cx} cy={cy - 11} rx="14" ry="6" fill="#2a1420" opacity="0.22" />
       </g>
 
-      {/* Eyelid crease, a hair above the lash line. Small, and it is most of
-          what makes an eye look drawn rather than stamped on. */}
+      {/* Soft crease well above the lash line, so the two do not merge. */}
       <path
-        d={`M${cx - 8} ${cy - 7.5} C ${cx - 5} ${cy - 12}, ${cx + 4} ${cy - 13}, ${cx + 10} ${cy - 8}`}
-        stroke="#8a5c68"
-        strokeWidth="1.1"
+        d={`M${cx - 7} ${cy - 11} C ${cx - 4} ${cy - 15}, ${cx + 5} ${cy - 15.5}, ${cx + 11} ${cy - 11}`}
+        stroke="#a9707e"
+        strokeWidth="1"
         fill="none"
         strokeLinecap="round"
-        opacity="0.55"
+        opacity="0.45"
       />
 
-      {/* Lashes: three separated strokes sweeping up at the outer corner. */}
-      <g stroke="#1d1219" strokeWidth="1.6" fill="none" strokeLinecap="round">
-        <path d={`M${cx + d * 9} ${cy - 4} q ${d * 4} -1, ${d * 6} -3.6`} />
-        <path d={`M${cx + d * 6.5} ${cy - 6.4} q ${d * 3} -1.6, ${d * 4.6} -4`} />
-        <path d={`M${cx + d * 3} ${cy - 7.6} q ${d * 2} -2, ${d * 3} -4`} />
-      </g>
+      {/* The lash line and its clumps, filled rather than stroked. */}
+      <path d={lashMass} fill="#1b1018" />
+      {lashClumps.map((d, i) => (
+        <path key={i} d={d} fill="#1b1018" />
+      ))}
 
-      {/* Lower lash line: thin, and stopping short of the inner corner. */}
+      {/*
+       * No lower lashes at all. Small dark marks under the eye read as
+       * scratches or tear tracks at this scale, and animated faces almost
+       * always leave the lower lid open — it is what keeps the eye looking
+       * bright rather than ringed and tired. A faint warm line is enough to
+       * suggest the lid.
+       */}
       <path
-        d={`M${cx - 4} ${cy + 6} q 4 1.4, 8 -1`}
-        stroke="#5a3542"
-        strokeWidth="1.1"
+        d={`M${cx - 6} ${cy + 7} C ${cx - 2} ${cy + 9.4}, ${cx + 4} ${cy + 9}, ${cx + 9} ${cy + 5.6}`}
+        stroke="#c08a92"
+        strokeWidth="1"
         fill="none"
         strokeLinecap="round"
-        opacity="0.7"
+        opacity="0.5"
       />
 
-      <circle cx={cx - 2} cy={cy - 4} r="2.6" fill="#fff" />
-      <circle cx={cx + 4} cy={cy + 2.4} r="1.2" fill="#fff" opacity="0.9" />
+      <circle cx={cx - 2.5} cy={cy - 5} r="3.1" fill="#fff" />
+      <circle cx={cx + 4.5} cy={cy + 2} r="1.5" fill="#fff" opacity="0.92" />
     </g>
   );
 }
@@ -317,28 +359,51 @@ function Eye({ cx, cy, color, flip }: { cx: number; cy: number; color: string; f
 function Face({ princess }: { princess: Princess }) {
   return (
     <g>
-      {/* Thin, high, clearly arched brows — a doll's brow is groomed, not bold. */}
-      <path d="M94 49 C 90 43, 79 41.5, 72 46.5" stroke="#4a3038" strokeWidth="2.3" fill="none" strokeLinecap="round" />
-      <path d="M106 49 C 110 43, 121 41.5, 128 46.5" stroke="#4a3038" strokeWidth="2.3" fill="none" strokeLinecap="round" />
-
-      <Eye cx={84} cy={66} color={princess.eyeColor} flip={false} />
-      <Eye cx={116} cy={66} color={princess.eyeColor} flip />
-
-      {/* Nose: a soft shadow and a highlight down the bridge, no outline. */}
-      <path d="M100 60 C 99 68, 98.5 74, 97.5 78" stroke="#fff" strokeWidth="2.2" fill="none" strokeLinecap="round" opacity="0.3" />
-      <path d="M97 80 q 3 2.4, 6 0" stroke={princess.skinShade} strokeWidth="1.6" fill="none" strokeLinecap="round" />
-
       {/*
-       * Lips with a cupid's bow and a full lower lip, plus a gloss highlight.
-       * A single smile arc reads as a cartoon; the doll look needs actual lip
-       * shape, which is two curves meeting at the corners.
+       * Brows are thin, set high and tapered — thick at the inner end, fading
+       * to a fine point past the arch. A brow of even weight reads as drawn on
+       * with a marker, and the gap above the eye is what makes the eye look
+       * large, so they sit well clear of the lash line.
        */}
       <path
-        d="M90 88 C 93 85.5, 96.5 85, 100 87 C 103.5 85, 107 85.5, 110 88 C 106.5 93.5, 102.5 95.5, 100 95.5 C 97.5 95.5, 93.5 93.5, 90 88 Z"
-        fill="#e0697a"
+        d="M92 47.5 C 87.5 42, 78.5 40.2, 72.5 44.5 C 78.5 42.8, 86.5 44.6, 92 47.5 Z"
+        fill="#6b4a52"
+        opacity="0.7"
       />
-      <path d="M90 88 C 94 89.5, 106 89.5, 110 88" stroke="#b84a5c" strokeWidth="0.9" fill="none" opacity="0.7" />
-      <ellipse cx="102" cy="91.6" rx="3.4" ry="1.5" fill="#fff" opacity="0.5" />
+      <path
+        d="M108 47.5 C 112.5 42, 121.5 40.2, 127.5 44.5 C 121.5 42.8, 113.5 44.6, 108 47.5 Z"
+        fill="#6b4a52"
+        opacity="0.7"
+      />
+
+      <Eye cx={83} cy={67} color={princess.eyeColor} side="left" />
+      <Eye cx={117} cy={67} color={princess.eyeColor} side="right" />
+
+      {/* Nose: one soft shadow under the tip and nothing else. Any outline at
+          this scale ages the face immediately. */}
+      <path
+        d="M97.5 81 q 2.5 2, 5 0"
+        stroke={princess.skinShade}
+        strokeWidth="1.5"
+        fill="none"
+        strokeLinecap="round"
+        opacity="0.85"
+      />
+
+      {/*
+       * A small mouth with a pronounced cupid's bow and a fuller lower lip.
+       * Width matters more than anything here: a mouth as wide as the gap
+       * between the eyes looks adult, so this one is deliberately narrow.
+       */}
+      <path
+        d="M92.5 88.5 C 95 85.8, 97.5 85.6, 100 87.4 C 102.5 85.6, 105 85.8, 107.5 88.5
+           C 105 93.8, 102 96, 100 96 C 98 96, 95 93.8, 92.5 88.5 Z"
+        fill="#dd6274"
+      />
+      {/* Lip line, lighter in the middle so the mouth reads as slightly open. */}
+      <path d="M92.5 88.5 C 96 90.2, 104 90.2, 107.5 88.5" stroke="#b04354" strokeWidth="0.9" fill="none" opacity="0.65" />
+      <ellipse cx="102" cy="92" rx="3" ry="1.3" fill="#fff" opacity="0.45" />
+      <ellipse cx="97.5" cy="87" rx="2" ry="0.9" fill="#fff" opacity="0.3" />
 
       {/* Blush, plus cheekbone and jaw contour — what makes a doll face read as
           sculpted rather than flat. */}
