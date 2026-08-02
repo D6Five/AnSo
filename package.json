@@ -14,7 +14,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "content:report": "node scripts/content-report.mjs",
-    "test:sync": "node scripts/test-sync.mjs"
+    "test:sync": "node scripts/test-sync.mjs",
+    "config:check": "node core/config/validate-cli.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
