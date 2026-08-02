@@ -23,6 +23,7 @@ import { PrincessArt } from './PrincessArt';
 import { RoomArt } from './RoomArt';
 import { BackButton } from './BackButton';
 import { RewardIcon } from './RewardIcon';
+import { sentenceCase, useCurrency, useTerms } from '../../core/runtime/ConfigProvider';
 
 /**
  * Wardrobe and bedroom.
@@ -40,15 +41,17 @@ interface PrincessScreenProps {
 
 type Tab = 'wardrobe' | 'room' | 'shop';
 
-const TAB_LABEL: Record<Tab, string> = {
-  wardrobe: '👗 Wardrobe',
-  room: '🛏️ Her Royal Chamber',
-  shop: '✨ Stardust Shop',
-};
-
 export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
   const [tab, setTab] = useState<Tab>('wardrobe');
+  const terms = useTerms();
+  const currency = useCurrency();
   const princess = princessOrDefault(profile.princess);
+
+  const tabLabel: Record<Tab, string> = {
+    wardrobe: `👗 ${terms.wardrobe}`,
+    room: `🛏️ ${terms.homeBase}`,
+    shop: `${terms.currencyIcon} ${terms.shop}`,
+  };
 
   const earned = useMemo(() => earnedRewards(profile), [profile]);
   const dresses = earned.filter((r): r is DressReward => r.kind === 'dress');
@@ -80,11 +83,14 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
           </p>
         </div>
         <div className="header-counts">
-          <span className="treasure-count" title="Treasures earned">
+          <span className="treasure-count" title={`${terms.rewards} earned`}>
             👑 {earned.length} / {TOTAL_REWARDS}
           </span>
-          <span className="stardust-count" title="Stardust left to spend in the shop">
-            ✨ {spendableStardust(profile).toLocaleString()}
+          <span
+            className="stardust-count"
+            title={`${terms.currency} left to spend in the ${terms.shop}`}
+          >
+            {currency.short(spendableStardust(profile))}
           </span>
         </div>
       </header>
@@ -100,7 +106,7 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
               setTab(t);
             }}
           >
-            {TAB_LABEL[t]}
+            {tabLabel[t]}
           </button>
         ))}
       </div>
@@ -122,7 +128,9 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
           <div className="closet">
             <h2>Dresses</h2>
             {dresses.length === 0 ? (
-              <p className="closet-empty">Finish a star and your first hanbok arrives.</p>
+              <p className="closet-empty">
+                Finish a {terms.lesson} and your first outfit arrives.
+              </p>
             ) : (
               <div className="swatch-grid">
                 {dresses.map((d) => (
@@ -181,8 +189,9 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
       ) : tab === 'shop' ? (
         <div className="shop">
           <p className="shop-intro">
-            Stardust is earned from every star, including ones you play again. Spend
-            it on whatever you like — these never appear as rewards.
+            {sentenceCase(terms.currency)} is earned from every {terms.lesson}, including
+            ones you play again. Spend it on whatever you like — these never appear as
+            rewards.
           </p>
           <div className="shop-grid">
             {SHOP.map((item) => {
@@ -235,8 +244,8 @@ export function PrincessScreen({ profile, onBack }: PrincessScreenProps) {
           </div>
           <p className="room-caption">
             {roomItems.length === 0
-              ? 'Nothing in here yet. Every few stars adds something.'
-              : `${roomItems.length} thing${roomItems.length === 1 ? '' : 's'} in her room so far, from ${stars} star${stars === 1 ? '' : 's'}.`}
+              ? `Nothing in here yet. Every few ${terms.lessonPlural} adds something.`
+              : `${roomItems.length} thing${roomItems.length === 1 ? '' : 's'} in ${terms.homeBase} so far, from ${stars} ${stars === 1 ? terms.lesson : terms.lessonPlural}.`}
           </p>
           <div className="room-list">
             {roomItems.map((r) => (

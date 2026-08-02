@@ -5,6 +5,7 @@ import { completeStar, starsCompleted } from '../core/store';
 import { rewardForMilestone } from '../content/rewards';
 import { RewardReveal } from './PrincessScreen';
 import { BackButton } from './BackButton';
+import { useCurrency, useTerms } from '../../core/runtime/ConfigProvider';
 import { sfxStarComplete, sfxStardust, sfxWhoosh } from '../core/audio';
 import { speak, stopSpeaking } from '../core/voice';
 import { setScene } from '../core/music';
@@ -29,6 +30,8 @@ interface StarViewProps {
 type Phase = 'intro' | 'passage' | 'playing' | 'done';
 
 export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: StarViewProps) {
+  const terms = useTerms();
+  const currency = useCurrency();
   const attempt = profile.progress[star.id]?.completions ?? 0;
   const challenges = useMemo(() => challengesFor(star, attempt), [star, attempt]);
 
@@ -99,17 +102,18 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
       window.setTimeout(sfxStardust, 700);
 
       const perfect = finalScore === challenges.length;
+      const earned = currency.amount(stardust);
       const line = ranOutOfTime
-        ? `Time is up. You got ${finalScore} of them, and they all still count. ${stardust} stardust.`
+        ? `Time is up. You got ${finalScore} of them, and they all still count. ${earned}.`
         : perfect
-          ? `Every single one. You earned ${stardust} stardust.`
+          ? `Every single one. You earned ${earned}.`
           : finalScore >= challenges.length * 0.7
-            ? `${finalScore} out of ${challenges.length}. Strong work. ${stardust} stardust.`
-            : `${finalScore} out of ${challenges.length}. This star will be here whenever you want another go. ${stardust} stardust.`;
+            ? `${finalScore} out of ${challenges.length}. Strong work. ${earned}.`
+            : `${finalScore} out of ${challenges.length}. This ${terms.lesson} will be here whenever you want another go. ${earned}.`;
       setAnsoLine(line);
       setAnsoMood(perfect && !ranOutOfTime ? 'happy' : 'encouraging');
     },
-    [profile, star.id, challenges.length],
+    [profile, star.id, challenges.length, currency, terms.lesson],
   );
 
   /**
@@ -260,7 +264,7 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
               <p className="score-big">
                 {score} <span>/ {challenges.length}</span>
               </p>
-              <p className="stardust-earned">+{awarded} stardust</p>
+              <p className="stardust-earned">+{currency.amount(awarded)}</p>
             </div>
 
             {newReward && !rewardSeen ? (

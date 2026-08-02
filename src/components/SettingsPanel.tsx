@@ -18,11 +18,13 @@ import {
 } from '../core/voice';
 import { setVolume } from '../core/audio';
 import { totalMinutes } from '../content';
+import { useTerms } from '../../core/runtime/ConfigProvider';
 
 /** Grown-up settings. Deliberately plain, and reachable from the map only. */
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const save = useSave();
   const profile = useActiveProfile();
+  const terms = useTerms();
   const { settings } = save;
   // Voice lists populate asynchronously, so re-read once they arrive rather
   // than rendering an empty dropdown on first open.
@@ -68,7 +70,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
         <label className="setting-row">
           <span>
-            AnSo speaks out loud
+            {terms.guide} speaks out loud
             {!isSynthesisSupported() ? <em> — not available in this browser</em> : null}
           </span>
           <input
@@ -85,7 +87,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         {settings.voiceEnabled && voices.length > 0 ? (
           <>
             <label className="setting-row">
-              <span>AnSo's voice</span>
+              <span>{terms.guide}&rsquo;s voice</span>
               <select
                 className="voice-select"
                 value={settings.voiceName ?? ''}
@@ -93,7 +95,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   const name = e.target.value || null;
                   updateSettings({ voiceName: name });
                   setPreferredVoice(name);
-                  void speak('Hello. I am AnSo, and this is my voice.');
+                  void speak(`Hello. I am ${terms.guide}, and this is my voice.`);
                 }}
               >
                 <option value="">Best available</option>
@@ -110,7 +112,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 className="btn"
-                onClick={() => void speak('Hello. I am AnSo, and this is my voice.')}
+                onClick={() => void speak(`Hello. I am ${terms.guide}, and this is my voice.`)}
               >
                 🔊 Hear it
               </button>
@@ -182,7 +184,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             plus unlimited replay on the maths and typing stars.
           </p>
           <p className="muted">
-            Music quietens while AnSo is speaking and stops entirely while a reading
+            Music quietens while {terms.guide} is speaking and stops entirely while a reading
             passage is on screen.
           </p>
           <p className="muted">

@@ -9,6 +9,7 @@ import { BackButton } from './BackButton';
 import { princessOrDefault } from '../content/princesses';
 import { REWARD_BY_ID, type AccessoryReward, type DressReward } from '../content/rewards';
 import { earnedRewards, spendableStardust } from '../core/store';
+import { useCurrency, useTerms } from '../../core/runtime/ConfigProvider';
 
 /**
  * The universe of learning.
@@ -49,6 +50,8 @@ export function GalaxyMap({
     return out;
   }, [profile.grade, profile.progress]);
 
+  const terms = useTerms();
+  const currency = useCurrency();
   const princess = princessOrDefault(profile.princess);
   const treasures = earnedRewards(profile);
 
@@ -69,9 +72,12 @@ export function GalaxyMap({
 
   const greeting = useMemo(() => {
     const totalDone = Object.values(progressBySubject).reduce((n, p) => n + p.done, 0);
-    if (totalDone === 0) return `Welcome, ${profile.name}. Pick a constellation and we will begin.`;
-    return `Good to see you again, ${profile.name}. You have lit ${totalDone} star${totalDone === 1 ? '' : 's'} so far.`;
-  }, [profile.name, progressBySubject]);
+    if (totalDone === 0) {
+      return `Welcome, ${profile.name}. Pick a ${terms.lessonGroup} and we will begin.`;
+    }
+    const noun = totalDone === 1 ? terms.lesson : terms.lessonPlural;
+    return `Good to see you again, ${profile.name}. You have lit ${totalDone} ${noun} so far.`;
+  }, [profile.name, progressBySubject, terms]);
 
   if (openSubject) {
     const subject = SUBJECTS.find((s) => s.id === openSubject)!;
@@ -91,6 +97,8 @@ export function GalaxyMap({
         }}
       >
         <BackButton label="Go Home" onClick={() => setOpenSubject(null)} />
+        {/* Subject names come from the client config, so a build can drop or
+            rename a strand without touching this component. */}
 
         <header className="constellation-header">
           <h1>
@@ -102,8 +110,8 @@ export function GalaxyMap({
         {stars.length === 0 ? (
           <div className="empty-constellation">
             <p>
-              This constellation is waiting for its stars. Add weeks to{' '}
-              <code>src/content/bsfWeeks.ts</code> and they will appear here.
+              This {terms.lessonGroup} is waiting for its {terms.lessonPlural}. Add weeks
+              to <code>src/content/bsfWeeks.ts</code> and they will appear here.
             </p>
           </div>
         ) : nextStar ? (
@@ -122,7 +130,7 @@ export function GalaxyMap({
                 onOpenStar(nextStar);
               }}
             >
-              <span className="next-label">Your next star</span>
+              <span className="next-label">Your next {terms.lesson}</span>
               <span className="next-title">{nextStar.title}</span>
               <span className="next-blurb">{nextStar.blurb}</span>
               <span className="next-go">Start ▸</span>
@@ -131,7 +139,8 @@ export function GalaxyMap({
             {litStars.length > 0 ? (
               <section className="lit-section">
                 <h2 className="lit-heading">
-                  ⭐ {litStars.length} star{litStars.length === 1 ? '' : 's'} you have lit
+                  ⭐ {litStars.length} {litStars.length === 1 ? terms.lesson : terms.lessonPlural}{' '}
+                  you have lit
                 </h2>
                 <p className="lit-note">You can play any of these again whenever you like.</p>
                 <div className="lit-row">
@@ -155,8 +164,8 @@ export function GalaxyMap({
         ) : (
           <div className="constellation-done">
             <p className="done-glyph" aria-hidden="true">👑</p>
-            <h2>Every star here is lit.</h2>
-            <p>You finished the whole constellation. Play any of them again below.</p>
+            <h2>Every {terms.lesson} here is lit.</h2>
+            <p>You finished the whole {terms.lessonGroup}. Play any of them again below.</p>
             <div className="lit-row">
               {litStars.map((star) => (
                 <button
@@ -185,8 +194,11 @@ export function GalaxyMap({
           <span className="chip-name">{profile.name}</span>
           <span className="chip-grade">Grade {profile.grade}</span>
         </div>
-        <div className="stardust-counter" title="Stardust left to spend in the shop">
-          ✨ {spendableStardust(profile).toLocaleString()}
+        <div
+          className="stardust-counter"
+          title={`${terms.currency} left to spend in the ${terms.shop}`}
+        >
+          {currency.short(spendableStardust(profile))}
         </div>
         <div className="header-actions">
           <SyncBadge />
@@ -268,9 +280,9 @@ export function GalaxyMap({
           size={190}
         />
         <span className="panel-meta">
-          👑 {treasures.length} treasure{treasures.length === 1 ? '' : 's'}
+          👑 {treasures.length} {terms.rewards}
         </span>
-        <span className="panel-cta">Tap to dress her</span>
+        <span className="panel-cta">Tap to dress your {terms.avatar}</span>
       </button>
       </div>
     </div>

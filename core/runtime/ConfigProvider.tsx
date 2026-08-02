@@ -53,6 +53,18 @@ export function useConfig(): ClientConfig {
   return config;
 }
 
+/**
+ * Capitalise a themed noun for the start of a sentence.
+ *
+ * Needed because a configured noun does not know where it will be used, and
+ * "sea glass is earned from every shell" is a sentence starting in lower case.
+ * Only the first letter is touched, so "Bible study" does not become
+ * "Bible Study".
+ */
+export function sentenceCase(value: string): string {
+  return value.length === 0 ? value : value[0].toUpperCase() + value.slice(1);
+}
+
 /** The themed nouns. Kept separate because copy uses these constantly. */
 export function useTerms() {
   return useConfig().terms;

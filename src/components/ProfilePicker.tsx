@@ -12,6 +12,7 @@ import { PrincessArt } from './PrincessArt';
 import { useSyncStatus } from '../core/sync';
 import { sfxTap, sfxUnlock, unlockAudio } from '../core/audio';
 import { AnSoGuide } from './AnSoGuide';
+import { useTerms } from '../../core/runtime/ConfigProvider';
 
 /**
  * Who is exploring today.
@@ -31,6 +32,7 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
   const [addingAnother, setAddingAnother] = useState(false);
   const [name, setName] = useState('');
   const [grade, setGrade] = useState<Grade>(1);
+  const terms = useTerms();
   const [princess, setPrincessChoice] = useState<PrincessId>(PRINCESSES[0].id);
   const chosenPrincess = princessOrDefault(princess);
   // Kept in step with the princess so the stored value never contradicts her.
@@ -84,7 +86,7 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
           mood="idle"
           says={
             creating
-              ? 'Hello. I am AnSo. Tell me your name and I will show you the universe.'
+              ? `Hello. I am ${terms.guide}. Tell me your name and I will show you the universe.`
               : 'Welcome back. Who is exploring today?'
           }
           voice={voiceEnabled}
@@ -174,7 +176,7 @@ export function ProfilePicker({ voiceEnabled, onReady }: ProfilePickerProps) {
           </fieldset>
 
           <fieldset className="field">
-            <legend>Choose your princess</legend>
+            <legend>Choose your {terms.avatar}</legend>
             <div className="princess-choice">
               {PRINCESSES.map((p) => (
                 <button
