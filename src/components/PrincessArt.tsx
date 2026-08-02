@@ -255,29 +255,24 @@ function Eye({
   const outline = `M${cx - 12} ${cy + 1} C ${cx - 10} ${cy - 9}, ${cx + 3} ${cy - 11}, ${cx + 12} ${cy - 4} C ${cx + 8} ${cy + 8}, ${cx - 5} ${cy + 9}, ${cx - 12} ${cy + 1} Z`;
 
   /**
-   * The lash mass: along the top of the eye, out to a flick, and back
-   * underneath — thicker at the outer end than the inner.
-   */
-  const lashMass =
-    `M${cx - 12} ${cy + 1} ` +
-    `C ${cx - 10} ${cy - 9}, ${cx + 3} ${cy - 11}, ${cx + 12} ${cy - 4} ` +
-    `L ${cx + 19} ${cy - 10} ` +
-    `C ${cx + 17} ${cy - 3}, ${cx + 15} ${cy - 1}, ${cx + 11} ${cy - 0.5} ` +
-    `C ${cx + 3} ${cy - 6}, ${cx - 7} ${cy - 4}, ${cx - 12} ${cy + 1} Z`;
-
-  /**
-   * A second, shorter flick just inside the main one — both sweeping up and
-   * *outward* at roughly the same shallow angle.
+   * The lash is two overlapping shapes in one fill, not a single outline.
    *
-   * Clumps rising vertically from the middle of the lid was the previous
-   * mistake and it read as horns. Real lashes fan outward along the line of the
-   * eye, and they only bunch at the outer corner; over the centre of the lid
-   * they are short enough to be part of the mass.
+   * Tracing the lid out to a flick tip and back in one path puts a cusp at the
+   * outer corner: the boundary has to reverse direction there, and the reversal
+   * renders as a second spike, so each eye ended up with two points. Overlapping
+   * a crescent with a tapered wedge lets the silhouette union cleanly — there is
+   * no seam because both are the same colour, and no reversal to go wrong.
    */
-  const lashClumps = [
-    `M${cx + 8.5} ${cy - 7.8} C ${cx + 11} ${cy - 10.5}, ${cx + 13} ${cy - 12.5}, ${cx + 15.5} ${cy - 14} ` +
-      `C ${cx + 13.5} ${cy - 10.5}, ${cx + 12} ${cy - 8.6}, ${cx + 10.5} ${cy - 6.6} Z`,
-  ];
+  const lidBand =
+    `M${cx - 12} ${cy + 1} ` +
+    `C ${cx - 10} ${cy - 9}, ${cx + 3} ${cy - 11}, ${cx + 13} ${cy - 3.5} ` +
+    `C ${cx + 8} ${cy - 6}, ${cx - 4} ${cy - 9.5}, ${cx - 12} ${cy + 1} Z`;
+
+  /** The flick. Its base sits inside the band, so only the tip shows. */
+  const lashFlick =
+    `M${cx + 7} ${cy - 7} ` +
+    `C ${cx + 12} ${cy - 9}, ${cx + 16} ${cy - 10.5}, ${cx + 19.5} ${cy - 12} ` +
+    `C ${cx + 16} ${cy - 7.5}, ${cx + 13.5} ${cy - 5}, ${cx + 11} ${cy - 2.5} Z`;
 
   return (
     // Drawn flicking outward to the right, then mirrored in place for the eye
@@ -318,21 +313,22 @@ function Eye({
         <ellipse cx={cx} cy={cy - 11} rx="14" ry="6" fill="#2a1420" opacity="0.22" />
       </g>
 
-      {/* Soft crease well above the lash line, so the two do not merge. */}
+      {/* Crease, barely there. At full opacity it became a second line above
+          the lash and the eye looked like it had two lids. */}
       <path
-        d={`M${cx - 7} ${cy - 11} C ${cx - 4} ${cy - 15}, ${cx + 5} ${cy - 15.5}, ${cx + 11} ${cy - 11}`}
-        stroke="#a9707e"
-        strokeWidth="1"
+        d={`M${cx - 6} ${cy - 11.5} C ${cx - 3} ${cy - 15}, ${cx + 5} ${cy - 15.5}, ${cx + 10} ${cy - 11.5}`}
+        stroke="#b98a94"
+        strokeWidth="0.9"
         fill="none"
         strokeLinecap="round"
-        opacity="0.45"
+        opacity="0.3"
       />
 
-      {/* The lash line and its clumps, filled rather than stroked. */}
-      <path d={lashMass} fill="#1b1018" />
-      {lashClumps.map((d, i) => (
-        <path key={i} d={d} fill="#1b1018" />
-      ))}
+      {/* Same fill, so the two shapes read as one silhouette. */}
+      <g fill="#1b1018">
+        <path d={lidBand} />
+        <path d={lashFlick} />
+      </g>
 
       {/*
        * No lower lashes at all. Small dark marks under the eye read as
