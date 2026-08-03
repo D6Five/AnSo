@@ -11,6 +11,7 @@ import { speak, stopSpeaking } from '../core/voice';
 import { setScene } from '../core/music';
 import { AnSoGuide, type AnSoMood } from './AnSoGuide';
 import { ChallengeView, type ChallengeResult } from '../activities/ChallengeView';
+import { useSyncStatus, applyUpdate } from '../core/sync';
 
 /**
  * Runs a single star from opening line to reward screen.
@@ -32,6 +33,7 @@ type Phase = 'intro' | 'passage' | 'playing' | 'done';
 export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: StarViewProps) {
   const terms = useTerms();
   const currency = useCurrency();
+  const syncStatus = useSyncStatus();
   const attempt = profile.progress[star.id]?.completions ?? 0;
   const challenges = useMemo(() => challengesFor(star, attempt), [star, attempt]);
 
@@ -278,6 +280,13 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
 
             {newReward && !rewardSeen ? (
               <RewardReveal rewardId={newReward} onSeen={() => setRewardSeen(true)} />
+            ) : syncStatus.updateAvailable ? (
+              <div className="update-prompt">
+                <p>✨ A new version is ready!</p>
+                <button type="button" className="btn btn-primary btn-large" onClick={applyUpdate}>
+                  Get the latest →
+                </button>
+              </div>
             ) : (
               <button type="button" className="btn btn-primary btn-large" onClick={onExit}>
                 Back to the map →

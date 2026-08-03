@@ -29,9 +29,15 @@ interface SyncState {
    * server, and a new explorer can never be created at all.
    */
   settled: boolean;
+  /**
+   * True when the server is running a different version of the app.
+   * A gentle reload prompt can be shown after the current activity finishes.
+   */
+  updateAvailable: boolean;
 }
 
-let state: SyncState = { status: 'off', lastSyncedAt: null, settled: false };
+let state: SyncState = { status: 'off', lastSyncedAt: null, settled: false, updateAvailable: false };
+let serverVersion: string | null = null;
 const listeners = new Set<() => void>();
 
 function setState(next: Partial<SyncState>): void {
@@ -57,6 +63,7 @@ export function useSyncStatus(): SyncState {
 interface SyncResponse {
   profiles: Profile[];
   deletedProfileIds?: string[];
+  version?: string;
 }
 
 /** True while we are writing server data into the store, to break the loop. */
@@ -122,6 +129,13 @@ async function push(): Promise<void> {
     if (!Array.isArray(merged.profiles)) {
       setState({ status: 'error' });
       return;
+    }
+
+    // Detect when the server is running a new version of the app.
+    const newVersion = merged.version;
+    if (newVersion && serverVersion !== newVersion) {
+      serverVersion = newVersion;
+      setState({ updateAvailable: true });
     }
 
     applying = true;
@@ -197,4 +211,10 @@ export function initSync(): void {
 /** Force an immediate sync. Used by the settings panel. */
 export function syncNow(): void {
   schedule(0);
+}
+
+/** Clear the update available flag and reload the page. */
+export function applyUpdate(): void {
+  setState({ updateAvailable: false });
+  window.location.reload();
 }

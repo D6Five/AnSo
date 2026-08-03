@@ -1391,6 +1391,10 @@ body {
 .score-big { margin: 0; font-size: 3.2rem; font-weight: 800; color: var(--good); }
 .score-big span { font-size: 1.6rem; color: var(--ink-dim); font-weight: 600; }
 .stardust-earned { margin: 4px 0 0; font-size: 1.3rem; color: var(--accent-warm); font-weight: 700; }
+.bonus-note { margin: 8px 0 0; font-size: 0.95rem; color: var(--accent-warm); }
+
+.update-prompt { text-align: center; }
+.update-prompt p { margin: 0 0 20px; font-size: 1.1rem; color: var(--accent-warm); font-weight: 600; }
 
 /* ------------------------------------------------------------------ */
 /* Settings modal                                                      */

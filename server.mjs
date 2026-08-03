@@ -26,6 +26,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 const PASSWORD = process.env.AUTH_PASSWORD ?? '';
 const SESSION_DAYS = Number(process.env.SESSION_DAYS) || 180;
 const COOKIE = 'anso_session';
+const SERVER_VERSION = Date.now().toString(36);
 
 // Fail closed. A missing password must never mean "serve it to everyone".
 if (!PASSWORD) {
@@ -343,7 +344,7 @@ async function handleSync(req, res) {
 
   try {
     const merged = await syncSave(incoming);
-    sendJson(res, 200, merged);
+    sendJson(res, 200, { ...merged, version: SERVER_VERSION });
   } catch (err) {
     // A failed sync must never break the app — the device keeps its local copy.
     console.error('Sync failed:', err.message);
