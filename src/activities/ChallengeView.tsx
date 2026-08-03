@@ -66,8 +66,27 @@ export function ChallengeView(props: ChallengeViewProps) {
 /* ------------------------------------------------------------------ */
 
 function ContinueButton({ onClick, label = 'Next' }: { onClick: () => void; label?: string }) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  /*
+   * Bring the button to her.
+   *
+   * On a reading star the passage stays on screen above the question, so by the
+   * time four options are answered the Next button can sit below the fold —
+   * under the guide, who is stuck to the bottom of the viewport. It looked like
+   * the lesson had frozen; the button was simply somewhere she had not thought
+   * to scroll. autoFocus alone does not reliably scroll it into view.
+   */
+  useEffect(() => {
+    const timer = window.setTimeout(
+      () => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+      60,
+    );
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
-    <button type="button" className="btn btn-primary continue-btn" onClick={onClick} autoFocus>
+    <button ref={ref} type="button" className="btn btn-primary continue-btn" onClick={onClick} autoFocus>
       {label} →
     </button>
   );
@@ -183,7 +202,22 @@ function ChoiceView({
   const [eliminated, setEliminated] = useState<number | null>(null);
 
   const choose = (index: number) => {
-    if (settled || index === eliminated) return;
+    if (settled) return;
+
+    /*
+     * A crossed-out option still answers back.
+     *
+     * Silently ignoring the tap is what makes a screen feel broken — the same
+     * mistake that made the matching round look frozen. Two of four options
+     * going quiet after one wrong answer reads as the app having stopped, not
+     * as a hint, especially to a child who taps everything to find what works.
+     */
+    if (index === eliminated || (wrongOnce && index === picked)) {
+      sfxTryAgain();
+      onAnSoSay('That one is crossed out. Pick one of the other two.', 'encouraging');
+      return;
+    }
+
     sfxTap();
     setPicked(index);
 
@@ -263,9 +297,10 @@ function ChoiceView({
               type="button"
               className={`option-btn ${state}`}
               onClick={() => choose(originalIndex)}
-              // The one she just tried is closed off too, so "two left" is
-              // literally true and re-tapping it cannot burn her second chance.
-              disabled={settled || isOut || (wrongOnce && isPicked && !isCorrect)}
+              // Only a finished question disables anything. Crossed-out options
+              // stay clickable and explain themselves; they simply cannot be
+              // chosen, so re-tapping one never burns the second chance.
+              disabled={settled}
             >
               {challenge.options[originalIndex]}
             </button>

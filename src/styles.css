@@ -222,7 +222,14 @@ body {
   to { opacity: 1; transform: none; }
 }
 
-.anso-dock { position: sticky; bottom: 12px; margin-top: 30px; }
+/*
+ * The guide sits below the question rather than floating over it.
+ *
+ * Stuck to the bottom of the viewport she covered whatever was underneath, and
+ * what was underneath was usually the Next button. Nothing the child needs to
+ * press should ever be behind her.
+ */
+.anso-dock { margin-top: 22px; }
 
 /* ------------------------------------------------------------------ */
 /* Profile picker                                                      */
@@ -1067,7 +1074,14 @@ body {
 
 .passage h2 { margin-top: 0; color: #0e7490; }
 .passage p { margin: 0 0 16px; }
-.passage-compact { font-size: 1rem; padding: 20px 24px; max-height: 300px; overflow-y: auto; }
+/* Kept short while questions are being answered. At 300px the story alone
+   filled a laptop screen and pushed the question and its button out of sight. */
+.passage-compact {
+  font-size: 1rem;
+  padding: 18px 22px;
+  max-height: min(200px, 28vh);
+  overflow-y: auto;
+}
 
 .preview-words {
   background: #e0f7fc;
@@ -1083,7 +1097,7 @@ body {
 
 .passage-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
 
-.play-panel { display: flex; flex-direction: column; gap: 20px; }
+.play-panel { display: flex; flex-direction: column; gap: 20px; padding-bottom: 24px; }
 .passage-drawer { display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
 
 /* ------------------------------------------------------------------ */
@@ -1191,7 +1205,14 @@ body {
 
 .pronounce-btn:hover { background: #e4dffb; border-color: #7c3aed; }
 
-.continue-btn { align-self: flex-end; }
+/* Full width and tall. It was a small right-aligned button, which is a poor
+   target for a six-year-old and easy to miss entirely on a long screen. */
+.continue-btn {
+  align-self: stretch;
+  min-height: 66px;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
 
 .answer-reveal {
   padding: 16px 20px;
