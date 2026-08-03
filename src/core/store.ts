@@ -9,7 +9,8 @@
  */
 
 import { useSyncExternalStore } from 'react';
-import type { Grade, Profile, SaveData, StarProgress } from '../types';
+import type { Grade, Profile, SaveData, Star, StarProgress, SubjectId } from '../types';
+import { starsForGrade } from '../content';
 import {
   REWARD_BY_ID,
   SHOP_BY_ID,
@@ -352,7 +353,12 @@ function updateActive(mutate: (p: Profile) => Profile): void {
  * that replaying a star still feels worthwhile, but the bonus for a new
  * personal best is bigger.
  */
-export function completeStar(starId: string, score: number, total: number): number {
+export function completeStar(
+  starId: string,
+  score: number,
+  total: number,
+  bonus = false,
+): number {
   let awarded = 0;
   updateActive((p) => {
     const prior: StarProgress = p.progress[starId] ?? {
@@ -365,6 +371,8 @@ export function completeStar(starId: string, score: number, total: number): numb
 
     awarded = score * 10 + (isFirst ? 50 : 0) + (isBest && !isFirst ? 20 : 0);
     if (score === total) awarded += 25;
+    // Doubled for a first visit to a constellation she has been avoiding.
+    if (bonus) awarded *= EXPLORATION_BONUS;
 
     return {
       ...p,
@@ -407,6 +415,58 @@ export function updateSettings(patch: Partial<SaveData['settings']>): void {
 export function starsCompleted(profile: Profile | null): number {
   if (!profile) return 0;
   return Object.values(profile.progress).filter((p) => p.completions > 0).length;
+}
+
+/**
+ * Constellations worth nudging her toward, and the reward for doing so.
+ *
+ * Children settle into whatever they are already good at, which is exactly the
+ * subject they least need. Rather than blocking the favourite — which would
+ * just make the app feel mean — a neglected constellation pays double.
+ *
+ * The rule deliberately waits for a real pattern: nothing is flagged until she
+ * has finished a handful of lessons, and a constellation only counts as
+ * neglected if it is several behind her strongest. A child who is evenly spread
+ * is never told she is doing it wrong.
+ */
+export const EXPLORATION_BONUS = 2;
+
+const MIN_LESSONS_BEFORE_NUDGING = 5;
+const GAP_THAT_COUNTS_AS_NEGLECTED = 3;
+
+export function neglectedSubjects(profile: Profile | null): Set<SubjectId> {
+  const out = new Set<SubjectId>();
+  if (!profile) return out;
+
+  // Look the subject up on the star record rather than parsing the id. Star ids
+  // do not contain the subject id verbatim — "g1_read_01" against "reading" —
+  // and a near-miss here silently marks everything neglected.
+  const stars = starsForGrade(profile.grade);
+  const counts = new Map<SubjectId, number>();
+  for (const star of stars) counts.set(star.subject, 0);
+
+  let total = 0;
+  for (const star of stars) {
+    if ((profile.progress[star.id]?.completions ?? 0) <= 0) continue;
+    total++;
+    counts.set(star.subject, (counts.get(star.subject) ?? 0) + 1);
+  }
+
+  if (total < MIN_LESSONS_BEFORE_NUDGING) return out;
+
+  const most = Math.max(...counts.values());
+  for (const [id, n] of counts) {
+    if (most - n >= GAP_THAT_COUNTS_AS_NEGLECTED) out.add(id);
+  }
+  return out;
+}
+
+/** Whether finishing this star right now would pay the exploration bonus. */
+export function bonusAppliesTo(profile: Profile | null, star: Star): boolean {
+  // Only the first completion pays double; replaying a neglected lesson to farm
+  // currency is exactly the behaviour this is meant to redirect.
+  if (!profile || (profile.progress[star.id]?.completions ?? 0) > 0) return false;
+  return neglectedSubjects(profile).has(star.subject);
 }
 
 /** Everything this princess owns: earned through stars, plus anything bought. */

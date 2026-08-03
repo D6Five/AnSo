@@ -79,6 +79,36 @@ function HintLine({ hint, show }: { hint?: string; show: boolean }) {
 }
 
 /**
+ * A hint for a challenge that was not written with one.
+ *
+ * Reading, vocabulary, Korean, thinking and BSF questions are authored by hand
+ * and many have no hint, so a child who guessed wrong got the same screen back
+ * with nothing new to work from — which teaches guessing rather than thinking.
+ * Maths and typing are excluded: they generate their own hints, and a typing
+ * hint is about finger position rather than the answer.
+ */
+function fallbackHint(challenge: Challenge): string | undefined {
+  switch (challenge.kind) {
+    case 'speak': {
+      const words = challenge.sampleAnswer.trim().split(/\s+/).length;
+      const first = challenge.accept[0] ?? '';
+      return words === 1 && first
+        ? `It starts with the letter ${first[0].toUpperCase()}.`
+        : 'Say it in your own words — a whole sentence is fine.';
+    }
+    case 'order':
+      return `The first one is "${challenge.items[0]}".`;
+    case 'match':
+      return 'Take the one you are most sure about first.';
+    case 'choice':
+      // The elimination below is the real help here; this just names it.
+      return 'I have crossed one out for you. Now pick between what is left.';
+    default:
+      return undefined;
+  }
+}
+
+/**
  * Speaks a vocabulary word on demand, and once automatically when it appears.
  * A word learned only by sight cannot be used in conversation or recognised
  * when somebody else says it.
@@ -148,8 +178,12 @@ function ChoiceView({
     () => createRng(`opts:${challenge.id}`).shuffle(challenge.options.map((_, i) => i)),
     [challenge.id, challenge.options],
   );
+
+  /** An option crossed out as a hint after the first wrong answer. */
+  const [eliminated, setEliminated] = useState<number | null>(null);
+
   const choose = (index: number) => {
-    if (settled) return;
+    if (settled || index === eliminated) return;
     sfxTap();
     setPicked(index);
 
@@ -157,20 +191,41 @@ function ChoiceView({
       sfxCorrect();
       setSettled(true);
       onAnSoSay(challenge.teach ?? 'That is right.', 'happy');
-    } else {
-      sfxTryAgain();
-      if (wrongOnce) {
-        // Second miss: show the answer and move on rather than let them stall.
-        setSettled(true);
-        onAnSoSay(
-          `The answer is "${challenge.options[challenge.correct]}". ${challenge.teach ?? ''}`,
-          'encouraging',
-        );
-      } else {
-        setWrongOnce(true);
-        onAnSoSay('Not that one. Have another look.', 'encouraging');
-      }
+      return;
     }
+
+    sfxTryAgain();
+    if (wrongOnce) {
+      // Second miss: show the answer and move on rather than let them stall.
+      setSettled(true);
+      onAnSoSay(
+        `The answer is "${challenge.options[challenge.correct]}". ${challenge.teach ?? ''}`,
+        'encouraging',
+      );
+      return;
+    }
+
+    /*
+     * First miss. Cross out one more wrong option, so the second attempt is a
+     * genuinely narrower choice rather than the same screen again. With four
+     * options this leaves two: enough to still require knowing the answer, and
+     * little enough that a child who is close can get there.
+     */
+    const remainingWrong = order.filter(
+      (i) => i !== challenge.correct && i !== index,
+    );
+    if (remainingWrong.length > 0) {
+      const rng = createRng(`elim:${challenge.id}`);
+      setEliminated(rng.pick(remainingWrong));
+    }
+
+    setWrongOnce(true);
+    onAnSoSay(
+      challenge.hint
+        ? `Not that one. ${challenge.hint}`
+        : 'Not that one. I have crossed out another, so there are two left.',
+      'encouraging',
+    );
   };
 
   return (
@@ -194,14 +249,23 @@ function ChoiceView({
         {order.map((originalIndex) => {
           const isCorrect = originalIndex === challenge.correct;
           const isPicked = picked === originalIndex;
-          const state = settled && isCorrect ? 'correct' : isPicked && !isCorrect ? 'wrong' : '';
+          const isOut = eliminated === originalIndex;
+          const state = settled && isCorrect
+            ? 'correct'
+            : isPicked && !isCorrect
+              ? 'wrong'
+              : isOut
+                ? 'eliminated'
+                : '';
           return (
             <button
               key={originalIndex}
               type="button"
               className={`option-btn ${state}`}
               onClick={() => choose(originalIndex)}
-              disabled={settled}
+              // The one she just tried is closed off too, so "two left" is
+              // literally true and re-tapping it cannot burn her second chance.
+              disabled={settled || isOut || (wrongOnce && isPicked && !isCorrect)}
             >
               {challenge.options[originalIndex]}
             </button>
@@ -209,7 +273,10 @@ function ChoiceView({
         })}
       </div>
 
-      <HintLine hint={challenge.hint} show={wrongOnce && !settled} />
+      <HintLine
+        hint={challenge.hint ?? fallbackHint(challenge)}
+        show={wrongOnce && !settled}
+      />
 
       {settled ? (
         <ContinueButton onClick={() => onResult({ correct: picked === challenge.correct })} />
@@ -305,7 +372,7 @@ function SpeakView({
             </div>
           </div>
 
-          <HintLine hint={challenge.hint} show={attempts >= 1} />
+          <HintLine hint={challenge.hint ?? fallbackHint(challenge)} show={attempts >= 1} />
         </>
       ) : (
         <>
@@ -402,7 +469,7 @@ function OrderView({
               ↩ Take back the last one
             </button>
           ) : null}
-          <HintLine hint={challenge.hint} show={placed.length > 0} />
+          <HintLine hint={challenge.hint ?? fallbackHint(challenge)} show={placed.length > 0} />
         </>
       ) : (
         <ContinueButton onClick={() => onResult({ correct: gotIt })} />
@@ -525,6 +592,10 @@ function MatchView({
           })}
         </div>
       </div>
+
+      {/* After a couple of misses, offer a way in rather than let her keep
+          guessing pairs at random. */}
+      <HintLine hint={fallbackHint(challenge)} show={!done && misses >= 2} />
 
       {done ? (
         // One miss is normal exploration; several means it was not really known.

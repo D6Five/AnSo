@@ -8,7 +8,7 @@ import { PrincessArt } from './PrincessArt';
 import { BackButton } from './BackButton';
 import { princessOrDefault } from '../content/princesses';
 import { REWARD_BY_ID, type AccessoryReward, type DressReward } from '../content/rewards';
-import { earnedRewards, spendableStardust } from '../core/store';
+import { earnedRewards, neglectedSubjects, spendableStardust } from '../core/store';
 import { useCurrency, useTerms } from '../../core/runtime/ConfigProvider';
 
 /**
@@ -70,14 +70,25 @@ export function GalaxyMap({
     [profile.equippedAccessories],
   );
 
+  const neglected = useMemo(() => neglectedSubjects(profile), [profile]);
+
   const greeting = useMemo(() => {
     const totalDone = Object.values(progressBySubject).reduce((n, p) => n + p.done, 0);
     if (totalDone === 0) {
       return `Welcome, ${profile.name}. Pick a ${terms.lessonGroup} and we will begin.`;
     }
     const noun = totalDone === 1 ? terms.lesson : terms.lessonPlural;
-    return `Good to see you again, ${profile.name}. You have lit ${totalDone} ${noun} so far.`;
-  }, [profile.name, progressBySubject, terms]);
+    const base = `Good to see you again, ${profile.name}. You have lit ${totalDone} ${noun} so far.`;
+
+    // Name one neglected constellation rather than listing them all. A single
+    // suggestion is an invitation; a list of everything she has not done reads
+    // as a telling-off.
+    const [first] = [...neglected];
+    if (!first) return base;
+    const subject = SUBJECTS.find((s) => s.id === first);
+    if (!subject) return base;
+    return `${base} ${subject.constellation} has been waiting — it pays double ${terms.currency} right now.`;
+  }, [profile.name, progressBySubject, terms, neglected]);
 
   if (openSubject) {
     const subject = SUBJECTS.find((s) => s.id === openSubject)!;
@@ -250,8 +261,15 @@ export function GalaxyMap({
                 <span className="card-progress-fill" style={{ width: `${pct}%` }} />
               </span>
               <span className="card-count">
-                {progress.done} of {progress.total} stars lit
+                {progress.done} of {progress.total} {terms.lessonPlural} lit
               </span>
+              {/* Shown on the card so the offer is visible while she is
+                  choosing, not discovered after she has already finished. */}
+              {neglected.has(subject.id) ? (
+                <span className="bonus-badge">
+                  {terms.currencyIcon} Double {terms.currency} here
+                </span>
+              ) : null}
             </button>
           );
         })}

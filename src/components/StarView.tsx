@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Profile, Star } from '../types';
 import { challengesFor } from '../content';
-import { completeStar, starsCompleted } from '../core/store';
+import { bonusAppliesTo, completeStar, starsCompleted } from '../core/store';
 import { rewardForMilestone } from '../content/rewards';
 import { RewardReveal } from './PrincessScreen';
 import { BackButton } from './BackButton';
@@ -46,6 +46,7 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
   const [newReward, setNewReward] = useState<string | null>(null);
   const [rewardSeen, setRewardSeen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
+  const [bonusPaid, setBonusPaid] = useState(false);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -90,8 +91,11 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
       const firstTime = (profile.progress[star.id]?.completions ?? 0) === 0;
       const collectedBefore = starsCompleted(profile);
 
-      const stardust = completeStar(star.id, finalScore, challenges.length);
+      // Worked out before completing, since finishing changes the answer.
+      const paidBonus = bonusAppliesTo(profile, star);
+      const stardust = completeStar(star.id, finalScore, challenges.length, paidBonus);
       setAwarded(stardust);
+      setBonusPaid(paidBonus);
       if (firstTime) {
         const treasure = rewardForMilestone(collectedBefore + 1);
         setNewReward(treasure ? treasure.id : null);
@@ -265,6 +269,11 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
                 {score} <span>/ {challenges.length}</span>
               </p>
               <p className="stardust-earned">+{currency.amount(awarded)}</p>
+              {bonusPaid ? (
+                <p className="bonus-note">
+                  ✨ Double for exploring somewhere new
+                </p>
+              ) : null}
             </div>
 
             {newReward && !rewardSeen ? (
