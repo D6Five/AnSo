@@ -269,6 +269,25 @@ export function stopMusic(): void {
   sceneGain = null;
 }
 
+/**
+ * Ensure music stops when the page closes or navigates away.
+ * Without this, oscillators scheduled ahead continue playing even after
+ * the browser leaves the page.
+ */
+export function initMusicCleanup(): void {
+  window.addEventListener('beforeunload', () => {
+    stopMusic();
+    const ctx = getContext();
+    if (ctx) {
+      try {
+        ctx.close();
+      } catch {
+        // Context may already be closed; ignore.
+      }
+    }
+  });
+}
+
 export function isMusicRunning(): boolean {
   return running;
 }

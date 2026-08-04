@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Star } from './types';
 import { micEnabledFor, selectProfile, useActiveProfile, useSave } from './core/store';
-import { startMusic, stopMusic } from './core/music';
+import { startMusic, stopMusic, initMusicCleanup } from './core/music';
 import { initVoices, setPreferredVoice, setVoiceEnabled, stopSpeaking } from './core/voice';
 import { initSync } from './core/sync';
 import { setMusicVolume, setVolume, unlockAudio } from './core/audio';
@@ -27,6 +27,9 @@ export function App() {
     // Mirrors progress to the server when the app is hosted. Fails quietly and
     // leaves the app fully working on localStorage when there is no server.
     initSync();
+    // Stop music and close audio context when the page unloads, so music doesn't
+    // continue playing after the browser leaves the page.
+    initMusicCleanup();
   }, []);
 
   // Keep the audio and voice engines in step with saved settings.
