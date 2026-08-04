@@ -13,7 +13,7 @@
 
 import { useSyncExternalStore } from 'react';
 import type { Profile, SaveData } from '../types';
-import { applyRemoteProfiles, getSave, isSeedProfile, subscribeToSave } from './store';
+import { applyDeployVersion, applyRemoteProfiles, getSave, isSeedProfile, subscribeToSave } from './store';
 
 export type SyncStatus = 'off' | 'syncing' | 'synced' | 'offline' | 'error';
 
@@ -140,6 +140,7 @@ async function push(): Promise<void> {
 
     applying = true;
     try {
+      if (newVersion) applyDeployVersion(newVersion);
       applyRemoteProfiles(merged.profiles, merged.deletedProfileIds ?? []);
     } finally {
       applying = false;

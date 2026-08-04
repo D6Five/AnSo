@@ -300,4 +300,9 @@ export interface SaveData {
   deletedProfileIds?: string[];
   /** Last time this device's copy changed. Used to settle settings conflicts. */
   updatedAt?: number;
+  /**
+   * Server version last seen by this device, used to notice a redeploy so the
+   * seed test explorers can be put back to their starting state.
+   */
+  deployVersion?: string | null;
 }

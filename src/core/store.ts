@@ -34,6 +34,7 @@ const DEFAULT_SAVE: SaveData = {
     voiceName: null,
   },
   deletedProfileIds: [],
+  deployVersion: null,
 };
 
 /** Drawn from the same family as the constellation palette so a profile card
@@ -179,6 +180,32 @@ function resetIdleSeeds(save: SaveData): SaveData {
   };
 }
 
+/**
+ * Put every seed explorer fully back to how she shipped — progress, treasures
+ * and economy all included, not just stardust — when the server reports a
+ * version this device has not seen before.
+ *
+ * A deploy is what "new build to test against" means, so that is the signal,
+ * not time or idleness. The very first sync a device ever makes also reports
+ * a "new" version — there is nothing to reset against yet, so that case is a
+ * no-op beyond recording the version.
+ */
+export function applyDeployVersion(version: string): void {
+  if (!version || state.deployVersion === version) return;
+  const isRedeploy = state.deployVersion != null;
+
+  commit({
+    ...state,
+    deployVersion: version,
+    profiles: isRedeploy
+      ? state.profiles.map((p) => {
+          const seed = SEED_PROFILES.find((s) => s.id === p.id);
+          return seed ? { ...seed, updatedAt: Date.now() } : p;
+        })
+      : state.profiles,
+  });
+}
+
 function load(): SaveData {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -250,7 +277,12 @@ export function applyRemoteProfiles(profiles: Profile[], deletedProfileIds: stri
   const previous = state.profiles.find((p) => p.id === state.activeProfileId);
 
   let activeProfileId: string | null = null;
-  if (previous) {
+  if (previous && isSeedProfile(previous.id)) {
+    // Seed explorers never leave this device (see payloadFrom in sync.ts), so
+    // they never come back in `profiles` either. Matching by name/grade below
+    // would always miss and silently sign her out mid-session.
+    activeProfileId = previous.id;
+  } else if (previous) {
     const sameId = profiles.find((p) => p.id === previous.id);
     const sameChild = profiles.find(
       (p) =>
