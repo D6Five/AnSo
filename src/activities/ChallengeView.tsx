@@ -131,6 +131,12 @@ function fallbackHint(challenge: Challenge): string | undefined {
  * Speaks a vocabulary word on demand, and once automatically when it appears.
  * A word learned only by sight cannot be used in conversation or recognised
  * when somebody else says it.
+ *
+ * When `meaning` is also supplied, it is queued to play automatically right
+ * after the word — a child must hear both at least once without clicking
+ * anything, and the two buttons below exist only to hear either one *again*.
+ * Sequenced rather than fired together: `speak()` cancels whatever is already
+ * talking, so playing them at the same time would just cut the word off.
  */
 function PronounceButton({
   word,
@@ -142,9 +148,20 @@ function PronounceButton({
   lang?: string;
 }) {
   useEffect(() => {
-    // Slightly slow and clearly separated from AnSo's own chatter.
-    const timer = window.setTimeout(() => void speak(word, { rate: 0.72, lang }), 350);
-    return () => window.clearTimeout(timer);
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      // Slightly slow and clearly separated from AnSo's own chatter.
+      await speak(word, { rate: 0.72, lang });
+      if (!cancelled && meaning) await speak(meaning, { rate: 0.85 });
+    }, 350);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+    // Meaning is fixed for the lifetime of a given word's card, so it is
+    // deliberately left out of the dependency list — including it would replay
+    // both lines every time the child re-triggers a render for another reason.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [word, lang]);
 
   return (
@@ -432,6 +449,14 @@ function SpeakView({
   return (
     <div className="challenge speak-challenge">
       <h2 className="challenge-prompt">{challenge.prompt}</h2>
+
+      {challenge.pronounce ? (
+        <PronounceButton
+          word={challenge.pronounce}
+          meaning={challenge.pronounceMeaning}
+          lang={challenge.pronounceLang}
+        />
+      ) : null}
 
       {heard ? (
         <p className={`heard-line ${gotIt ? 'good' : ''}`}>

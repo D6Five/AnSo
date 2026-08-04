@@ -28,20 +28,30 @@ export interface VocabStarSpec {
   words: WordEntry[];
 }
 
+/**
+ * Teach the word, then immediately ask for it back in her own words.
+ *
+ * This used to be four-option multiple choice, which meant the word could be
+ * "learned" by clicking through decoys until one stuck — no listening or
+ * understanding required. AnSo now reads the word and its meaning and example
+ * aloud automatically (via `pronounce` + `pronounceMeaning`, both required
+ * once by `PronounceButton`), and the only way through is saying what it
+ * means. Restating something right after hearing it is a much lower bar than
+ * the cold recall the flash-card review star asks for later, which is the
+ * point: this is the first exposure, that is the test of whether it stuck.
+ */
 function meaningChallenge(entry: WordEntry, idx: number, starId: string): Challenge {
-  // Rotate the correct position so the answer is not always in the same slot.
-  const correct = idx % 4;
-  const options = [...entry.decoys];
-  options.splice(correct, 0, entry.meaning);
+  const accept = FLASHCARD_ACCEPT[entry.word] ?? [entry.meaning];
   return {
-    kind: 'choice',
+    kind: 'speak',
     id: `${starId}_w${idx}_mean`,
-    prompt: `What does the word "${entry.word}" mean?`,
+    prompt: `What does the word "${entry.word}" mean? Say it in your own words.`,
     display: entry.word,
     pronounce: entry.word,
     pronounceMeaning: `${entry.word}. ${entry.meaning}. For example. ${entry.cloze.replace('____', entry.word)}`,
-    options,
-    correct,
+    accept: [...accept, entry.meaning],
+    sampleAnswer: entry.meaning,
+    hint: `Listen again if you need to, or think about this: ${entry.cloze.replace('____', '_____')}`,
     teach: entry.note ?? `"${entry.word}" means ${entry.meaning}.`,
   };
 }
