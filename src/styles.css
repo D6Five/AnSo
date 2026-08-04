@@ -1269,6 +1269,37 @@ body {
 .mic-partial { color: var(--card-ink-dim); }
 .mic-error { color: #b45309; }
 
+/* Vocabulary flash cards */
+
+.flashcard-face {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 34px 24px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, var(--card-surface-alt) 0%, var(--card-surface) 100%);
+  border: 3px solid var(--card-border);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+}
+
+.flashcard-face.good { border-color: var(--good); background: #d1fae5; }
+.flashcard-face.missed { border-color: var(--accent-warm); background: #ffe4e9; }
+
+.flashcard-eyebrow {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--card-ink-dim);
+  text-transform: uppercase;
+}
+
+.flashcard-word {
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--card-ink);
+}
+
 /* Order */
 
 .order-slots { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -1483,6 +1514,8 @@ body {
   .passage { padding: 22px 20px; font-size: 1.08rem; }
   .star-node { transform: none !important; }
   .typing-target { font-size: 1.2rem; }
+  .flashcard-word { font-size: 1.9rem; }
+  .flashcard-face { padding: 26px 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

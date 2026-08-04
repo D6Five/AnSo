@@ -1,5 +1,5 @@
 import type { Star } from '../../types';
-import { buildVocabStar, type VocabStarSpec } from '../vocabBuilder';
+import { buildFlashcardStar, buildVocabStar, type VocabStarSpec } from '../vocabBuilder';
 
 /**
  * Grade 3 vocabulary — 10 stars, 6 words each. Tier-two words: the ones that
@@ -465,4 +465,14 @@ const specs: VocabStarSpec[] = [
   },
 ];
 
-export const grade3Vocabulary: Star[] = specs.map(buildVocabStar);
+/**
+ * Each word set is immediately followed by its own flash-card review star —
+ * learn the six words, then straight away say what each one means out loud,
+ * while it is still fresh. Interleaving beats teaching all ten sets first and
+ * reviewing afterward, where the first set would be half-forgotten by the
+ * time review finally arrived.
+ */
+export const grade3Vocabulary: Star[] = specs.flatMap((spec) => [
+  buildVocabStar(spec),
+  buildFlashcardStar(spec),
+]);

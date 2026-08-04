@@ -162,14 +162,43 @@ function placeValue(rng: Rng, threeDigit: boolean): Built {
 }
 
 function multFacts(rng: Rng): Built {
-  const a = rng.int(2, 10);
-  const b = rng.int(2, 10);
+  const a = rng.int(1, 12);
+  const b = rng.int(1, 12);
   return {
     expression: `${a} × ${b}`,
     answer: a * b,
     prompt: `What is ${a} times ${b}?`,
     hint: `Think of ${a} groups with ${b} in each group.`,
     teach: `${a} times ${b} is ${a * b}.`,
+  };
+}
+
+/**
+ * One specific times table, e.g. "know your 7s". The fixed number lands on
+ * either side at random, since 7 × 4 and 4 × 7 both belong to the 7 times
+ * table and a child needs to recognise it either way round.
+ */
+function multTable(rng: Rng, table: number): Built {
+  const other = rng.int(1, 12);
+  const [a, b] = rng.chance(0.5) ? [table, other] : [other, table];
+  return {
+    expression: `${a} × ${b}`,
+    answer: a * b,
+    prompt: `What is ${a} times ${b}?`,
+    hint: `This is the ${table} times table: count by ${table}s, ${other} times.`,
+    teach: `${a} times ${b} is ${a * b}.`,
+  };
+}
+
+/** A number times itself. Worth its own drill — squares turn up constantly. */
+function multSquares(rng: Rng): Built {
+  const a = rng.int(1, 12);
+  return {
+    expression: `${a} × ${a}`,
+    answer: a * a,
+    prompt: `What is ${a} times ${a}?`,
+    hint: `${a} squared. Count ${a} groups of ${a}.`,
+    teach: `${a} times ${a} is ${a * a}.`,
   };
 }
 
@@ -555,6 +584,18 @@ function build(skill: MathSkill, rng: Rng): Built {
     case 'compare': return compare(rng, 100);
     case 'place-value': return placeValue(rng, rng.chance(0.5));
     case 'mult-facts': return multFacts(rng);
+    case 'mult-table-2': return multTable(rng, 2);
+    case 'mult-table-3': return multTable(rng, 3);
+    case 'mult-table-4': return multTable(rng, 4);
+    case 'mult-table-5': return multTable(rng, 5);
+    case 'mult-table-6': return multTable(rng, 6);
+    case 'mult-table-7': return multTable(rng, 7);
+    case 'mult-table-8': return multTable(rng, 8);
+    case 'mult-table-9': return multTable(rng, 9);
+    case 'mult-table-10': return multTable(rng, 10);
+    case 'mult-table-11': return multTable(rng, 11);
+    case 'mult-table-12': return multTable(rng, 12);
+    case 'mult-squares': return multSquares(rng);
     case 'div-facts': return divFacts(rng);
     case 'mult-two-digit': return multTwoDigit(rng);
     case 'fractions-compare': return fractionsCompare(rng);

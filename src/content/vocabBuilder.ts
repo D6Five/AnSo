@@ -1,4 +1,5 @@
 import type { Challenge, Grade, Star, SubjectId } from '../types';
+import { FLASHCARD_ACCEPT } from './flashcardAnswers';
 
 /**
  * Vocabulary stars are built from word data rather than hand-written challenge
@@ -98,6 +99,51 @@ export function buildVocabStar(spec: VocabStarSpec): Star {
     title: spec.title,
     blurb: spec.blurb,
     minutes: spec.minutes,
+    content: { kind: 'fixed', challenges },
+  };
+}
+
+/**
+ * Flash card: the word is shown, and she has to say what it means in her own
+ * words — the opposite direction from `produceChallenge`, and the harder
+ * skill. Recognising a definition is easier than generating one; this is the
+ * pass that shows whether a word has actually been learned or only recognised.
+ *
+ * The hint reuses the word's cloze sentence rather than paraphrasing the
+ * definition, so a stuck child gets the word back in context — a real clue —
+ * without being handed the answer outright.
+ */
+function defineChallenge(entry: WordEntry, idx: number, starId: string): Challenge {
+  const accept = FLASHCARD_ACCEPT[entry.word] ?? [entry.meaning];
+  return {
+    kind: 'speak',
+    id: `${starId}_w${idx}_define`,
+    prompt: `What does "${entry.word}" mean? Say it in your own words.`,
+    display: entry.word,
+    pronounce: entry.word,
+    flashcard: true,
+    accept: [...accept, entry.meaning],
+    sampleAnswer: entry.meaning,
+    hint: `Here it is in a sentence: ${entry.cloze.replace('____', '_____')}`,
+    teach: entry.note ?? `"${entry.word}" means ${entry.meaning}.`,
+  };
+}
+
+/**
+ * A flash-card review star for a word set already taught by its companion
+ * `buildVocabStar` star. Same words, but every question runs the hardest
+ * direction — word to spoken definition — nothing else.
+ */
+export function buildFlashcardStar(spec: VocabStarSpec): Star {
+  const challenges = spec.words.map((entry, i) => defineChallenge(entry, i, spec.id));
+
+  return {
+    id: `${spec.id}_fc`,
+    subject: 'vocabulary' as SubjectId,
+    grade: spec.grade,
+    title: `Flash Cards: ${spec.title}`,
+    blurb: 'Same words. This time you say what each one means, out loud, in your own words.',
+    minutes: Math.max(6, Math.round(spec.minutes * 0.6)),
     content: { kind: 'fixed', challenges },
   };
 }

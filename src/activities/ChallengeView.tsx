@@ -373,6 +373,62 @@ function SpeakView({
     setTyped('');
   };
 
+  if (challenge.flashcard) {
+    return (
+      <div className="challenge speak-challenge flashcard-challenge">
+        <div className={`flashcard-face ${settled ? (gotIt ? 'good' : 'missed') : ''}`}>
+          <span className="flashcard-eyebrow">What does this word mean?</span>
+          <span className="flashcard-word">{challenge.display}</span>
+        </div>
+
+        {challenge.pronounce ? (
+          <PronounceButton word={challenge.pronounce} lang={challenge.pronounceLang} />
+        ) : null}
+
+        {heard ? (
+          <p className={`heard-line ${gotIt ? 'good' : ''}`}>
+            I heard: <strong>“{heard}”</strong>
+          </p>
+        ) : null}
+
+        {!settled ? (
+          <>
+            <MicButton onTranscript={judge} micEnabled={micEnabled} />
+
+            <div className="type-fallback">
+              <label htmlFor="speak-input" className="type-label">
+                or type your answer
+              </label>
+              <div className="type-row">
+                <input
+                  id="speak-input"
+                  className="text-input"
+                  value={typed}
+                  onChange={(e) => setTyped(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && submitTyped()}
+                  placeholder="Type here…"
+                  autoComplete="off"
+                />
+                <button type="button" className="btn" onClick={submitTyped} disabled={!typed.trim()}>
+                  Check
+                </button>
+              </div>
+            </div>
+
+            <HintLine hint={challenge.hint} show={attempts >= 1} />
+          </>
+        ) : (
+          <>
+            <div className={`answer-reveal ${gotIt ? 'good' : ''}`}>
+              {gotIt ? '⭐ You got it.' : `A good answer: ${challenge.sampleAnswer}`}
+            </div>
+            <ContinueButton onClick={() => onResult({ correct: gotIt })} />
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="challenge speak-challenge">
       <h2 className="challenge-prompt">{challenge.prompt}</h2>

@@ -2,133 +2,138 @@ import type { Star } from '../../types';
 import { GRADE3_SENTENCES, GRADE3_WORDS } from '../generators/typing';
 
 /**
- * Grade 3 math and typing.
+ * Grade 3 math.
  *
- * Third grade math is where multiplication, division, and fractions arrive, so
- * the ladder spends most of its length there. Free numeric entry throughout —
- * by this age the typing is not the obstacle.
+ * The whole ladder is the times tables, 1 through 12 — the goal is not
+ * understanding what multiplication means (that takes ten minutes to grasp),
+ * it is instant recall of all 144 facts. Every star is 30 questions of pure
+ * multiplication, free numeric entry, so getting fast means getting fast at
+ * typing the answer too. The ladder introduces each table on its own, then
+ * reviews in growing combinations, then drills speed once the facts are in
+ * place — cramming everything together from day one would just teach
+ * counting on fingers under time pressure.
  */
 
 export const grade3Math: Star[] = [
   {
     id: 'g3_math_01', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
-    title: 'Warming Up',
-    blurb: 'Two-digit adding and taking away, to see where we are starting from.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-two-digit', 'sub-two-digit'] } },
+    title: 'The 2 and 3 Times Tables',
+    blurb: 'Thirty questions, just these two tables. Take your time — speed comes later.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-2', 'mult-table-3'] } },
   },
   {
-    id: 'g3_math_02', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Into the Hundreds',
-    blurb: 'Three-digit numbers. Line up the hundreds, tens, and ones in your head.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit'] } },
+    id: 'g3_math_02', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
+    title: 'The 4 and 5 Times Tables',
+    blurb: 'The 5s have a pattern: they always end in 0 or 5. Watch for it.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-4', 'mult-table-5'] } },
   },
   {
     id: 'g3_math_03', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Borrowing and Regrouping',
-    blurb: 'Subtraction with big numbers. This is the one people find tricky — take your time.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['sub-three-digit'] } },
+    title: 'The 6 and 7 Times Tables',
+    blurb: 'These two trip people up more than any others. Slow and correct first.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-6', 'mult-table-7'] } },
   },
   {
-    id: 'g3_math_04', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
-    title: 'Groups of Things',
-    blurb: 'Multiplication is just adding the same number over and over, faster.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts', 'word-problem-hard'] } },
+    id: 'g3_math_04', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
+    title: 'The 8 and 9 Times Tables',
+    blurb: 'For the 9s: the digits of the answer always add up to 9. Try it.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-8', 'mult-table-9'] } },
   },
   {
-    id: 'g3_math_05', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
-    title: 'Sharing Equally',
-    blurb: 'Division. The opposite question to multiplication.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['div-facts', 'word-problem-hard'] } },
+    id: 'g3_math_05', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
+    title: 'The 10, 11, and 12 Times Tables',
+    blurb: 'The last three, and often the easiest once you see the pattern.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-10', 'mult-table-11', 'mult-table-12'] } },
   },
   {
     id: 'g3_math_06', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Times and Share Together',
-    blurb: 'Both directions, mixed. Read the sign before you start.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts', 'div-facts'] } },
+    title: 'Review: 2 Through 5',
+    blurb: 'The first four tables together. If one feels shaky, that is the one to notice.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-2', 'mult-table-3', 'mult-table-4', 'mult-table-5'] } },
   },
   {
     id: 'g3_math_07', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Bigger Multiplication',
-    blurb: 'Two-digit times one-digit. Break the big number apart first.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-two-digit', 'word-problem-hard'] } },
+    title: 'Review: 6 Through 9',
+    blurb: 'The trickiest four, back again. They get easier every time you meet them.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-6', 'mult-table-7', 'mult-table-8', 'mult-table-9'] } },
   },
   {
-    id: 'g3_math_08', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Pieces of a Whole',
-    blurb: 'Fractions. Which piece is bigger, and why.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['fractions-compare'] } },
+    id: 'g3_math_08', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
+    title: 'Review: 10, 11, and 12',
+    blurb: 'The last three tables, mixed together.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-10', 'mult-table-11', 'mult-table-12'] } },
   },
   {
-    id: 'g3_math_09', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'The Same Amount, Different Names',
-    blurb: 'One half and two quarters are the same thing wearing different clothes.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['fractions-equivalent'] } },
+    id: 'g3_math_09', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 480,
+    title: 'The Tricky Sevens and Eights',
+    blurb: 'Extra practice on the two tables everybody needs the most reps on.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-7', 'mult-table-8'] } },
   },
   {
-    id: 'g3_math_10', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 600,
-    title: 'Close Enough',
-    blurb: 'Rounding. Knowing roughly is often more useful than knowing exactly.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['rounding'] } },
+    id: 'g3_math_10', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 480,
+    title: 'The Nine Pattern',
+    blurb: 'All nines. Watch the tens digit go up while the ones digit goes down.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-9'] } },
   },
   {
-    id: 'g3_math_11', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Around and Inside',
-    blurb: 'Area and perimeter. One is the walk around, one is the space within.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['area-perimeter', 'word-problem-hard'] } },
+    id: 'g3_math_11', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
+    title: 'Halfway There',
+    blurb: 'Every table, fully mixed, for the first time. This is the real test.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
   },
   {
-    id: 'g3_math_12', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Watching the Clock',
-    blurb: 'Elapsed time. How long from now until then.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['elapsed-time'] } },
+    id: 'g3_math_12', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 360,
+    title: 'Speed Round: Small Numbers',
+    blurb: 'Tables 2 through 6, against the clock now. Answer quickly — you know these.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-2', 'mult-table-3', 'mult-table-4', 'mult-table-5', 'mult-table-6'] } },
   },
   {
-    id: 'g3_math_13', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 600,
-    title: 'Making Change',
-    blurb: 'Money problems. Counting up is usually easier than subtracting.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['money', 'word-problem-hard'] } },
+    id: 'g3_math_13', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 360,
+    title: 'Speed Round: Big Numbers',
+    blurb: 'Tables 7 through 12, against the clock.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-table-7', 'mult-table-8', 'mult-table-9', 'mult-table-10', 'mult-table-11', 'mult-table-12'] } },
   },
   {
-    id: 'g3_math_14', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
-    title: 'Problems in Words',
-    blurb: 'The maths is hidden inside a story. Find it first, then solve it.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem-hard'] } },
+    id: 'g3_math_14', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 480,
+    title: 'Squares',
+    blurb: 'A number times itself. These come up everywhere — worth knowing on sight.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-squares', 'mult-facts'] } },
   },
   {
     id: 'g3_math_15', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
-    title: 'Harder Stories',
-    blurb: 'These take two steps. Do the first one before you look for the second.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['word-problem-hard', 'mult-facts', 'div-facts'] } },
+    title: 'All Twelve Tables',
+    blurb: 'Every fact, fully shuffled, no pattern to lean on.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
   },
   {
-    id: 'g3_math_16', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
-    title: 'Fractions and Rounding',
-    blurb: 'Two of the trickiest ideas, side by side.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['fractions-compare', 'fractions-equivalent', 'rounding'] } },
+    id: 'g3_math_16', subject: 'math', grade: 3, minutes: 12, timeLimitSeconds: 360,
+    title: 'All Twelve Tables, Faster',
+    blurb: 'The same facts, less time to think. Recall, not calculate.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
   },
   {
-    id: 'g3_math_17', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
-    title: 'Measure and Time',
-    blurb: 'Shapes, clocks, and coins together.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['area-perimeter', 'elapsed-time', 'money'] } },
+    id: 'g3_math_17', subject: 'math', grade: 3, minutes: 13, timeLimitSeconds: 480,
+    title: 'Squares and Everything Else',
+    blurb: 'Squares mixed back in with the full set.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-squares', 'mult-facts', 'mult-facts'] } },
   },
   {
-    id: 'g3_math_18', subject: 'math', grade: 3, minutes: 15, timeLimitSeconds: 600,
-    title: 'The Whole Ladder',
-    blurb: 'Everything from this constellation, all mixed together.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'mult-facts', 'div-facts', 'fractions-compare', 'rounding', 'word-problem-hard'] } },
-  },
-  {
-    id: 'g3_math_19', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 600,
+    id: 'g3_math_18', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 420,
     title: 'Fast and Accurate',
     blurb: 'Facts you should know without stopping to work them out.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts', 'div-facts'] } },
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
   },
   {
-    id: 'g3_math_20', subject: 'math', grade: 3, minutes: 16, timeLimitSeconds: 600,
-    title: 'The Counting Crown',
-    blurb: 'The final star. Twenty problems, every skill you have. Go carefully.',
-    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['add-three-digit', 'sub-three-digit', 'mult-two-digit', 'div-facts', 'fractions-equivalent', 'rounding', 'area-perimeter', 'elapsed-time', 'money', 'word-problem-hard'] } },
+    id: 'g3_math_19', subject: 'math', grade: 3, minutes: 14, timeLimitSeconds: 360,
+    title: 'One More Sprint',
+    blurb: 'Same as the last star, a little less time. See if it feels easier.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
+  },
+  {
+    id: 'g3_math_20', subject: 'math', grade: 3, minutes: 16, timeLimitSeconds: 300,
+    title: 'The Times Table Crown',
+    blurb: 'The final star. All twelve tables, fastest pace yet. Show me what you know.',
+    content: { kind: 'generated', count: 30, generator: { type: 'math', skills: ['mult-facts'] } },
   },
 ];
 

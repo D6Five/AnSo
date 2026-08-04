@@ -75,6 +75,8 @@ export interface SpeakChallenge extends ChallengeBase {
   accept: string[];
   /** Shown when the child asks to see choices instead of speaking. */
   sampleAnswer: string;
+  /** Render as a big flash card (word on the front) instead of the plain layout. */
+  flashcard?: boolean;
 }
 
 /** Arrange items into the right order. */
@@ -153,6 +155,18 @@ export type MathSkill =
   | 'compare'
   | 'place-value'
   | 'mult-facts'
+  | 'mult-table-2'
+  | 'mult-table-3'
+  | 'mult-table-4'
+  | 'mult-table-5'
+  | 'mult-table-6'
+  | 'mult-table-7'
+  | 'mult-table-8'
+  | 'mult-table-9'
+  | 'mult-table-10'
+  | 'mult-table-11'
+  | 'mult-table-12'
+  | 'mult-squares'
   | 'div-facts'
   | 'mult-two-digit'
   | 'fractions-compare'
