@@ -19,12 +19,14 @@ import {
 import { setVolume } from '../core/audio';
 import { totalMinutes } from '../content';
 import { useTerms } from '../../core/runtime/ConfigProvider';
+import { useSyncStatus } from '../core/sync';
 
 /** Grown-up settings. Deliberately plain, and reachable from the map only. */
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const save = useSave();
   const profile = useActiveProfile();
   const terms = useTerms();
+  const syncStatus = useSyncStatus();
   const { settings } = save;
   // Voice lists populate asynchronously, so re-read once they arrive rather
   // than rendering an empty dropdown on first open.
@@ -51,6 +53,11 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         aria-label="Settings"
       >
         <h2>Settings</h2>
+        {syncStatus.serverVersion ? (
+          <div className="settings-version">
+            <small>Running version: <code>{syncStatus.serverVersion}</code></small>
+          </div>
+        ) : null}
 
         <label className="setting-row">
           <span>Sound effects</span>

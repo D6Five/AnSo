@@ -34,10 +34,14 @@ interface SyncState {
    * A gentle reload prompt can be shown after the current activity finishes.
    */
   updateAvailable: boolean;
+  /**
+   * The server's version ID, shown in Settings so parents can confirm updates.
+   * Null until the first sync succeeds. Format is a timestamp in base36.
+   */
+  serverVersion: string | null;
 }
 
-let state: SyncState = { status: 'off', lastSyncedAt: null, settled: false, updateAvailable: false };
-let serverVersion: string | null = null;
+let state: SyncState = { status: 'off', lastSyncedAt: null, settled: false, updateAvailable: false, serverVersion: null };
 const listeners = new Set<() => void>();
 
 function setState(next: Partial<SyncState>): void {
@@ -133,9 +137,9 @@ async function push(): Promise<void> {
 
     // Detect when the server is running a new version of the app.
     const newVersion = merged.version;
-    if (newVersion && serverVersion !== newVersion) {
-      serverVersion = newVersion;
-      setState({ updateAvailable: true });
+    const versionChanged = newVersion && state.serverVersion !== newVersion;
+    if (versionChanged) {
+      setState({ updateAvailable: true, serverVersion: newVersion });
     }
 
     applying = true;
@@ -146,7 +150,7 @@ async function push(): Promise<void> {
       applying = false;
     }
 
-    setState({ status: 'synced', lastSyncedAt: Date.now() });
+    setState({ status: 'synced', lastSyncedAt: Date.now(), ...(newVersion && !versionChanged ? { serverVersion: newVersion } : {}) });
   } catch {
     // Network failure, or no server at all in dev. Local storage still holds
     // everything, so this is not an error the child should ever see.
