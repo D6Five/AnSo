@@ -102,7 +102,180 @@ const PICTURES: Record<string, JSX.Element> = {
       <path d="M46 44 L 46 62 M60 40 L 60 62 M74 48 L 74 64" stroke="#d9a985" strokeWidth="2" strokeLinecap="round" />
     </g>
   ),
+  tree: (
+    <g>
+      <rect x="44" y="58" width="12" height="32" rx="3" fill="#8a5a44" />
+      <circle cx="50" cy="38" r="26" fill="#4fae5a" />
+      <circle cx="32" cy="48" r="16" fill="#5cbd68" />
+      <circle cx="68" cy="48" r="16" fill="#5cbd68" />
+    </g>
+  ),
+  sun: (
+    <g>
+      {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => (
+        <line key={a} x1="50" y1="8" x2="50" y2="20" stroke="#f5c542" strokeWidth="5" strokeLinecap="round" transform={`rotate(${a} 50 50)`} />
+      ))}
+      <circle cx="50" cy="50" r="22" fill="#f5c542" />
+      <circle cx="50" cy="50" r="16" fill="#fadf7e" />
+    </g>
+  ),
+  bird: (
+    <g>
+      <ellipse cx="46" cy="54" rx="26" ry="20" fill="#6a8fd8" />
+      <circle cx="68" cy="38" r="13" fill="#6a8fd8" />
+      <path d="M78 36 l 12 4 l -12 4 Z" fill="#f5a742" />
+      <circle cx="70" cy="35" r="2.5" fill="#20293a" />
+      <path d="M30 52 q -8 8, -2 16 q 10 -2, 14 -10 Z" fill="#5379c4" />
+      <path d="M40 74 l -4 12 M52 74 l 4 12" stroke="#f5a742" strokeWidth="3" strokeLinecap="round" />
+    </g>
+  ),
+  fish: (
+    <g>
+      <ellipse cx="44" cy="50" rx="28" ry="18" fill="#f0925c" />
+      <path d="M68 50 L 90 34 L 90 66 Z" fill="#e07a44" />
+      <circle cx="32" cy="45" r="3.5" fill="#20293a" />
+      <path d="M40 34 q 8 6, 0 14" stroke="#e07a44" strokeWidth="2.5" fill="none" />
+      <circle cx="14" cy="30" r="3" fill="#5fc7ea" opacity="0.7" />
+      <circle cx="10" cy="20" r="2" fill="#5fc7ea" opacity="0.7" />
+    </g>
+  ),
+  milk: (
+    <g>
+      <path d="M34 26 L 66 26 L 66 34 L 72 46 L 72 88 L 28 88 L 28 46 L 34 34 Z" fill="#f4f0e6" stroke="#d8cfbd" strokeWidth="2" />
+      <path d="M34 26 L 66 26 L 66 34 L 34 34 Z" fill="#81b7d6" />
+      <path d="M28 46 L 72 46 L 72 60 L 28 60 Z" fill="#81b7d6" opacity="0.5" />
+      <ellipse cx="50" cy="74" rx="12" ry="8" fill="#fff" />
+    </g>
+  ),
+  rice: (
+    <g>
+      <path d="M18 56 a 32 20 0 0 0 64 0 Z" fill="#e07a5f" />
+      <ellipse cx="50" cy="54" rx="30" ry="10" fill="#c96a50" />
+      <ellipse cx="50" cy="48" rx="24" ry="10" fill="#fff" />
+      <circle cx="38" cy="44" r="5" fill="#f7f3ea" />
+      <circle cx="50" cy="40" r="6" fill="#f7f3ea" />
+      <circle cx="62" cy="44" r="5" fill="#f7f3ea" />
+    </g>
+  ),
+  eye: (
+    <g>
+      <path d="M10 50 Q 50 18, 90 50 Q 50 82, 10 50 Z" fill="#fff" stroke="#20293a" strokeWidth="2.5" />
+      <circle cx="50" cy="50" r="16" fill="#7a5c3f" />
+      <circle cx="50" cy="50" r="8" fill="#20293a" />
+      <circle cx="55" cy="45" r="3.5" fill="#fff" />
+      <path d="M22 34 Q 50 12, 78 34" stroke="#20293a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+    </g>
+  ),
+  nose: (
+    <g>
+      <path d="M50 18 L 50 52 Q 50 64, 42 68 Q 34 74, 42 80 Q 50 84, 58 80 Q 66 74, 58 68 Q 50 64, 50 52" fill="#f0c6a8" stroke="#d9a985" strokeWidth="2.5" strokeLinecap="round" />
+      <ellipse cx="40" cy="76" rx="4" ry="3" fill="#c98f6a" />
+      <ellipse cx="60" cy="76" rx="4" ry="3" fill="#c98f6a" />
+    </g>
+  ),
+  mouth: (
+    <g>
+      <path d="M14 50 Q 30 38, 50 44 Q 70 38, 86 50 Q 70 76, 50 76 Q 30 76, 14 50 Z" fill="#e8534f" />
+      <path d="M14 50 Q 50 58, 86 50 Q 70 46, 50 48 Q 30 46, 14 50 Z" fill="#fff" />
+      <path d="M30 62 Q 50 70, 70 62 Q 60 68, 50 68 Q 40 68, 30 62 Z" fill="#c93a3a" />
+    </g>
+  ),
+  foot: (
+    <g>
+      <path d="M38 12 Q 56 10, 60 30 L 62 52 Q 64 68, 76 72 Q 86 76, 84 84 Q 80 92, 62 90 L 40 88 Q 28 86, 30 70 L 34 32 Q 34 16, 38 12 Z" fill="#f0c6a8" />
+      <circle cx="36" cy="14" r="6" fill="#f0c6a8" />
+      <circle cx="46" cy="10" r="5" fill="#f0c6a8" />
+      <circle cx="55" cy="12" r="4.5" fill="#f0c6a8" />
+      <circle cx="62" cy="16" r="4" fill="#f0c6a8" />
+      <circle cx="67" cy="22" r="3.5" fill="#f0c6a8" />
+    </g>
+  ),
+  mom: (
+    <g>
+      <path d="M28 44 Q 26 16, 50 14 Q 74 16, 72 44 L 74 66 Q 62 60, 50 62 Q 38 60, 26 66 Z" fill="#7a4a2a" />
+      <circle cx="50" cy="42" r="20" fill="#f0c6a8" />
+      <circle cx="43" cy="40" r="2.5" fill="#20293a" />
+      <circle cx="57" cy="40" r="2.5" fill="#20293a" />
+      <path d="M44 50 q 6 5, 12 0" stroke="#c95a5a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M30 88 Q 34 66, 50 66 Q 66 66, 70 88 Z" fill="#e07aa0" />
+    </g>
+  ),
+  dad: (
+    <g>
+      <path d="M32 34 Q 32 16, 50 16 Q 68 16, 68 34 L 68 40 L 32 40 Z" fill="#3a2723" />
+      <circle cx="50" cy="44" r="20" fill="#f0c6a8" />
+      <circle cx="43" cy="42" r="2.5" fill="#20293a" />
+      <circle cx="57" cy="42" r="2.5" fill="#20293a" />
+      <path d="M44 52 q 6 5, 12 0" stroke="#a06a4a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M30 90 Q 34 68, 50 68 Q 66 68, 70 90 Z" fill="#4a6a9a" />
+    </g>
+  ),
+  baby: (
+    <g>
+      <circle cx="50" cy="48" r="24" fill="#f6d7bd" />
+      <path d="M50 22 q -2 -8, 6 -10 q 2 6, -3 10 Z" fill="#7a4a2a" />
+      <circle cx="42" cy="46" r="3" fill="#20293a" />
+      <circle cx="58" cy="46" r="3" fill="#20293a" />
+      <circle cx="36" cy="54" r="4" fill="#f0a8a0" opacity="0.7" />
+      <circle cx="64" cy="54" r="4" fill="#f0a8a0" opacity="0.7" />
+      <path d="M45 58 q 5 4, 10 0" stroke="#c95a5a" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      <path d="M34 82 Q 40 72, 50 72 Q 60 72, 66 82 Q 60 90, 50 90 Q 40 90, 34 82 Z" fill="#a8d8ea" />
+    </g>
+  ),
+  one: (
+    <g>
+      <circle cx="50" cy="30" r="14" fill="#e8534f" />
+      <path d="M44 58 L 54 52 L 54 88 M44 88 L 64 88" stroke="#20293a" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  ),
+  two: (
+    <g>
+      <circle cx="36" cy="28" r="12" fill="#e8534f" />
+      <circle cx="64" cy="28" r="12" fill="#5fc7ea" />
+      <path d="M38 56 Q 38 48, 50 48 Q 62 48, 62 58 Q 62 66, 50 74 L 38 86 L 64 86" stroke="#20293a" strokeWidth="5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  ),
+  three: (
+    <g>
+      <circle cx="30" cy="26" r="10" fill="#e8534f" />
+      <circle cx="50" cy="22" r="10" fill="#5fc7ea" />
+      <circle cx="70" cy="26" r="10" fill="#f5c542" />
+      <path d="M38 52 Q 40 46, 50 46 Q 62 46, 60 56 Q 59 63, 50 65 Q 62 66, 62 76 Q 62 88, 50 88 Q 40 88, 38 82" stroke="#20293a" strokeWidth="5" fill="none" strokeLinecap="round" />
+    </g>
+  ),
+  red: (
+    <g>
+      <path d="M50 12 C 64 30, 82 44, 80 62 a 30 30 0 0 1 -60 0 C 18 44, 36 30, 50 12 Z" fill="#e8534f" />
+      <ellipse cx="40" cy="58" rx="8" ry="12" fill="#fff" opacity="0.25" transform="rotate(-15 40 58)" />
+      <rect x="20" y="82" width="60" height="8" rx="4" fill="#c93a3a" />
+    </g>
+  ),
+  blue: (
+    <g>
+      <path d="M50 12 C 64 30, 82 44, 80 62 a 30 30 0 0 1 -60 0 C 18 44, 36 30, 50 12 Z" fill="#3f7ac9" />
+      <ellipse cx="40" cy="58" rx="8" ry="12" fill="#fff" opacity="0.25" transform="rotate(-15 40 58)" />
+      <rect x="20" y="82" width="60" height="8" rx="4" fill="#2e5da3" />
+    </g>
+  ),
+  yellow: (
+    <g>
+      <path d="M50 12 C 64 30, 82 44, 80 62 a 30 30 0 0 1 -60 0 C 18 44, 36 30, 50 12 Z" fill="#f5c542" />
+      <ellipse cx="40" cy="58" rx="8" ry="12" fill="#fff" opacity="0.35" transform="rotate(-15 40 58)" />
+      <rect x="20" y="82" width="60" height="8" rx="4" fill="#dba61f" />
+    </g>
+  ),
+  ball: (
+    <g>
+      <circle cx="50" cy="50" r="34" fill="#e8534f" />
+      <path d="M50 16 a 34 34 0 0 1 0 68" fill="#f5c542" />
+      <path d="M50 16 Q 30 50, 50 84 M50 16 Q 70 50, 50 84" stroke="#fff" strokeWidth="3" fill="none" />
+      <circle cx="50" cy="50" r="34" fill="none" stroke="#c93a3a" strokeWidth="2.5" />
+    </g>
+  ),
 };
+
+/** The picture names that exist. Content tests check every Korean word against this. */
+export const PICTURE_NAMES: string[] = Object.keys(PICTURES);
 
 export function WordPicture({ name, size = 128 }: { name: string; size?: number }) {
   const art = PICTURES[name];

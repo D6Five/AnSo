@@ -13,6 +13,9 @@
     "start": "node server.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
     "content:report": "node scripts/content-report.mjs",
     "test:sync": "node scripts/test-sync.mjs",
     "config:check": "node core/config/validate-cli.mjs"
@@ -25,7 +28,10 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/ui": "^4.1.10",
+    "jsdom": "^30.0.1",
     "typescript": "^5.7.2",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vitest": "^4.1.10"
   }
 }
