@@ -10,3 +10,9 @@ dist/
 .env*
 API_Key.txt
 *Keys.txt
+
+# playwright
+playwright-report/
+test-results/
+playwright/.auth/
+.e2e-data/

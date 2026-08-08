@@ -5,7 +5,8 @@ one runner (vitest), and it runs automatically on every push.
 
 ```bash
 npm test          # watch mode while developing
-npm run test:run  # the full suite once — what CI runs
+npm run test:run  # the full vitest suite once
+npm run test:e2e  # build, then end-to-end smoke in a real browser
 npm run typecheck # TypeScript across the project
 ```
 
@@ -19,6 +20,7 @@ npm run typecheck # TypeScript across the project
 | Merge semantics | `tests/merge.test.mjs` | The server merge: max/union rules that make two devices safe, tombstones, same-child stitching, symmetry |
 | Server integration | `tests/server.test.mjs` | Boots the real `server.mjs`: password gate serves nothing unauthenticated, forged sessions rejected, sync round-trips and merges |
 | Components | `src/activities/*.test.tsx` | Real interaction flows in jsdom: Next always appears, crossed-out options answer back, second chances count, no dead ends |
+| End-to-end smoke | `e2e/*.spec.ts` (Playwright) | The built app behind the real password gate, in a real browser at 1280×800 and 375×812: login flow, the galaxy map, a full question with `toBeInViewport()` on Next, the BSF read-along and study card, settings. Screenshots and traces on failure |
 
 ## Conventions
 
@@ -34,6 +36,10 @@ npm run typecheck # TypeScript across the project
   component flow (a child can always finish it).
 - DOM tests start with `// @vitest-environment jsdom`; everything else runs in
   node and stays fast.
+- **Layout bugs belong in the e2e layer.** jsdom has no real rendering, so
+  "exists but off-screen" can only be caught by Playwright's
+  `toBeInViewport()`. Keep the e2e suite small — a handful of journeys, not
+  hundreds of cases — so it stays fast enough to run on every push.
 
 ## Continuous execution
 

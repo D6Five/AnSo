@@ -18,13 +18,15 @@
     "test:run": "vitest run",
     "content:report": "node scripts/content-report.mjs",
     "test:sync": "node scripts/test-sync.mjs",
-    "config:check": "node core/config/validate-cli.mjs"
+    "config:check": "node core/config/validate-cli.mjs",
+    "test:e2e": "npm run build && playwright test"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
