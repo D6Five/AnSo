@@ -4,6 +4,7 @@ import { micEnabledFor, selectProfile, useActiveProfile, useSave } from './core/
 import { startMusic, stopMusic, initMusicCleanup } from './core/music';
 import { initVoices, setPreferredVoice, setVoiceEnabled, stopSpeaking } from './core/voice';
 import { initSync } from './core/sync';
+import { initIdleGuard } from './core/idle';
 import { setMusicVolume, setVolume, unlockAudio } from './core/audio';
 import { ProfilePicker } from './components/ProfilePicker';
 import { GalaxyMap } from './components/GalaxyMap';
@@ -30,6 +31,8 @@ export function App() {
     // Stop music and close audio context when the page unloads, so music doesn't
     // continue playing after the browser leaves the page.
     initMusicCleanup();
+    // An hour with no input returns the tab to the password page.
+    initIdleGuard();
   }, []);
 
   // Keep the audio and voice engines in step with saved settings.

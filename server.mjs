@@ -9,7 +9,10 @@
  * Configuration (Railway → Variables):
  *   AUTH_PASSWORD   required. The shared password. The server refuses to start
  *                   without it, so the app cannot accidentally become public.
- *   SESSION_DAYS    optional, default 180. How long a device stays signed in.
+ *   IDLE_MINUTES    optional, default 60. How long a signed-in device may sit
+ *                   idle before the password is required again. The window
+ *                   slides: every authenticated request (and the client's
+ *                   activity keepalive) pushes it forward.
  */
 
 import { createServer } from 'node:http';
@@ -24,7 +27,8 @@ const ROOT = resolve(fileURLToPath(new URL('./dist', import.meta.url)));
 const PORT = Number(process.env.PORT) || 8080;
 const HOST = process.env.HOST || '0.0.0.0';
 const PASSWORD = process.env.AUTH_PASSWORD ?? '';
-const SESSION_DAYS = Number(process.env.SESSION_DAYS) || 180;
+const IDLE_MINUTES = Number(process.env.IDLE_MINUTES) || 60;
+const IDLE_MS = IDLE_MINUTES * 60000;
 const COOKIE = 'anso_session';
 const SERVER_VERSION = Date.now().toString(36);
 
@@ -59,9 +63,29 @@ function sign(value) {
   return createHmac('sha256', SIGNING_KEY).update(value).digest('base64url');
 }
 
+/**
+ * Sessions are an idle window, not a long lease: the token carries its own
+ * expiry one idle-window ahead, and every authenticated request re-issues it,
+ * so the window slides while the app is in use and closes when it is not.
+ *
+ * The 'idle.' prefix in the signed payload versions the scheme — cookies from
+ * the old 180-day format fail the signature check, so the idle rule applies
+ * to every device immediately rather than after months of grandfathering.
+ */
 function issueSession() {
-  const expires = Date.now() + SESSION_DAYS * 86400000;
-  return `${expires}.${sign(String(expires))}`;
+  const expires = Date.now() + IDLE_MS;
+  return `${expires}.${sign('idle.' + expires)}`;
+}
+
+function sessionCookieHeader() {
+  return [
+    `${COOKIE}=${issueSession()}`,
+    'Path=/',
+    'HttpOnly',
+    'Secure',
+    'SameSite=Strict',
+    `Max-Age=${Math.ceil(IDLE_MS / 1000)}`,
+  ].join('; ');
 }
 
 function isValidSession(token) {
@@ -74,7 +98,7 @@ function isValidSession(token) {
   if (!/^\d+$/.test(expires)) return false;
   if (Number(expires) < Date.now()) return false;
 
-  const expected = sign(expires);
+  const expected = sign('idle.' + expires);
   const a = Buffer.from(provided);
   const b = Buffer.from(expected);
   return a.length === b.length && timingSafeEqual(a, b);
@@ -293,24 +317,20 @@ async function handleLogin(req, res) {
 
   // Secure is safe to always set: Railway serves HTTPS, and a cookie that
   // refuses to travel over plain HTTP is exactly the behaviour we want.
-  const cookie = [
-    `${COOKIE}=${issueSession()}`,
-    'Path=/',
-    'HttpOnly',
-    'Secure',
-    'SameSite=Strict',
-    `Max-Age=${SESSION_DAYS * 86400}`,
-  ].join('; ');
-
-  res.writeHead(303, { Location: '/', 'Set-Cookie': cookie, 'Cache-Control': 'no-store' });
+  res.writeHead(303, {
+    Location: '/',
+    'Set-Cookie': sessionCookieHeader(),
+    'Cache-Control': 'no-store',
+  });
   res.end();
 }
 
-function sendJson(res, status, body) {
+function sendJson(res, status, body, headers = {}) {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
     'X-Content-Type-Options': 'nosniff',
+    ...headers,
   });
   res.end(JSON.stringify(body));
 }
@@ -344,7 +364,8 @@ async function handleSync(req, res) {
 
   try {
     const merged = await syncSave(incoming);
-    sendJson(res, 200, { ...merged, version: SERVER_VERSION });
+    // Syncing is activity, so it slides the idle window.
+    sendJson(res, 200, { ...merged, version: SERVER_VERSION }, { 'Set-Cookie': sessionCookieHeader() });
   } catch (err) {
     // A failed sync must never break the app — the device keeps its local copy.
     console.error('Sync failed:', err.message);
@@ -362,8 +383,9 @@ const server = createServer(async (req, res) => {
   }
 
   const isSyncRequest = req.method === 'POST' && path === '/api/sync';
+  const isPingRequest = req.method === 'POST' && path === '/api/ping';
 
-  if (!isSyncRequest && req.method !== 'GET' && req.method !== 'HEAD') {
+  if (!isSyncRequest && !isPingRequest && req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { Allow: 'GET, HEAD, POST' });
     res.end('Method not allowed');
     return;
@@ -372,7 +394,7 @@ const server = createServer(async (req, res) => {
   // Nothing below this line is reachable without a valid session, the sync
   // endpoint very much included.
   if (!isValidSession(readCookie(req.headers.cookie, COOKIE))) {
-    if (isSyncRequest) {
+    if (isSyncRequest || isPingRequest) {
       sendJson(res, 401, { error: 'Not signed in' });
       return;
     }
@@ -382,6 +404,15 @@ const server = createServer(async (req, res) => {
 
   if (isSyncRequest) {
     await handleSync(req, res);
+    return;
+  }
+
+  // The activity keepalive: the client calls this while a child is genuinely
+  // using the app, so a long lesson with no sync traffic still keeps the
+  // session alive — and an idle hour genuinely does not.
+  if (isPingRequest) {
+    res.writeHead(204, { 'Set-Cookie': sessionCookieHeader(), 'Cache-Control': 'no-store' });
+    res.end();
     return;
   }
 
@@ -400,6 +431,8 @@ const server = createServer(async (req, res) => {
   res.writeHead(200, {
     'Content-Type': MIME[extname(file).toLowerCase()] ?? 'application/octet-stream',
     'Cache-Control': cacheHeaderFor(file),
+    // Every authenticated request slides the idle window forward.
+    'Set-Cookie': sessionCookieHeader(),
     'X-Content-Type-Options': 'nosniff',
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'no-referrer',
