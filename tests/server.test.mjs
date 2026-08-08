@@ -124,15 +124,17 @@ describe('idle timeout', () => {
   it('slides the window: every authenticated request refreshes the cookie', async () => {
     const { cookie } = await login();
 
+    // Works with or without a dist/ build present — either way the response
+    // to an authenticated document request must carry a fresh session.
     const page = await fetch(BASE + '/', { headers: { Cookie: cookie } });
-    expect(page.headers.get('set-cookie')).toContain('anso_session=');
+    expect(page.headers.get('set-cookie') ?? '').toContain('anso_session=');
 
     const sync = await fetch(BASE + '/api/sync', {
       method: 'POST',
       headers: { Cookie: cookie, 'Content-Type': 'application/json' },
       body: JSON.stringify({ version: 1, profiles: [], deletedProfileIds: [] }),
     });
-    expect(sync.headers.get('set-cookie')).toContain('anso_session=');
+    expect(sync.headers.get('set-cookie') ?? '').toContain('anso_session=');
   });
 
   it('answers the activity keepalive with a refreshed session', async () => {

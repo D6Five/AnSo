@@ -423,7 +423,12 @@ const server = createServer(async (req, res) => {
   try {
     await stat(file);
   } catch {
-    res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    res.writeHead(500, {
+      'Content-Type': 'text/plain; charset=utf-8',
+      // Still an authenticated request, so it slides the idle window like
+      // any other — and the session tests stay honest without a build.
+      'Set-Cookie': sessionCookieHeader(),
+    });
     res.end('Build output missing. Run "npm run build" before starting.');
     return;
   }
