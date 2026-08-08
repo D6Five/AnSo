@@ -17,7 +17,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -27,7 +27,9 @@ jobs:
         run: npm run typecheck
 
       - name: Unit, content, component, and server tests
-        run: npm run test:run
+        # The github-actions reporter surfaces each failure as an annotation on
+        # the run, so a red build explains itself without opening the logs.
+        run: npx vitest run --reporter=default --reporter=github-actions
 
       - name: Production build
         run: npm run build

@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 /**
  * Boots the real server (real HMAC sessions, real merge, real throttling) on a
@@ -33,7 +34,7 @@ async function waitForServer(tries = 50) {
 beforeAll(async () => {
   dataDir = await mkdtemp(join(tmpdir(), 'anso-test-'));
   child = spawn(process.execPath, ['server.mjs'], {
-    cwd: new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'),
+    cwd: fileURLToPath(new URL('..', import.meta.url)),
     env: {
       ...process.env,
       AUTH_PASSWORD: PASSWORD,
