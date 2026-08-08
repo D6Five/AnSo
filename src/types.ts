@@ -40,8 +40,15 @@ export interface Subject {
 
 interface ChallengeBase {
   id: string;
-  /** Spoken aloud by AnSo when the challenge opens. */
+  /** The question text shown on screen. */
   prompt: string;
+  /**
+   * Read the prompt aloud automatically when the challenge opens, with a
+   * replay button. Used by BSF, where hearing the question matters as much as
+   * reading it. Skipped when `pronounce` is set — that path already plays
+   * audio on open, and two auto-plays would cancel each other.
+   */
+  speakPrompt?: boolean;
   /** Optional shorter text shown on screen if the prompt is long. */
   display?: string;
   hint?: string;

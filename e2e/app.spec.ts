@@ -96,8 +96,11 @@ test('the BSF lesson opens with read-along scripture and the study card', async 
   await page.getByRole('button', { name: /Our Need for the Gospel/ }).click();
   await page.getByRole('button', { name: 'I am ready' }).click();
 
-  // Read-along mode, not the plain passage.
-  await expect(page.getByRole('button', { name: /Read it to me/ })).toBeVisible();
+  // The two-step structure is visible: listen first, review second.
+  await expect(page.getByText('Step 1 · Listen to God’s Word')).toBeVisible();
+  await expect(page.getByText('Step 2 · Review the treasures')).toBeVisible();
+  await expect(page.getByRole('button', { name: /Read God's Word to me/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Read the treasures to me/ })).toBeVisible();
   // NIV text is on screen.
   await expect(page.getByText(/Paul, a servant of Christ Jesus/)).toBeVisible();
   // All four treasures plus the memory verse on the study card.

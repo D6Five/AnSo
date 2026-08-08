@@ -319,7 +319,9 @@ export function buildBsfStar(week: BsfWeek, grade: Grade, all: BsfWeek[]): Star 
     ...questions,
     gospelChallenge(week, id),
     ...verseChallenges(week, grade, id),
-  ];
+    // Every Lamp question is read aloud as it opens. The renderer skips the
+    // ones that already auto-play their own audio via `pronounce`.
+  ].map((c) => ({ ...c, speakPrompt: true }));
 
   return {
     id,

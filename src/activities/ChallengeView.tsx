@@ -45,20 +45,50 @@ export function ChallengeView(props: ChallengeViewProps) {
   // Remount every engine when the challenge changes so no state leaks across.
   const key = challenge.id;
 
-  switch (challenge.kind) {
-    case 'choice':
-      return <ChoiceView key={key} {...props} challenge={challenge} />;
-    case 'speak':
-      return <SpeakView key={key} {...props} challenge={challenge} />;
-    case 'order':
-      return <OrderView key={key} {...props} challenge={challenge} />;
-    case 'match':
-      return <MatchView key={key} {...props} challenge={challenge} />;
-    case 'math':
-      return <MathView key={key} {...props} challenge={challenge} />;
-    case 'typing':
-      return <TypingView key={key} {...props} challenge={challenge} />;
-  }
+  /*
+   * Challenges marked `speakPrompt` read their question aloud as they open,
+   * so a child who is still learning to read is never stuck staring at text.
+   * Challenges with `pronounce` are excluded: that path already auto-plays
+   * its own audio, and a second utterance would cut the first one off.
+   */
+  const autoSpeak = !!challenge.speakPrompt && !challenge.pronounce;
+  useEffect(() => {
+    if (autoSpeak) void speak(challenge.prompt);
+    // Keyed by id so the next question is read when it arrives.
+  }, [challenge.id, challenge.prompt, autoSpeak]);
+
+  const engine = (() => {
+    switch (challenge.kind) {
+      case 'choice':
+        return <ChoiceView key={key} {...props} challenge={challenge} />;
+      case 'speak':
+        return <SpeakView key={key} {...props} challenge={challenge} />;
+      case 'order':
+        return <OrderView key={key} {...props} challenge={challenge} />;
+      case 'match':
+        return <MatchView key={key} {...props} challenge={challenge} />;
+      case 'math':
+        return <MathView key={key} {...props} challenge={challenge} />;
+      case 'typing':
+        return <TypingView key={key} {...props} challenge={challenge} />;
+    }
+  })();
+
+  if (!autoSpeak) return engine;
+  return (
+    <div className="spoken-challenge">
+      <div className="hear-question-row">
+        <button
+          type="button"
+          className="btn btn-quiet hear-question"
+          onClick={() => void speak(challenge.prompt)}
+        >
+          🔊 Hear the question again
+        </button>
+      </div>
+      {engine}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ */

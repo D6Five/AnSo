@@ -13,6 +13,7 @@ import { AnSoGuide, type AnSoMood } from './AnSoGuide';
 import { ChallengeView, type ChallengeResult } from '../activities/ChallengeView';
 import { useSyncStatus, applyUpdate } from '../core/sync';
 import { ReadAloudPassage } from './ReadAloudPassage';
+import { ReadAloudNotes } from './ReadAloudNotes';
 import { BsfArt } from './BsfArt';
 
 /** The study card under a scripture passage — main truth, attribute, and so on. */
@@ -65,6 +66,8 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
   const [rewardSeen, setRewardSeen] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const [bonusPaid, setBonusPaid] = useState(false);
+  // The scripture has been heard once — time to nudge toward the study card.
+  const [passageHeard, setPassageHeard] = useState(false);
 
   useEffect(() => () => stopSpeaking(), []);
 
@@ -233,12 +236,28 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
                   </ul>
                 </aside>
               ) : null}
+              {passage.readAlong && passage.notes?.length ? (
+                <p className="step-tag">Step 1 · Listen to God&rsquo;s Word</p>
+              ) : null}
               {passage.readAlong ? (
-                <ReadAloudPassage paragraphs={passage.paragraphs} />
+                <ReadAloudPassage
+                  paragraphs={passage.paragraphs}
+                  label="🔊 Read God's Word to me"
+                  onFinished={() => setPassageHeard(true)}
+                />
               ) : (
                 passage.paragraphs.map((para, i) => <p key={i}>{para}</p>)
               )}
-              {passage.notes?.length ? <StudyNotes notes={passage.notes} /> : null}
+              {passage.notes?.length ? (
+                passage.readAlong ? (
+                  <>
+                    <p className="step-tag">Step 2 · Review the treasures</p>
+                    <ReadAloudNotes notes={passage.notes} nudge={passageHeard} />
+                  </>
+                ) : (
+                  <StudyNotes notes={passage.notes} />
+                )
+              ) : null}
               {passage.credit ? <p className="passage-credit">{passage.credit}</p> : null}
             </article>
 

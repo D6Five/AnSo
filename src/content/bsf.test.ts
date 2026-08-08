@@ -80,6 +80,14 @@ describe('BSF Romans curriculum', () => {
         });
       });
 
+      it('every question is marked to be read aloud', () => {
+        stars.forEach((star) => {
+          challengesOf(star.content as never).forEach((c) => {
+            expect(c.speakPrompt, `${c.id} should speak its prompt`).toBe(true);
+          });
+        });
+      });
+
       it('typing targets contain no untypeable characters', () => {
         stars.forEach((star) => {
           challengesOf(star.content as never).forEach((c) => {

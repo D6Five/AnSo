@@ -129,6 +129,42 @@ describe('choice challenge', () => {
   });
 });
 
+describe('spoken questions (speakPrompt)', () => {
+  it('reads the prompt aloud on open and offers a replay button', async () => {
+    const { speak } = await import('../core/voice');
+    vi.mocked(speak).mockClear();
+
+    renderChallenge({ ...choice, id: 'spoken_1', speakPrompt: true });
+
+    expect(speak).toHaveBeenCalledWith('What did Mia lose?');
+    const replay = screen.getByRole('button', { name: /hear the question again/i });
+    vi.mocked(speak).mockClear();
+    fireEvent.click(replay);
+    expect(speak).toHaveBeenCalledWith('What did Mia lose?');
+  });
+
+  it('does not read or show replay for ordinary challenges', async () => {
+    const { speak } = await import('../core/voice');
+    vi.mocked(speak).mockClear();
+
+    renderChallenge(choice);
+
+    expect(speak).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /hear the question again/i })).toBeNull();
+  });
+
+  it('yields to challenges that already auto-play audio via pronounce', async () => {
+    const { speak } = await import('../core/voice');
+    vi.mocked(speak).mockClear();
+
+    renderChallenge({ ...choice, id: 'spoken_2', speakPrompt: true, pronounce: 'mitten' });
+
+    // The prompt must not race the pronounce audio; only one auto-play path.
+    expect(vi.mocked(speak).mock.calls.map((c) => c[0])).not.toContain('What did Mia lose?');
+    expect(screen.queryByRole('button', { name: /hear the question again/i })).toBeNull();
+  });
+});
+
 describe('order challenge', () => {
   const order: OrderChallenge = {
     kind: 'order',
