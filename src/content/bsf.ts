@@ -335,6 +335,8 @@ export function buildBsfStar(week: BsfWeek, grade: Grade, all: BsfWeek[]): Star 
         paragraphs: week.passage,
         readAlong: true,
         art: week.art,
+        credit:
+          'Scripture taken from the Holy Bible, New International Version® NIV®. Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc. Used by permission. All rights reserved worldwide.',
         notes: [
           { label: 'Main Truth', text: week.truth, emphasis: true },
           { label: "God's Attribute", text: `${week.attribute.name} — ${week.attribute.meaning}` },

@@ -9,15 +9,17 @@ import type { BsfWeek } from './bsf';
  * Lesson summaries (main truth, God's attribute, doctrine, gospel connection)
  * and the NIV memory verses follow the BSF Romans children's material.
  *
- * Passage text is the World English Bible (WEB), a modern public-domain
- * translation, so the full scripture reading can ship inside the app. The
- * memory verses the girls learn by heart are NIV, exactly as on the lesson
- * cards. To swap the passage text for another translation, replace the
- * `passage` arrays — every other feature works unchanged.
+ * Passage text and memory verses are the New International Version (NIV),
+ * supplied by the family for their own study, matching the BSF lesson cards.
+ * Scripture taken from the Holy Bible, New International Version® NIV®,
+ * Copyright © 1973, 1978, 1984, 2011 by Biblica, Inc. Used by permission.
  *
- * Lesson 2 reads Romans 1:18-25 rather than the full 18-32: the closing
- * verses of that chapter name adult matters the BSF children's material
- * also leaves for later years. The lesson's truth is taught in full.
+ * A few readings are shortened for the six-to-nine audience, following the
+ * children's-material practice of leaving adult matters for later years:
+ * Lesson 2 reads Romans 1:18-23 and 25; Lesson 3 skips 2:22-27; Lesson 4
+ * skips the 3:13-18 quotations; Lesson 7 skips 4:9-12 and 14-15; Lesson 12
+ * reads selections from Romans 7:7-25; Lesson 13 skips 8:7-8. Every
+ * lesson's truth is taught in full.
  * ============================================================================
  */
 
@@ -31,12 +33,12 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'scroll',
     minutes: 18,
     passage: [
-      "Paul, a servant of Jesus Christ, called to be an apostle, set apart for the Good News of God, which he promised before through his prophets in the holy Scriptures, concerning his Son, who was born of the offspring of David according to the flesh,",
-      "who was declared to be the Son of God with power, according to the Spirit of holiness, by the resurrection from the dead, Jesus Christ our Lord, through whom we received grace and apostleship, for obedience of faith among all the nations, for his name’s sake; among whom you are also called to belong to Jesus Christ;",
-      "to all who are in Rome, beloved of God, called to be saints: Grace to you and peace from God our Father and the Lord Jesus Christ. First, I thank my God through Jesus Christ for all of you, that your faith is proclaimed throughout the whole world. For God is my witness, whom I serve in my spirit in the Good News of his Son, how unceasingly I make mention of you always in my prayers,",
-      "requesting, if by any means now at last I may be prospered by the will of God to come to you. For I long to see you, that I may impart to you some spiritual gift, to the end that you may be established; that is, that I with you may be encouraged in you, each of us by the other’s faith, both yours and mine.",
-      "Now I don’t desire to have you unaware, brothers, that I often planned to come to you, and was hindered so far, that I might have some fruit among you also, even as among the rest of the Gentiles. I am debtor both to Greeks and to foreigners, both to the wise and to the foolish. So, as much as is in me, I am eager to preach the Good News to you also who are in Rome.",
-      "For I am not ashamed of the Good News of Christ, because it is the power of God for salvation for everyone who believes; for the Jew first, and also for the Greek. For in it is revealed God’s righteousness from faith to faith. As it is written, “But the righteous shall live by faith.”",
+      "Paul, a servant of Christ Jesus, called to be an apostle and set apart for the gospel of God— the gospel he promised beforehand through his prophets in the Holy Scriptures regarding his Son, who as to his earthly life was a descendant of David,",
+      "and who through the Spirit of holiness was appointed the Son of God in power by his resurrection from the dead: Jesus Christ our Lord. Through him we received grace and apostleship to call all the Gentiles to the obedience that comes from faith for his name’s sake. And you also are among those Gentiles who are called to belong to Jesus Christ.",
+      "To all in Rome who are loved by God and called to be his holy people: Grace and peace to you from God our Father and from the Lord Jesus Christ. First, I thank my God through Jesus Christ for all of you, because your faith is being reported all over the world. God, whom I serve in my spirit in preaching the gospel of his Son, is my witness how constantly I remember you",
+      "in my prayers at all times; and I pray that now at last by God’s will the way may be opened for me to come to you. I long to see you so that I may impart to you some spiritual gift to make you strong— that is, that you and I may be mutually encouraged by each other’s faith.",
+      "I do not want you to be unaware, brothers and sisters, that I planned many times to come to you (but have been prevented from doing so until now) in order that I might have a harvest among you, just as I have had among the other Gentiles. I am obligated both to Greeks and non-Greeks, both to the wise and the foolish. That is why I am so eager to preach the gospel also to you who are in Rome.",
+      "For I am not ashamed of the gospel, because it is the power of God that brings salvation to everyone who believes: first to the Jew, then to the Gentile. For in the gospel the righteousness of God is revealed—a righteousness that is by faith from first to last, just as it is written: “The righteous will live by faith.”",
     ],
     memoryVerse: {
       text: 'For in the gospel the righteousness of God is revealed—a righteousness that is by faith from first to last.',
@@ -95,9 +97,9 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'storm',
     minutes: 17,
     passage: [
-      "For the wrath of God is revealed from heaven against all ungodliness and unrighteousness of men, who suppress the truth in unrighteousness, because that which is known of God is revealed in them, for God revealed it to them. For the invisible things of him since the creation of the world are clearly seen, being perceived through the things that are made, even his everlasting power and divinity; that they may be without excuse.",
-      "Because, knowing God, they didn’t glorify him as God, neither gave thanks, but became vain in their reasoning, and their senseless heart was darkened. Professing themselves to be wise, they became fools, and traded the glory of the incorruptible God for the likeness of an image of corruptible man, and of birds, and four-footed animals, and creeping things.",
-      "Therefore God also gave them up in the lusts of their hearts to uncleanness, that their bodies should be dishonored among themselves; who exchanged the truth of God for a lie, and worshiped and served the creature rather than the Creator, who is blessed forever. Amen.",
+      "The wrath of God is being revealed from heaven against all the godlessness and wickedness of people, who suppress the truth by their wickedness, since what may be known about God is plain to them, because God has made it plain to them. For since the creation of the world God’s invisible qualities—his eternal power and divine nature—have been clearly seen, being understood from what has been made, so that people are without excuse.",
+      "For although they knew God, they neither glorified him as God nor gave thanks to him, but their thinking became futile and their foolish hearts were darkened. Although they claimed to be wise, they became fools and exchanged the glory of the immortal God for images made to look like a mortal human being and birds and animals and reptiles.",
+      "They exchanged the truth about God for a lie, and worshiped and served created things rather than the Creator—who is forever praised. Amen.",
     ],
     memoryVerse: {
       text: 'For since the creation of the world God’s invisible qualities—his eternal power and divine nature—have been clearly seen, being understood from what has been made, so that people are without excuse.',
@@ -166,14 +168,13 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'scales',
     minutes: 19,
     passage: [
-      "Therefore you are without excuse, O man, whoever you are who judge. For in that which you judge another, you condemn yourself. For you who judge practice the same things. We know that the judgment of God is according to truth against those who practice such things. Do you think this, O man who judges those who practice such things, and do the same, that you will escape the judgment of God?",
-      "Or do you despise the riches of his goodness, forbearance, and patience, not knowing that the goodness of God leads you to repentance? But according to your hardness and unrepentant heart you are treasuring up for yourself wrath in the day of wrath, revelation, and of the righteous judgment of God; who “will pay back to everyone according to their works:”",
-      "to those who by perseverance in well-doing seek for glory, honor, and incorruptibility, eternal life; but to those who are self-seeking, and don’t obey the truth, but obey unrighteousness, will be wrath and indignation, oppression and anguish, on every soul of man who does evil, to the Jew first, and also to the Greek.",
-      "But glory, honor, and peace go to every man who does good, to the Jew first, and also to the Greek. For there is no partiality with God. For as many as have sinned without the law will also perish without the law. As many as have sinned under the law will be judged by the law.",
-      "For it isn’t the hearers of the law who are righteous before God, but the doers of the law will be justified (for when Gentiles who don’t have the law do by nature the things of the law, these, not having the law, are a law to themselves, in that they show the work of the law written in their hearts, their conscience testifying with them, and their thoughts among themselves accusing or else excusing them)",
-      "in the day when God will judge the secrets of men, according to my Good News, by Jesus Christ. Indeed you bear the name of a Jew, and rest on the law, and glory in God, and know his will, and approve the things that are excellent, being instructed out of the law,",
-      "and are confident that you yourself are a guide of the blind, a light to those who are in darkness, a corrector of the foolish, a teacher of babies, having in the law the form of knowledge and of the truth. You therefore who teach another, don’t you teach yourself? You who preach that a man shouldn’t steal, do you steal?",
-      "For he is not a Jew who is one outwardly, neither is that circumcision which is outward in the flesh; but he is a Jew who is one inwardly, and circumcision is that of the heart, in the spirit not in the letter; whose praise is not from men, but from God.",
+      "You, therefore, have no excuse, you who pass judgment on someone else, for at whatever point you judge another, you are condemning yourself, because you who pass judgment do the same things. Now we know that God’s judgment against those who do such things is based on truth. So when you, a mere human being, pass judgment on them and yet do the same things, do you think you will escape God’s judgment? Or do you show contempt for the riches of his kindness, forbearance and patience, not realizing that God’s kindness is intended to lead you to repentance?",
+      "But because of your stubbornness and your unrepentant heart, you are storing up wrath against yourself for the day of God’s wrath, when his righteous judgment will be revealed. God “will repay each person according to what they have done.” To those who by persistence in doing good seek glory, honor and immortality, he will give eternal life. But for those who are self-seeking and who reject the truth and follow evil, there will be wrath and anger.",
+      "There will be trouble and distress for every human being who does evil: first for the Jew, then for the Gentile; but glory, honor and peace for everyone who does good: first for the Jew, then for the Gentile. For God does not show favoritism.",
+      "All who sin apart from the law will also perish apart from the law, and all who sin under the law will be judged by the law. For it is not those who hear the law who are righteous in God’s sight, but it is those who obey the law who will be declared righteous.",
+      "(Indeed, when Gentiles, who do not have the law, do by nature things required by the law, they are a law for themselves, even though they do not have the law. They show that the requirements of the law are written on their hearts, their consciences also bearing witness, and their thoughts sometimes accusing them and at other times even defending them.) This will take place on the day when God judges people’s secrets through Jesus Christ, as my gospel declares.",
+      "Now you, if you call yourself a Jew; if you rely on the law and boast in God; if you know his will and approve of what is superior because you are instructed by the law; if you are convinced that you are a guide for the blind, a light for those who are in the dark, an instructor of the foolish, a teacher of little children, because you have in the law the embodiment of knowledge and truth— you, then, who teach others, do you not teach yourself? You who preach against stealing, do you steal?",
+      "A person is not a Jew who is one only outwardly, nor is circumcision merely outward and physical. No, a person is a Jew who is one inwardly; and circumcision is circumcision of the heart, by the Spirit, not by the written code. Such a person’s praise is not from other people, but from God.",
     ],
     memoryVerse: {
       text: 'For God does not show favoritism.',
@@ -232,11 +233,11 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'mirror',
     minutes: 18,
     passage: [
-      "Then what advantage does the Jew have? Or what is the profit of circumcision? Much in every way! Because first of all, they were entrusted with the revelations of God. For what if some were without faith? Will their lack of faith nullify the faithfulness of God?",
-      "May it never be! Yes, let God be found true, but every man a liar. As it is written, “That you might be justified in your words, and might prevail when you come into judgment.” But if our unrighteousness commends the righteousness of God, what will we say? Is God unrighteous who inflicts wrath? I speak like men do. May it never be! For then how will God judge the world?",
-      "What then? Are we better than they? No, in no way. For we previously warned both Jews and Greeks, that they are all under sin.",
-      "As it is written, “There is no one righteous; no, not one. There is no one who understands. There is no one who seeks after God. They have all turned away. They have together become unprofitable. There is no one who does good, no, not so much as one.”",
-      "Now we know that whatever things the law says, it speaks to those who are under the law, that every mouth may be closed, and all the world may be brought under the judgment of God. Because by the works of the law, no flesh will be justified in his sight. For through the law comes the knowledge of sin.",
+      "What advantage, then, is there in being a Jew, or what value is there in circumcision? Much in every way! First of all, the Jews have been entrusted with the very words of God.",
+      "What if some were unfaithful? Will their unfaithfulness nullify God’s faithfulness? Not at all! Let God be true, and every human being a liar. As it is written: “So that you may be proved right when you speak and prevail when you judge.” But if our unrighteousness brings out God’s righteousness more clearly, what shall we say? That God is unjust in bringing his wrath on us? (I am using a human argument.) Certainly not! If that were so, how could God judge the world?",
+      "Someone might argue, “If my falsehood enhances God’s truthfulness and so increases his glory, why am I still condemned as a sinner?” Why not say—as some slanderously claim that we say—“Let us do evil that good may result”? Their condemnation is just! What shall we conclude then? Do we have any advantage? Not at all! For we have already made the charge that Jews and Gentiles alike are all under the power of sin.",
+      "As it is written: “There is no one righteous, not even one; there is no one who understands; there is no one who seeks God. All have turned away, they have together become worthless; there is no one who does good, not even one.”",
+      "Now we know that whatever the law says, it says to those who are under the law, so that every mouth may be silenced and the whole world held accountable to God. Therefore no one will be declared righteous in God’s sight by the works of the law; rather, through the law we become conscious of our sin.",
     ],
     memoryVerse: {
       text: 'As it is written: ‘There is no one righteous, not even one.’',
@@ -291,8 +292,8 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'cross',
     minutes: 17,
     passage: [
-      "But now apart from the law, a righteousness of God has been revealed, being testified by the law and the prophets; even the righteousness of God through faith in Jesus Christ to all and on all those who believe. For there is no distinction, for all have sinned, and fall short of the glory of God;",
-      "being justified freely by his grace through the redemption that is in Christ Jesus; whom God sent to be an atoning sacrifice, through faith in his blood, for a demonstration of his righteousness through the passing over of prior sins, in God’s forbearance; to demonstrate his righteousness at this present time; that he might himself be just, and the justifier of him who has faith in Jesus.",
+      "But now apart from the law the righteousness of God has been made known, to which the Law and the Prophets testify. This righteousness is given through faith in Jesus Christ to all who believe. There is no difference between Jew and Gentile, for all have sinned and fall short of the glory of God,",
+      "and all are justified freely by his grace through the redemption that came by Christ Jesus. God presented Christ as a sacrifice of atonement, through the shedding of his blood—to be received by faith. He did this to demonstrate his righteousness, because in his forbearance he had left the sins committed beforehand unpunished— he did it to demonstrate his righteousness at the present time, so as to be just and the one who justifies those who have faith in Jesus.",
     ],
     memoryVerse: {
       text: 'And all are justified freely by his grace through the redemption that came by Christ Jesus.',
@@ -351,8 +352,8 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'gift_hands',
     minutes: 16,
     passage: [
-      "Where then is the boasting? It is excluded. By what kind of law? Of works? No, but by a law of faith. We maintain therefore that a man is justified by faith apart from the works of the law. Or is God the God of Jews only? Isn’t he the God of Gentiles also? Yes, of Gentiles also,",
-      "since indeed there is one God who will justify the circumcised by faith, and the uncircumcised through faith. Do we then nullify the law through faith? May it never be! No, we establish the law.",
+      "Where, then, is boasting? It is excluded. Because of what law? The law that requires works? No, because of the law that requires faith. For we maintain that a person is justified by faith apart from the works of the law.",
+      "Or is God the God of Jews only? Is he not the God of Gentiles too? Yes, of Gentiles too, since there is only one God, who will justify the circumcised by faith and the uncircumcised through that same faith. Do we, then, nullify the law by this faith? Not at all! Rather, we uphold the law.",
     ],
     memoryVerse: {
       text: 'For we maintain that a person is justified by faith apart from the works of the law.',
@@ -406,12 +407,12 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'stars_promise',
     minutes: 19,
     passage: [
-      "What then will we say that Abraham, our forefather, has found according to the flesh? For if Abraham was justified by works, he has something to boast about, but not toward God. For what does the Scripture say? “Abraham believed God, and it was accounted to him for righteousness.”",
-      "Now to him who works, the reward is not counted as grace, but as something owed. But to him who doesn’t work, but believes in him who justifies the ungodly, his faith is accounted for righteousness. Even as David also pronounces blessing on the man to whom God counts righteousness apart from works,",
-      "“Blessed are they whose iniquities are forgiven, whose sins are covered. Blessed is the man whom the Lord will by no means charge with sin.”",
-      "For the promise to Abraham and to his offspring that he should be heir of the world wasn’t through the law, but through the righteousness of faith. As it is written, “I have made you a father of many nations.” This is in the presence of him whom he believed: God, who gives life to the dead, and calls the things that are not, as though they were. Besides hope, Abraham in hope believed, to the end that he might become a father of many nations, according to that which had been spoken, “So will your offspring be.”",
-      "Without being weakened in faith, he didn’t consider his own body, already having been worn out, (he being about a hundred years old), and the deadness of Sarah’s womb. Yet, looking to the promise of God, he didn’t waver through unbelief, but grew strong through faith, giving glory to God, and being fully assured that what he had promised, he was also able to perform.",
-      "Therefore it also was “credited to him for righteousness.” Now it was not written that it was accounted to him for his sake alone, but for our sake also, to whom it will be accounted, who believe in him who raised Jesus, our Lord, from the dead, who was delivered up for our trespasses, and was raised for our justification.",
+      "What then shall we say that Abraham, our forefather according to the flesh, discovered in this matter? If, in fact, Abraham was justified by works, he had something to boast about—but not before God. What does Scripture say? “Abraham believed God, and it was credited to him as righteousness.”",
+      "Now to the one who works, wages are not credited as a gift but as an obligation. However, to the one who does not work but trusts God who justifies the ungodly, their faith is credited as righteousness. David says the same thing when he speaks of the blessedness of the one to whom God credits righteousness apart from works: “Blessed are those whose transgressions are forgiven, whose sins are covered. Blessed is the one whose sin the Lord will never count against them.”",
+      "It was not through the law that Abraham and his offspring received the promise that he would be heir of the world, but through the righteousness that comes by faith.",
+      "Therefore, the promise comes by faith, so that it may be by grace and may be guaranteed to all Abraham’s offspring—not only to those who are of the law but also to those who have the faith of Abraham. He is the father of us all. As it is written: “I have made you a father of many nations.” He is our father in the sight of God, in whom he believed—the God who gives life to the dead and calls into being things that were not. Against all hope, Abraham in hope believed and so became the father of many nations, just as it had been said to him, “So shall your offspring be.”",
+      "Without weakening in his faith, he faced the fact that his body was as good as dead—since he was about a hundred years old—and that Sarah’s womb was also dead. Yet he did not waver through unbelief regarding the promise of God, but was strengthened in his faith and gave glory to God, being fully persuaded that God had power to do what he had promised.",
+      "This is why “it was credited to him as righteousness.” The words “it was credited to him” were written not for him alone, but also for us, to whom God will credit righteousness—for us who believe in him who raised Jesus our Lord from the dead. He was delivered over to death for our sins and was raised to life for our justification.",
     ],
     memoryVerse: {
       text: 'Yet he did not waver through unbelief regarding the promise of God, but was strengthened in his faith and gave glory to God, being fully persuaded that God had power to do what he had promised.',
@@ -465,10 +466,10 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'dove',
     minutes: 17,
     passage: [
-      "Being therefore justified by faith, we have peace with God through our Lord Jesus Christ; through whom we also have our access by faith into this grace in which we stand. We rejoice in hope of the glory of God. Not only this, but we also rejoice in our sufferings, knowing that suffering produces perseverance;",
-      "and perseverance, proven character; and proven character, hope: and hope doesn’t disappoint us, because God’s love has been poured out into our hearts through the Holy Spirit who was given to us. For while we were yet weak, at the right time Christ died for the ungodly.",
-      "For one will hardly die for a righteous man. Yet perhaps for a righteous person someone would even dare to die. But God commends his own love toward us, in that while we were yet sinners, Christ died for us. Much more then, being now justified by his blood, we will be saved from God’s wrath through him.",
-      "For if, while we were enemies, we were reconciled to God through the death of his Son, much more, being reconciled, we will be saved by his life. Not only so, but we also rejoice in God through our Lord Jesus Christ, through whom we have now received the reconciliation.",
+      "Therefore, since we have been justified through faith, we have peace with God through our Lord Jesus Christ, through whom we have gained access by faith into this grace in which we now stand. And we boast in the hope of the glory of God.",
+      "Not only so, but we also glory in our sufferings, because we know that suffering produces perseverance; perseverance, character; and character, hope. And hope does not put us to shame, because God’s love has been poured out into our hearts through the Holy Spirit, who has been given to us.",
+      "You see, at just the right time, when we were still powerless, Christ died for the ungodly. Very rarely will anyone die for a righteous person, though for a good person someone might possibly dare to die. But God demonstrates his own love for us in this: While we were still sinners, Christ died for us.",
+      "Since we have now been justified by his blood, how much more shall we be saved from God’s wrath through him! For if, while we were God’s enemies, we were reconciled to him through the death of his Son, how much more, having been reconciled, shall we be saved through his life! Not only is this so, but we also boast in God through our Lord Jesus Christ, through whom we have now received reconciliation.",
     ],
     memoryVerse: {
       text: 'Therefore, since we have been justified through faith, we have peace with God through our Lord Jesus Christ.',
@@ -522,10 +523,10 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'gift',
     minutes: 17,
     passage: [
-      "Therefore as sin entered into the world through one man, and death through sin; and so death passed to all men, because all sinned. For until the law, sin was in the world; but sin is not charged when there is no law. Nevertheless death reigned from Adam until Moses, even over those whose sins weren’t like Adam’s disobedience, who is a foreshadowing of him who was to come.",
-      "But the free gift isn’t like the trespass. For if by the trespass of the one the many died, much more did the grace of God, and the gift by the grace of the one man, Jesus Christ, abound to the many. The gift is not as through one who sinned: for the judgment came by one to condemnation, but the free gift came of many trespasses to justification. For if by the trespass of the one, death reigned through the one; so much more will those who receive the abundance of grace and of the gift of righteousness reign in life through the one, Jesus Christ.",
-      "So then as through one trespass, all men were condemned; even so through one act of righteousness, all men were justified to life. For as through the one man’s disobedience many were made sinners, even so through the obedience of the one, many will be made righteous. The law came in besides, that the trespass might abound; but where sin abounded, grace abounded more exceedingly;",
-      "that as sin reigned in death, even so grace might reign through righteousness to eternal life through Jesus Christ our Lord.",
+      "Therefore, just as sin entered the world through one man, and death through sin, and in this way death came to all people, because all sinned— To be sure, sin was in the world before the law was given, but sin is not charged against anyone’s account where there is no law. Nevertheless, death reigned from the time of Adam to the time of Moses, even over those who did not sin by breaking a command, as did Adam, who is a pattern of the one to come.",
+      "But the gift is not like the trespass. For if the many died by the trespass of the one man, how much more did God’s grace and the gift that came by the grace of the one man, Jesus Christ, overflow to the many! Nor can the gift of God be compared with the result of one man’s sin: The judgment followed one sin and brought condemnation, but the gift followed many trespasses and brought justification. For if, by the trespass of the one man, death reigned through that one man, how much more will those who receive God’s abundant provision of grace and of the gift of righteousness reign in life through the one man, Jesus Christ!",
+      "Consequently, just as one trespass resulted in condemnation for all people, so also one righteous act resulted in justification and life for all people. For just as through the disobedience of the one man the many were made sinners, so also through the obedience of the one man the many will be made righteous.",
+      "The law was brought in so that the trespass might increase. But where sin increased, grace increased all the more, so that, just as sin reigned in death, so also grace might reign through righteousness to bring eternal life through Jesus Christ our Lord.",
     ],
     memoryVerse: {
       text: 'Consequently, just as one trespass resulted in condemnation for all people, so also one righteous act resulted in justification and life for all people.',
@@ -584,10 +585,10 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'chains',
     minutes: 17,
     passage: [
-      "What shall we say then? Shall we continue in sin, that grace may abound? May it never be! We who died to sin, how could we live in it any longer? Or don’t you know that all we who were baptized into Christ Jesus were baptized into his death?",
-      "We were buried therefore with him through baptism into death, that just as Christ was raised from the dead through the glory of the Father, so we also might walk in newness of life. For if we have become united with him in the likeness of his death, we will also be part of his resurrection; knowing this, that our old man was crucified with him, that the body of sin might be done away with, so that we would no longer be in bondage to sin.",
-      "For he who has died has been freed from sin. But if we died with Christ, we believe that we will also live with him; knowing that Christ, being raised from the dead, dies no more. Death no more has dominion over him!",
-      "For the death that he died, he died to sin one time; but the life that he lives, he lives to God. Thus consider yourselves also to be dead to sin, but alive to God in Christ Jesus our Lord.",
+      "What shall we say, then? Shall we go on sinning so that grace may increase? By no means! We are those who have died to sin; how can we live in it any longer?",
+      "Or don’t you know that all of us who were baptized into Christ Jesus were baptized into his death? We were therefore buried with him through baptism into death in order that, just as Christ was raised from the dead through the glory of the Father, we too may live a new life.",
+      "For if we have been united with him in a death like his, we will certainly also be united with him in a resurrection like his. For we know that our old self was crucified with him so that the body ruled by sin might be done away with, that we should no longer be slaves to sin— because anyone who has died has been set free from sin.",
+      "Now if we died with Christ, we believe that we will also live with him. For we know that since Christ was raised from the dead, he cannot die again; death no longer has mastery over him. The death he died, he died to sin once for all; but the life he lives, he lives to God. In the same way, count yourselves dead to sin but alive to God in Christ Jesus.",
     ],
     memoryVerse: {
       text: 'In the same way, count yourselves dead to sin but alive to God in Christ Jesus.',
@@ -641,9 +642,9 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'sunrise',
     minutes: 17,
     passage: [
-      "Therefore don’t let sin reign in your mortal body, that you should obey it in its lusts. Also, do not present your members to sin as instruments of unrighteousness, but present yourselves to God, as alive from the dead, and your members as instruments of righteousness to God. For sin will not have dominion over you. For you are not under law, but under grace.",
-      "What then? Shall we sin, because we are not under law, but under grace? May it never be! Don’t you know that when you present yourselves as servants and obey someone, you are the servants of whomever you obey; whether of sin to death, or of obedience to righteousness? But thanks be to God, that, whereas you were bondservants of sin, you became obedient from the heart to that form of teaching to which you were delivered.",
-      "Being made free from sin, you became bondservants of righteousness. For when you were servants of sin, you were free in regard to righteousness. What fruit then did you have at that time in the things of which you are now ashamed? For the end of those things is death. But now, being made free from sin, and having become servants of God, you have your fruit of sanctification, and the result of eternal life. For the wages of sin is death, but the free gift of God is eternal life in Christ Jesus our Lord.",
+      "Therefore do not let sin reign in your mortal body so that you obey its evil desires. Do not offer any part of yourself to sin as an instrument of wickedness, but rather offer yourselves to God as those who have been brought from death to life; and offer every part of yourself to him as an instrument of righteousness. For sin shall no longer be your master, because you are not under the law, but under grace.",
+      "What then? Shall we sin because we are not under the law but under grace? By no means! Don’t you know that when you offer yourselves to someone as obedient slaves, you are slaves of the one you obey—whether you are slaves to sin, which leads to death, or to obedience, which leads to righteousness? But thanks be to God that, though you used to be slaves to sin, you have come to obey from your heart the pattern of teaching that has now claimed your allegiance. You have been set free from sin and have become slaves to righteousness.",
+      "When you were slaves to sin, you were free from the control of righteousness. What benefit did you reap at that time from the things you are now ashamed of? Those things result in death! But now that you have been set free from sin and have become slaves of God, the benefit you reap leads to holiness, and the result is eternal life. For the wages of sin is death, but the gift of God is eternal life in Christ Jesus our Lord.",
     ],
     memoryVerse: {
       text: 'For the wages of sin is death, but the gift of God is eternal life in Christ Jesus our Lord.',
@@ -697,11 +698,11 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'tablets_heart',
     minutes: 18,
     passage: [
-      "What shall we say then? Is the law sin? May it never be! However, I wouldn’t have known sin, except through the law. For I wouldn’t have known coveting, unless the law had said, “You shall not covet.” Therefore the law indeed is holy, and the commandment holy, and righteous, and good.",
-      "For we know that the law is spiritual, but I am fleshly, sold under sin. For I don’t know what I am doing. For I don’t practice what I desire to do; but what I hate, that I do.",
-      "For the good which I desire, I don’t do; but the evil which I don’t desire, that I practice. But if what I don’t desire, that I do, it is no more I that do it, but sin which dwells in me. I find then the law, that, to me, while I desire to do good, evil is present.",
-      "For I delight in God’s law after the inward man, but I see a different law in my members, warring against the law of my mind, and bringing me into captivity under the law of sin which is in my members. What a wretched man I am! Who will deliver me out of the body of this death?",
-      "I thank God through Jesus Christ, our Lord! So then with the mind, I myself serve God’s law, but with the flesh, the sin’s law.",
+      "What shall we say, then? Is the law sinful? Certainly not! Nevertheless, I would not have known what sin was had it not been for the law. For I would not have known what coveting really was if the law had not said, “You shall not covet.”",
+      "So then, the law is holy, and the commandment is holy, righteous and good.",
+      "We know that the law is spiritual; but I am unspiritual, sold as a slave to sin. I do not understand what I do. For what I want to do I do not do, but what I hate I do.",
+      "For I know that good itself does not dwell in me, that is, in my sinful nature. For I have the desire to do what is good, but I cannot carry it out. For I do not do the good I want to do, but the evil I do not want to do—this I keep on doing.",
+      "So I find this law at work: Although I want to do good, evil is right there with me. For in my inner being I delight in God’s law; but I see another law at work in me, waging war against the law of my mind and making me a prisoner of the law of sin at work within me. What a wretched man I am! Who will rescue me from this body that is subject to death? Thanks be to God, who delivers me through Jesus Christ our Lord! So then, I myself in my mind am a slave to God’s law, but in my sinful nature a slave to the law of sin.",
     ],
     memoryVerse: {
       text: 'Thanks be to God, who delivers me through Jesus Christ our Lord!',
@@ -760,11 +761,11 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'flame',
     minutes: 18,
     passage: [
-      "There is therefore now no condemnation to those who are in Christ Jesus, who don’t walk according to the flesh, but according to the Spirit. For the law of the Spirit of life in Christ Jesus made me free from the law of sin and of death. For what the law couldn’t do, in that it was weak through the flesh, God did, sending his own Son in the likeness of sinful flesh and for sin, he condemned sin in the flesh;",
-      "that the ordinance of the law might be fulfilled in us, who walk not after the flesh, but after the Spirit. For those who live according to the flesh set their minds on the things of the flesh, but those who live according to the Spirit, the things of the Spirit. For the mind of the flesh is death, but the mind of the Spirit is life and peace;",
-      "But you are not in the flesh but in the Spirit, if it is so that the Spirit of God dwells in you. If Christ is in you, the body is dead because of sin, but the spirit is alive because of righteousness. But if the Spirit of him who raised up Jesus from the dead dwells in you, he who raised up Christ Jesus from the dead will also give life to your mortal bodies through his Spirit who dwells in you.",
-      "For if you live after the flesh, you must die; but if by the Spirit you put to death the deeds of the body, you will live. For as many as are led by the Spirit of God, these are children of God. For you didn’t receive the spirit of bondage again to fear, but you received the Spirit of adoption, by whom we cry, “Abba! Father!”",
-      "The Spirit himself testifies with our spirit that we are children of God; and if children, then heirs; heirs of God, and joint heirs with Christ; if indeed we suffer with him, that we may also be glorified with him.",
+      "Therefore, there is now no condemnation for those who are in Christ Jesus, because through Christ Jesus the law of the Spirit who gives life has set you free from the law of sin and death. For what the law was powerless to do because it was weakened by the flesh, God did by sending his own Son in the likeness of sinful flesh to be a sin offering. And so he condemned sin in the flesh, in order that the righteous requirement of the law might be fully met in us, who do not live according to the flesh but according to the Spirit.",
+      "Those who live according to the flesh have their minds set on what the flesh desires; but those who live in accordance with the Spirit have their minds set on what the Spirit desires. The mind governed by the flesh is death, but the mind governed by the Spirit is life and peace.",
+      "You, however, are not in the realm of the flesh but are in the realm of the Spirit, if indeed the Spirit of God lives in you. And if anyone does not have the Spirit of Christ, they do not belong to Christ. But if Christ is in you, then even though your body is subject to death because of sin, the Spirit gives life because of righteousness. And if the Spirit of him who raised Jesus from the dead is living in you, he who raised Christ from the dead will also give life to your mortal bodies because of his Spirit who lives in you.",
+      "Therefore, brothers and sisters, we have an obligation—but it is not to the flesh, to live according to it. For if you live according to the flesh, you will die; but if by the Spirit you put to death the misdeeds of the body, you will live. For those who are led by the Spirit of God are the children of God. The Spirit you received does not make you slaves, so that you live in fear again; rather, the Spirit you received brought about your adoption to sonship. And by him we cry, “Abba, Father.”",
+      "The Spirit himself testifies with our spirit that we are God’s children. Now if we are children, then we are heirs—heirs of God and co-heirs with Christ, if indeed we share in his sufferings in order that we may also share in his glory.",
     ],
     memoryVerse: {
       text: 'Therefore, there is now no condemnation for those who are in Christ Jesus.',
@@ -818,10 +819,10 @@ export const BSF_WEEKS: BsfWeek[] = [
     art: 'crown',
     minutes: 18,
     passage: [
-      "For I consider that the sufferings of this present time are not worthy to be compared with the glory which will be revealed toward us. For the creation waits with eager expectation for the children of God to be revealed. For the creation was subjected to vanity, not of its own will, but because of him who subjected it, in hope",
-      "that the creation itself also will be delivered from the bondage of decay into the liberty of the glory of the children of God. For we know that the whole creation groans and travails in pain together until now. Not only so, but ourselves also, who have the first fruits of the Spirit, even we ourselves groan within ourselves, waiting for adoption, the redemption of our body.",
-      "For we were saved in hope, but hope that is seen is not hope. For who hopes for that which he sees? But if we hope for that which we don’t see, we wait for it with patience. In the same way, the Spirit also helps our weaknesses, for we don’t know how to pray as we ought. But the Spirit himself makes intercession for us with groanings which can’t be uttered.",
-      "He who searches the hearts knows what is on the Spirit’s mind, because he makes intercession for the saints according to God.",
+      "I consider that our present sufferings are not worth comparing with the glory that will be revealed in us. For the creation waits in eager expectation for the children of God to be revealed. For the creation was subjected to frustration, not by its own choice, but by the will of the one who subjected it, in hope that the creation itself will be liberated from its bondage to decay and brought into the freedom and glory of the children of God.",
+      "We know that the whole creation has been groaning as in the pains of childbirth right up to the present time. Not only so, but we ourselves, who have the firstfruits of the Spirit, groan inwardly as we wait eagerly for our adoption to sonship, the redemption of our bodies.",
+      "For in this hope we were saved. But hope that is seen is no hope at all. Who hopes for what they already have? But if we hope for what we do not yet have, we wait for it patiently.",
+      "In the same way, the Spirit helps us in our weakness. We do not know what we ought to pray for, but the Spirit himself intercedes for us through wordless groans. And he who searches our hearts knows the mind of the Spirit, because the Spirit intercedes for God’s people in accordance with the will of God.",
     ],
     memoryVerse: {
       text: 'I consider that our present sufferings are not worth comparing with the glory that will be revealed in us.',

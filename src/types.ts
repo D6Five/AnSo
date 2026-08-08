@@ -149,6 +149,11 @@ export interface Passage {
   notes?: { label: string; text: string; emphasis?: boolean }[];
   /** Key into the BSF illustration set, drawn above the passage. */
   art?: string;
+  /**
+   * Small attribution line under the passage — e.g. a scripture copyright
+   * notice. Displayed only; never read aloud.
+   */
+  credit?: string;
 }
 
 /* ------------------------------------------------------------------ */

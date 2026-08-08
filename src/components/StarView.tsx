@@ -239,6 +239,7 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
                 passage.paragraphs.map((para, i) => <p key={i}>{para}</p>)
               )}
               {passage.notes?.length ? <StudyNotes notes={passage.notes} /> : null}
+              {passage.credit ? <p className="passage-credit">{passage.credit}</p> : null}
             </article>
 
             <div className="passage-actions">
