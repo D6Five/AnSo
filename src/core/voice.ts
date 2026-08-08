@@ -139,6 +139,13 @@ export interface SpeakOptions {
   onEnd?: () => void;
   /** Cancel anything already speaking. Defaults to true. */
   interrupt?: boolean;
+  /**
+   * Fired as the voice reaches each word, with the character index into the
+   * spoken text. Drives follow-along highlighting. Not every voice emits
+   * boundary events (some remote voices stay silent), so callers must keep a
+   * time-based fallback — see ReadAloudPassage.
+   */
+  onBoundary?: (charIndex: number) => void;
 }
 
 /**
@@ -149,7 +156,7 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
   // Pitch sits near neutral. Raising it makes a modern neural voice sound
   // younger, but makes an old SAPI voice sound thin and chipmunk-like — and the
   // old voices are exactly the ones already struggling to sound human.
-  const { rate = 0.92, pitch = 1.02, lang, onEnd, interrupt = true } = opts;
+  const { rate = 0.92, pitch = 1.02, lang, onEnd, interrupt = true, onBoundary } = opts;
 
   if (!enabled || !isSynthesisSupported() || !text.trim()) {
     onEnd?.();
@@ -191,6 +198,14 @@ export function speak(text: string, opts: SpeakOptions = {}): Promise<void> {
 
     utter.onend = finish;
     utter.onerror = finish;
+
+    if (onBoundary) {
+      utter.onboundary = (e: SpeechSynthesisEvent) => {
+        // Some engines fire sentence boundaries too; both carry charIndex,
+        // and re-highlighting the same word is harmless.
+        if (typeof e.charIndex === 'number') onBoundary(e.charIndex);
+      };
+    }
 
     // Chrome silently drops long utterances if the tab is backgrounded, so a
     // timeout guarantees the promise always settles and the UI never hangs.

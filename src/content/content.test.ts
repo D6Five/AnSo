@@ -10,8 +10,8 @@ const GRADES = [1, 3] as const;
  * their originals + 20; bsf is expanded to 14 in its own phase).
  */
 const MIN_STARS: Record<Grade, Record<string, number>> = {
-  1: { reading: 30, vocabulary: 30, korean: 23, math: 40, thinking: 30, typing: 34, bsf: 2 },
-  3: { reading: 28, vocabulary: 40, korean: 23, math: 40, thinking: 30, typing: 32, bsf: 2 },
+  1: { reading: 30, vocabulary: 30, korean: 23, math: 40, thinking: 30, typing: 34, bsf: 14 },
+  3: { reading: 28, vocabulary: 40, korean: 23, math: 40, thinking: 30, typing: 32, bsf: 14 },
 };
 
 /** ID stems by subject: most subjects abbreviate; bsf uses its own scheme. */

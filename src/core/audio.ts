@@ -178,3 +178,14 @@ export function sfxUnlock(): void {
   notes.forEach((f, i) => tone({ freq: f, duration: 0.9, at: i * 0.11, gain: 0.14 }));
   noise(1.2, 0.05, 3000);
 }
+
+/**
+ * Three soft bell tones before scripture is read aloud. A settling sound, not
+ * a fanfare — it marks the reading as a moment worth quieting down for, the
+ * way a church bell does.
+ */
+export function sfxVerseChime(): void {
+  tone({ freq: 587.33, duration: 1.1, gain: 0.1 });
+  tone({ freq: 880, duration: 1.2, at: 0.35, gain: 0.08 });
+  tone({ freq: 1174.66, duration: 1.6, at: 0.7, gain: 0.06 });
+}

@@ -135,6 +135,20 @@ export interface Passage {
   paragraphs: string[];
   /** Words worth pre-teaching before reading. */
   preview?: { word: string; meaning: string }[];
+  /**
+   * Follow-along mode: AnSo reads the passage aloud while each word is
+   * underlined in time with her voice. Used by scripture passages, where
+   * hearing the text read well matters as much as decoding it. Reading
+   * stars leave this off on purpose — there the child does the reading.
+   */
+  readAlong?: boolean;
+  /**
+   * Study notes shown as a card under the passage — label/text rows like
+   * "Main Truth" or "God's Attribute". Emphasised rows render larger.
+   */
+  notes?: { label: string; text: string; emphasis?: boolean }[];
+  /** Key into the BSF illustration set, drawn above the passage. */
+  art?: string;
 }
 
 /* ------------------------------------------------------------------ */

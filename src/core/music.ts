@@ -278,12 +278,10 @@ export function initMusicCleanup(): void {
   window.addEventListener('beforeunload', () => {
     stopMusic();
     const ctx = getContext();
-    if (ctx) {
-      try {
-        ctx.close();
-      } catch {
-        // Context may already be closed; ignore.
-      }
+    // close() rejects (as a promise) if the context is already closed, so the
+    // catch has to be on the promise — a try/catch around the call misses it.
+    if (ctx && ctx.state !== 'closed') {
+      void ctx.close().catch(() => {});
     }
   });
 }

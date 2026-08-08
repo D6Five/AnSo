@@ -12,6 +12,22 @@ import { setScene } from '../core/music';
 import { AnSoGuide, type AnSoMood } from './AnSoGuide';
 import { ChallengeView, type ChallengeResult } from '../activities/ChallengeView';
 import { useSyncStatus, applyUpdate } from '../core/sync';
+import { ReadAloudPassage } from './ReadAloudPassage';
+import { BsfArt } from './BsfArt';
+
+/** The study card under a scripture passage — main truth, attribute, and so on. */
+function StudyNotes({ notes }: { notes: { label: string; text: string; emphasis?: boolean }[] }) {
+  return (
+    <aside className="study-notes">
+      {notes.map((n) => (
+        <div key={n.label} className={n.emphasis ? 'study-row emphasis' : 'study-row'}>
+          <span className="study-label">{n.label}</span>
+          <p className="study-text">{n.text}</p>
+        </div>
+      ))}
+    </aside>
+  );
+}
 
 /**
  * Runs a single star from opening line to reward screen.
@@ -199,6 +215,11 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
         {phase === 'passage' && passage ? (
           <div className="passage-panel">
             <article className="passage">
+              {passage.art ? (
+                <div className="passage-art">
+                  <BsfArt name={passage.art} size={110} />
+                </div>
+              ) : null}
               <h2>{passage.title}</h2>
               {passage.preview?.length ? (
                 <aside className="preview-words">
@@ -212,17 +233,22 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
                   </ul>
                 </aside>
               ) : null}
-              {passage.paragraphs.map((para, i) => (
-                <p key={i}>{para}</p>
-              ))}
+              {passage.readAlong ? (
+                <ReadAloudPassage paragraphs={passage.paragraphs} />
+              ) : (
+                passage.paragraphs.map((para, i) => <p key={i}>{para}</p>)
+              )}
+              {passage.notes?.length ? <StudyNotes notes={passage.notes} /> : null}
             </article>
 
             <div className="passage-actions">
-              <button type="button" className="btn" onClick={readPassageAloud}>
-                🔊 Read it to me
-              </button>
+              {!passage.readAlong ? (
+                <button type="button" className="btn" onClick={readPassageAloud}>
+                  🔊 Read it to me
+                </button>
+              ) : null}
               <button type="button" className="btn btn-primary" onClick={startQuestions}>
-                I have read it →
+                {passage.readAlong ? 'I have listened →' : 'I have read it →'}
               </button>
             </div>
           </div>
@@ -237,10 +263,13 @@ export function StarView({ star, profile, voiceEnabled, micEnabled, onExit }: St
                   className="btn btn-quiet"
                   onClick={() => setShowPassage((v) => !v)}
                 >
-                  {showPassage ? '▾ Hide the story' : '▸ Show the story again'}
+                  {showPassage
+                    ? passage.notes?.length ? '▾ Hide the passage and study card' : '▾ Hide the story'
+                    : passage.notes?.length ? '▸ Show the passage and study card' : '▸ Show the story again'}
                 </button>
                 {showPassage ? (
                   <article className="passage passage-compact">
+                    {passage.notes?.length ? <StudyNotes notes={passage.notes} /> : null}
                     {passage.paragraphs.map((para, i) => (
                       <p key={i}>{para}</p>
                     ))}
